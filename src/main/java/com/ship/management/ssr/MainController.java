@@ -56,4 +56,17 @@ public class MainController {
     public String roles() {
         return "roles";
     }
+    @GetMapping("/logout")
+    public String logout(HttpSession session) {
+        session.invalidate();
+        return "redirect:/login";
+    }
+  
+    @GetMapping("/users")
+    public String users(HttpSession session) {
+        if (session.getAttribute("email") == null) {
+            return "redirect:/login";
+        }
+        return "users";
+    }
 }

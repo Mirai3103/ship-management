@@ -106,6 +106,7 @@
                                     <img src="https://ui-avatars.com/api/?name=Admin&background=0d9488&color=fff" alt="User Avatar" />
                                 </div>
                             </div>
+                          
                             <div class="text-left">
                                 <div class="font-medium">Admin User</div>
                                 <div class="text-xs text-base-content/70">admin@shipmanager.com</div>

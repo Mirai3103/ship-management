@@ -50,6 +50,7 @@ public class AuthController {
             session.setAttribute("email", user.getEmail());
             session.setAttribute("fullName", user.getFullName());
             session.setAttribute("userRole", user.getRole().getName());
+            session.setAttribute("user", user);
 
             // Set session timeout (30 minutes default, 7 days if remember me)
             if (loginRequest.isRemember()) {
