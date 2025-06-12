@@ -15,4 +15,7 @@ public class ShipDTO {
     @NotBlank(message = "Ship description is required")
     @Size(min = 1, max = 500, message = "Ship description must be between 1 and 500 characters")
     private String description;
+
+    private Long companyId;
+    private String companyName;
 }

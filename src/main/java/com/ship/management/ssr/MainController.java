@@ -69,4 +69,11 @@ public class MainController {
         }
         return "users";
     }
+    @GetMapping("/reviews-ship")
+    public String reviewsShip(HttpSession session) {
+        if (session.getAttribute("email") == null) {
+            return "redirect:/login";
+        }
+        return "reviews-ship";
+    }
 }

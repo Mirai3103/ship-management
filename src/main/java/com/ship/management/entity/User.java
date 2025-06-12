@@ -29,6 +29,10 @@ public class User implements UserDetails {
     @JoinColumn(name = "role_id", referencedColumnName = "id")
     private Role role;
 
+    @ManyToOne
+    @JoinColumn(name = "company_id", referencedColumnName = "id",nullable = true)
+    private Company company;
+
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

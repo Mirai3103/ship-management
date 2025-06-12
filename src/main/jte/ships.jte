@@ -2,7 +2,7 @@
     title = "Quản lý tàu",
     activePage = "ships",
     content = @`
-        <div x-data="shipManager()" x-init="loadShips()" class="space-y-6">
+        <div x-data="shipManager()" x-init="loadShips(); loadCompanies()" class="space-y-6">
             <!-- Header Section -->
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div>
@@ -87,6 +87,7 @@
                                     <th>ID</th>
                                     <th>Tên tàu</th>
                                     <th>Mô tả</th>
+                                    <th>Công ty</th>
                                     <th>Trạng thái</th>
                                     <th>Thao tác</th>
                                 </tr>
@@ -104,7 +105,13 @@
                                             </div>
                                         </td>
                                         <td>
-                                            <span x-text="ship.description"></span>
+                                            <span class="text-sm max-w-xs truncate" x-text="ship.description" :title="ship.description"></span>
+                                        </td>
+                                        <td>
+                                            <div class="flex items-center space-x-1">
+                                                <i data-lucide="building" class="w-3 h-3 text-base-content/50"></i>
+                                                <span class="text-sm" x-text="ship.companyName || 'Chưa có'"></span>
+                                            </div>
                                         </td>
                                         <td>
                                             <span class="badge badge-success">Hoạt động</span>
@@ -204,6 +211,26 @@
                             </label>
                         </div>
 
+                        <!-- Company Selection -->
+                        <div class="form-control">
+                            <label class="label">
+                                <span class="label-text">Công ty</span>
+                            </label>
+                            <select 
+                                class="select select-bordered"
+                                :class="{ 'select-error': errors.companyId }"
+                                x-model="formData.companyId"
+                            >
+                                <option value="">Chọn công ty (tùy chọn)</option>
+                                <template x-for="company in availableCompanies" :key="company.id">
+                                    <option :value="company.id" x-text="company.name"></option>
+                                </template>
+                            </select>
+                            <label class="label" x-show="errors.companyId">
+                                <span class="label-text-alt text-error" x-text="errors.companyId"></span>
+                            </label>
+                        </div>
+
                         <div class="modal-action">
                             <button type="button" class="btn btn-ghost" @click="closeModal()">Hủy</button>
                             <button type="submit" class="btn btn-primary" :disabled="saving">
@@ -217,6 +244,112 @@
                     </form>
                 </div>
                 <div class="modal-backdrop" @click="closeModal()"></div>
+            </div>
+
+            <!-- View Ship Detail Modal -->
+            <div class="modal" :class="{ 'modal-open': showViewModal }">
+                <div class="modal-box max-w-2xl">
+                    <h3 class="font-bold text-lg mb-6">
+                        <i data-lucide="ship" class="w-5 h-5 inline mr-2"></i>
+                        Chi tiết tàu
+                    </h3>
+                    
+                    <div x-show="loadingShipDetail" class="flex justify-center py-8">
+                        <span class="loading loading-spinner loading-lg"></span>
+                    </div>
+
+                    <div x-show="!loadingShipDetail && viewingShip" class="space-y-6">
+                        <!-- Ship Header -->
+                        <div class="flex items-center space-x-4 p-4 bg-base-200 rounded-lg">
+                            <div class="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center">
+                                <i data-lucide="ship" class="w-8 h-8 text-primary"></i>
+                            </div>
+                            <div>
+                                <h4 class="text-xl font-semibold" x-text="viewingShip?.name"></h4>
+                                <p class="text-base-content/70" x-text="viewingShip?.description"></p>
+                                <div class="flex items-center gap-2 mt-2">
+                                    <span class="badge badge-success">Hoạt động</span>
+                                    <span x-show="viewingShip?.companyName" class="badge badge-ghost">
+                                        <i data-lucide="building" class="w-3 h-3 mr-1"></i>
+                                        <span x-text="viewingShip?.companyName"></span>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Detailed Information -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <!-- Ship ID -->
+                            <div class="form-control">
+                                <label class="label">
+                                    <span class="label-text font-medium">ID tàu</span>
+                                </label>
+                                <div class="input input-bordered bg-base-200 flex items-center">
+                                    <span class="font-mono" x-text="viewingShip?.id"></span>
+                                </div>
+                            </div>
+
+                            <!-- Ship Name -->
+                            <div class="form-control">
+                                <label class="label">
+                                    <span class="label-text font-medium">Tên tàu</span>
+                                </label>
+                                <div class="input input-bordered bg-base-200 flex items-center">
+                                    <span x-text="viewingShip?.name"></span>
+                                </div>
+                            </div>
+
+                            <!-- Description -->
+                            <div class="form-control md:col-span-2">
+                                <label class="label">
+                                    <span class="label-text font-medium">Mô tả</span>
+                                </label>
+                                <div class="textarea textarea-bordered bg-base-200 min-h-[4rem] flex items-start p-3">
+                                    <span x-text="viewingShip?.description"></span>
+                                </div>
+                            </div>
+
+                            <!-- Company -->
+                            <div class="form-control">
+                                <label class="label">
+                                    <span class="label-text font-medium">Công ty</span>
+                                </label>
+                                <div class="input input-bordered bg-base-200 flex items-center">
+                                    <i data-lucide="building" class="w-4 h-4 mr-2 text-base-content/50"></i>
+                                    <span x-text="viewingShip?.companyName || 'Chưa có'"></span>
+                                </div>
+                            </div>
+
+                            <!-- Company ID -->
+                            <div class="form-control" x-show="viewingShip?.companyId">
+                                <label class="label">
+                                    <span class="label-text font-medium">ID công ty</span>
+                                </label>
+                                <div class="input input-bordered bg-base-200 flex items-center">
+                                    <span class="font-mono" x-text="viewingShip?.companyId"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Additional Information -->
+                        <div class="alert alert-info">
+                            <i data-lucide="info" class="w-4 h-4"></i>
+                            <div class="text-sm">
+                                <strong>Lưu ý:</strong> Thông tin chi tiết này chỉ dành cho mục đích quản trị. 
+                                Để thay đổi thông tin, vui lòng sử dụng chức năng "Chỉnh sửa".
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-action">
+                        <button class="btn btn-ghost" @click="closeViewModal()">Đóng</button>
+                        <button class="btn btn-primary" @click="editShipFromView()" x-show="viewingShip">
+                            <i data-lucide="edit" class="w-4 h-4"></i>
+                            Chỉnh sửa
+                        </button>
+                    </div>
+                </div>
+                <div class="modal-backdrop" @click="closeViewModal()"></div>
             </div>
 
             <!-- Delete Confirmation Modal -->
@@ -263,19 +396,24 @@
                         first: true,
                         last: true
                     },
+                    availableCompanies: [],
                     loading: false,
                     saving: false,
                     deleting: false,
+                    loadingShipDetail: false,
                     currentPage: 0,
                     pageSize: 10,
                     searchQuery: '',
                     showModal: false,
                     showDeleteModal: false,
+                    showViewModal: false,
                     editingShip: null,
                     shipToDelete: null,
+                    viewingShip: null,
                     formData: {
                         name: '',
-                        description: ''
+                        description: '',
+                        companyId: ''
                     },
                     errors: {},
                     notifications: [],
@@ -301,6 +439,18 @@
                             this.loading = false;
                             // Re-initialize Lucide icons after DOM update
                             this.$nextTick(() => lucide.createIcons());
+                        }
+                    },
+
+                    async loadCompanies() {
+                        try {
+                            const response = await fetch('/api/companies?page=0&size=1000');
+                            if (response.ok) {
+                                const companiesData = await response.json();
+                                this.availableCompanies = companiesData.content || [];
+                            }
+                        } catch (error) {
+                            console.error('Failed to load companies:', error);
                         }
                     },
 
@@ -364,7 +514,7 @@
 
                     openAddModal() {
                         this.editingShip = null;
-                        this.formData = { name: '', description: '' };
+                        this.formData = { name: '', description: '', companyId: '' };
                         this.errors = {};
                         this.showModal = true;
                     },
@@ -373,20 +523,52 @@
                         this.editingShip = ship;
                         this.formData = { 
                             name: ship.name, 
-                            description: ship.description 
+                            description: ship.description,
+                            companyId: ship.companyId || ''
                         };
                         this.errors = {};
                         this.showModal = true;
                     },
 
-                    viewShip(ship) {
-                        this.showNotification('info', 'Xem chi tiết tàu: ' + ship.name, 'info');
+                    async viewShip(ship) {
+                        this.loadingShipDetail = true;
+                        this.showViewModal = true;
+                        this.viewingShip = null;
+
+                        try {
+                            const response = await fetch('/api/ships/' + ship.id);
+                            if (response.ok) {
+                                this.viewingShip = await response.json();
+                            } else {
+                                this.showNotification('error', 'Không thể tải thông tin chi tiết tàu', 'alert-triangle');
+                                this.closeViewModal();
+                            }
+                        } catch (error) {
+                            this.showNotification('error', 'Lỗi kết nối: ' + error.message, 'alert-triangle');
+                            this.closeViewModal();
+                        } finally {
+                            this.loadingShipDetail = false;
+                            this.$nextTick(() => lucide.createIcons());
+                        }
+                    },
+
+                    closeViewModal() {
+                        this.showViewModal = false;
+                        this.viewingShip = null;
+                        this.loadingShipDetail = false;
+                    },
+
+                    editShipFromView() {
+                        if (this.viewingShip) {
+                            this.closeViewModal();
+                            this.editShip(this.viewingShip);
+                        }
                     },
 
                     closeModal() {
                         this.showModal = false;
                         this.editingShip = null;
-                        this.formData = { name: '', description: '' };
+                        this.formData = { name: '', description: '', companyId: '' };
                         this.errors = {};
                     },
 

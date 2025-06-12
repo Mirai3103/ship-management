@@ -43,4 +43,8 @@ public class ReviewPlan {
     @JoinColumn(name = "ship_id")
     private Ship ship;
 
+    @ManyToOne
+    @JoinColumn(name = "company_id", referencedColumnName = "id",nullable = false)
+    private Company company;
+
 }

@@ -2,7 +2,7 @@
     title = "Quản lý người dùng",
     activePage = "users",
     content = @`
-        <div x-data="userManager()" x-init="loadUsers(); loadRoles()" class="space-y-6">
+        <div x-data="userManager()" x-init="loadUsers(); loadRoles(); loadCompanies()" class="space-y-6">
             <!-- Header Section -->
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div>
@@ -88,6 +88,7 @@
                                     <th>Họ và tên</th>
                                     <th>Email</th>
                                     <th>Vai trò</th>
+                                    <th>Công ty</th>
                                     <th>Thao tác</th>
                                 </tr>
                             </thead>
@@ -119,6 +120,12 @@
                                                   }"
                                                   x-text="user.roleName">
                                             </span>
+                                        </td>
+                                        <td>
+                                            <div class="flex items-center space-x-1">
+                                                <i data-lucide="building" class="w-3 h-3 text-base-content/50"></i>
+                                                <span class="text-sm" x-text="user.companyName || 'Chưa có'"></span>
+                                            </div>
                                         </td>
                                         <td>
                                             <div class="dropdown dropdown-end">
@@ -261,6 +268,26 @@
                             </select>
                             <label class="label" x-show="errors.roleId">
                                 <span class="label-text-alt text-error" x-text="errors.roleId"></span>
+                            </label>
+                        </div>
+
+                        <!-- Company Selection -->
+                        <div class="form-control">
+                            <label class="label">
+                                <span class="label-text">Công ty</span>
+                            </label>
+                            <select 
+                                class="select select-bordered"
+                                :class="{ 'select-error': errors.companyId }"
+                                x-model="formData.companyId"
+                            >
+                                <option value="">Chọn công ty (tùy chọn)</option>
+                                <template x-for="company in availableCompanies" :key="company.id">
+                                    <option :value="company.id" x-text="company.name"></option>
+                                </template>
+                            </select>
+                            <label class="label" x-show="errors.companyId">
+                                <span class="label-text-alt text-error" x-text="errors.companyId"></span>
                             </label>
                         </div>
 
@@ -429,14 +456,20 @@
                             <div>
                                 <h4 class="text-xl font-semibold" x-text="viewingUser?.fullName"></h4>
                                 <p class="text-base-content/70" x-text="viewingUser?.email"></p>
-                                <span class="badge badge-outline mt-2" 
-                                      :class="{
-                                          'badge-error': viewingUser?.roleName === 'ADMIN',
-                                          'badge-warning': viewingUser?.roleName === 'MANAGER',
-                                          'badge-info': viewingUser?.roleName === 'USER'
-                                      }"
-                                      x-text="viewingUser?.roleName">
-                                </span>
+                                <div class="flex items-center gap-2 mt-2">
+                                    <span class="badge badge-outline" 
+                                          :class="{
+                                              'badge-error': viewingUser?.roleName === 'ADMIN',
+                                              'badge-warning': viewingUser?.roleName === 'MANAGER',
+                                              'badge-info': viewingUser?.roleName === 'USER'
+                                          }"
+                                          x-text="viewingUser?.roleName">
+                                    </span>
+                                    <span x-show="viewingUser?.companyName" class="badge badge-ghost">
+                                        <i data-lucide="building" class="w-3 h-3 mr-1"></i>
+                                        <span x-text="viewingUser?.companyName"></span>
+                                    </span>
+                                </div>
                             </div>
                         </div>
 
@@ -491,6 +524,27 @@
                                 </label>
                                 <div class="input input-bordered bg-base-200 flex items-center">
                                     <span class="font-mono" x-text="viewingUser?.roleId"></span>
+                                </div>
+                            </div>
+
+                            <!-- Company -->
+                            <div class="form-control">
+                                <label class="label">
+                                    <span class="label-text font-medium">Công ty</span>
+                                </label>
+                                <div class="input input-bordered bg-base-200 flex items-center">
+                                    <i data-lucide="building" class="w-4 h-4 mr-2 text-base-content/50"></i>
+                                    <span x-text="viewingUser?.companyName || 'Chưa có'"></span>
+                                </div>
+                            </div>
+
+                            <!-- Company ID -->
+                            <div class="form-control" x-show="viewingUser?.companyId">
+                                <label class="label">
+                                    <span class="label-text font-medium">ID công ty</span>
+                                </label>
+                                <div class="input input-bordered bg-base-200 flex items-center">
+                                    <span class="font-mono" x-text="viewingUser?.companyId"></span>
                                 </div>
                             </div>
                         </div>
@@ -562,6 +616,7 @@
                         last: true
                     },
                     availableRoles: [],
+                    availableCompanies: [],
                     loading: false,
                     saving: false,
                     deleting: false,
@@ -584,7 +639,8 @@
                     formData: {
                         fullName: '',
                         email: '',
-                        roleId: ''
+                        roleId: '',
+                        companyId: ''
                     },
                     passwordForm: {
                         currentPassword: '',
@@ -623,12 +679,24 @@
 
                     async loadRoles() {
                         try {
-                            const response = await fetch('/api/users/roles');
+                            const response = await fetch('/api/users/roles?page=0&size=1000');
                             if (response.ok) {
                                 this.availableRoles = await response.json();
                             }
                         } catch (error) {
                             console.error('Failed to load roles:', error);
+                        }
+                    },
+
+                    async loadCompanies() {
+                        try {
+                            const response = await fetch('/api/companies?page=0&size=1000');
+                            if (response.ok) {
+                                const companiesData = await response.json();
+                                this.availableCompanies = companiesData.content || [];
+                            }
+                        } catch (error) {
+                            console.error('Failed to load companies:', error);
                         }
                     },
 
@@ -692,7 +760,7 @@
 
                     openAddModal() {
                         this.editingUser = null;
-                        this.formData = { fullName: '', email: '', roleId: '' };
+                        this.formData = { fullName: '', email: '', roleId: '', companyId: '' };
                         this.errors = {};
                         this.showModal = true;
                     },
@@ -702,7 +770,8 @@
                         this.formData = { 
                             fullName: user.fullName, 
                             email: user.email,
-                            roleId: user.roleId
+                            roleId: user.roleId,
+                            companyId: user.companyId || ''
                         };
                         this.errors = {};
                         this.showModal = true;
@@ -746,7 +815,7 @@
                     closeModal() {
                         this.showModal = false;
                         this.editingUser = null;
-                        this.formData = { fullName: '', email: '', roleId: '' };
+                        this.formData = { fullName: '', email: '', roleId: '', companyId: '' };
                         this.errors = {};
                     },
 

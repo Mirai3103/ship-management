@@ -55,6 +55,12 @@ public class SecurityConfig {
                 .anyRequest().authenticated()
             )
             .addFilterBefore(sessionFilter, UsernamePasswordAuthenticationFilter.class)
+            .formLogin(form -> form
+                .loginPage("/login")
+                .loginProcessingUrl("/login")
+                .defaultSuccessUrl("/dashboard")
+                .permitAll()
+            )
          
             .logout(logout -> logout
                 .logoutUrl("/logout")

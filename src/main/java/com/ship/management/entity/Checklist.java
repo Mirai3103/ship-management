@@ -69,5 +69,8 @@ public class Checklist {
     @OneToMany(mappedBy = "checklist", cascade = CascadeType.ALL, orphanRemoval = true,fetch = FetchType.EAGER)
     private List<Attachment> attachments;
     
+    @ManyToOne
+    @JoinColumn(name = "company_id", referencedColumnName = "id",nullable = false)
+    private Company company;
 
 }

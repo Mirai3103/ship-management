@@ -20,4 +20,7 @@ public class UserDTO {
     
     private Long roleId;
     private String roleName;
+
+    private Long companyId;
+    private String companyName;
 } 

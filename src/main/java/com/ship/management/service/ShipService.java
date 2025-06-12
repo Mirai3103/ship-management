@@ -1,7 +1,9 @@
 package com.ship.management.service;
 
 import com.ship.management.dto.ShipDTO;
+import com.ship.management.entity.Company;
 import com.ship.management.entity.Ship;
+import com.ship.management.repository.CompanyRepository;
 import com.ship.management.repository.ShipRepository;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -17,6 +19,7 @@ public class ShipService {
 
     private final ShipRepository shipRepository;
     private final ModelMapper modelMapper;
+    private final CompanyRepository companyRepository;
 
     public Page<ShipDTO> getAllShips(Pageable pageable) {
         Page<Ship> ships = shipRepository.findAll(pageable);
@@ -36,6 +39,8 @@ public class ShipService {
     public ShipDTO createShip(ShipDTO shipDTO) {
         Ship ship = convertToEntity(shipDTO);
         ship.setId(null); // Ensure it's a new entity
+        Company company = companyRepository.findById(shipDTO.getCompanyId()).orElseThrow(() -> new RuntimeException("Công ty không tồn tại"));
+        ship.setCompany(company);
         Ship savedShip = shipRepository.save(ship);
         return convertToDTO(savedShip);
     }
@@ -45,6 +50,8 @@ public class ShipService {
                 .map(existingShip -> {
                     existingShip.setName(shipDTO.getName());
                     existingShip.setDescription(shipDTO.getDescription());
+                    Company company = companyRepository.findById(shipDTO.getCompanyId()).orElseThrow(() -> new RuntimeException("Công ty không tồn tại"));
+                    existingShip.setCompany(company);
                     Ship updatedShip = shipRepository.save(existingShip);
                     return convertToDTO(updatedShip);
                 });

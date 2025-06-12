@@ -4,8 +4,10 @@ import com.ship.management.dto.UserRegistrationDTO;
 import com.ship.management.dto.UserDTO;
 import com.ship.management.dto.ChangePasswordDTO;
 import com.ship.management.dto.AssignRoleDTO;
+import com.ship.management.entity.Company;
 import com.ship.management.entity.Role;
 import com.ship.management.entity.User;
+import com.ship.management.repository.CompanyRepository;
 import com.ship.management.repository.RoleRepository;
 import com.ship.management.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +29,7 @@ public class UserService implements UserDetailsService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
+    private final CompanyRepository companyRepository;
     private final ModelMapper modelMapper;
 
     @Override
@@ -59,11 +62,15 @@ public class UserService implements UserDetailsService {
         // Get role
         Role role = roleRepository.findById(userDTO.getRoleId())
                 .orElseThrow(() -> new Exception("Vai trò không tồn tại"));
+        
+        Company company = companyRepository.findById(userDTO.getCompanyId())
+                .orElseThrow(() -> new Exception("Công ty không tồn tại"));
 
         // Create new user with default password
         User user = User.builder()
                 .email(userDTO.getEmail())
                 .fullName(userDTO.getFullName())
+                .company(company)
                 .hashedPassword(passwordEncoder.encode("123456")) // Default password
                 .role(role)
                 .build();
@@ -83,7 +90,8 @@ public class UserService implements UserDetailsService {
 
                     existingUser.setFullName(userDTO.getFullName());
                     existingUser.setEmail(userDTO.getEmail());
-                    
+                    Company company = companyRepository.findById(userDTO.getCompanyId()).orElseThrow(() -> new RuntimeException("Công ty không tồn tại"));
+                    existingUser.setCompany(company);
                     User updatedUser = userRepository.save(existingUser);
                     return convertToDTO(updatedUser);
                 });
@@ -145,6 +153,8 @@ public class UserService implements UserDetailsService {
         // Get default role (USER)
         Role userRole = roleRepository.findByName("USER")
                 .orElseThrow(() -> new Exception("Default role not found"));
+
+       
 
         // Create new user
         User user = User.builder()

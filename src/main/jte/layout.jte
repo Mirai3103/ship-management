@@ -31,24 +31,33 @@
     }
     </style>
 </head>
-<body class="bg-base-200" x-data="{ sidebarOpen: false }">
-    <div class="drawer lg:drawer-open">
+<body class="bg-base-200" x-data="{ sidebarOpen: true, isMobile: window.innerWidth < 1024 }" @resize.window="isMobile = window.innerWidth < 1024">
+    <div class="drawer" :class="{ 'lg:drawer-open': sidebarOpen && !isMobile }">
         <input id="drawer-toggle" type="checkbox" class="drawer-toggle" x-model="sidebarOpen" />
         
         <!-- Sidebar -->
         <div class="drawer-side">
             <label for="drawer-toggle" class="drawer-overlay" @click="sidebarOpen = false"></label>
-            <aside class="min-h-full w-60 bg-base-100 text-base-content">
+            <aside class="min-h-full w-72 bg-base-100 text-base-content">
                 <!-- Sidebar Header -->
                 <div class="p-4 border-b border-base-300">
-                    <div class="flex items-center space-x-3">
-                        <div class="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
-                            <i data-lucide="ship" class="w-6 h-6 text-primary-content"></i>
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
+                                <i data-lucide="ship" class="w-6 h-6 text-primary-content"></i>
+                            </div>
+                            <div>
+                                <h1 class="text-xl font-bold">Ship Manager</h1>
+                                <p class="text-xs text-base-content/70">Hệ thống quản lý tàu</p>
+                            </div>
                         </div>
-                        <div>
-                            <h1 class="text-xl font-bold">Ship Manager</h1>
-                            <p class="text-xs text-base-content/70">Hệ thống quản lý tàu</p>
-                        </div>
+                        <!-- Close button for mobile -->
+                        <button 
+                            class="btn btn-ghost btn-sm lg:hidden" 
+                            @click="sidebarOpen = false"
+                        >
+                            <i data-lucide="x" class="w-4 h-4"></i>
+                        </button>
                     </div>
                 </div>
 
@@ -71,6 +80,13 @@
                             </a>
                         </li>
 
+                        <!-- Reviews Ship -->
+                        <li>
+                            <a href="/reviews-ship" class="flex items-center space-x-3 ${activePage.equals("reviews-ship") ? "active" : ""}">
+                                <i data-lucide="star" class="w-5 h-5"></i>
+                                <span>Kiểm tra & Đánh giá tàu</span>
+                            </a>
+                        </li>
                         <!-- User Management -->
                         <li>
                             <a href="/users" class="flex items-center space-x-3 ${activePage.equals("users") ? "active" : ""}">
@@ -127,20 +143,34 @@
         <div class="drawer-content flex flex-col">
             <!-- Header -->
             <header class="navbar bg-base-100 border-b border-base-300 px-4">
-                <div class="flex-none lg:hidden">
-                    <label for="drawer-toggle" class="btn btn-square btn-ghost" @click="sidebarOpen = !sidebarOpen">
+                <div class="flex-none">
+                    <!-- Sidebar toggle button - works on both mobile and desktop -->
+                    <button 
+                        class="btn btn-square btn-ghost" 
+                        @click="sidebarOpen = !sidebarOpen"
+                        :title="sidebarOpen ? 'Ẩn sidebar' : 'Hiển thị sidebar'"
+                    >
                         <i data-lucide="menu" class="w-6 h-6"></i>
-                    </label>
+                    </button>
                 </div>
                 
-                <div class="flex-1">
+                <div class="flex-1 ml-4">
                     <h1 class="text-xl font-semibold">${title}</h1>
                 </div>
                 
                 <div class="flex-none space-x-2">
-                  
+                    <!-- Notification button -->
+                    <button class="btn btn-ghost btn-circle">
+                        <div class="indicator">
+                            <i data-lucide="bell" class="w-5 h-5"></i>
+                            <span class="badge badge-xs badge-primary indicator-item"></span>
+                        </div>
+                    </button>
                     
-                   
+                    <!-- Settings button -->
+                    <button class="btn btn-ghost btn-circle">
+                        <i data-lucide="settings" class="w-5 h-5"></i>
+                    </button>
                 </div>
             </header>
 
