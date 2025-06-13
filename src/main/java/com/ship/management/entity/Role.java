@@ -20,11 +20,17 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class Role {
+    public enum RootRole {
+        ADMIN,
+        SHIP,
+        COMPANY,
+    }
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
     private String description;
+    private RootRole rootRole;
     @OneToMany(mappedBy = "role")
     private List<User> users;
 }

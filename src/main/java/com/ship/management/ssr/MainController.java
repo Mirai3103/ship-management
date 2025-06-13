@@ -27,13 +27,7 @@ public class MainController {
         return "login";
     }
     
-    @GetMapping("/register")
-    public String register(HttpSession session) {
-        if (session.getAttribute("email") != null) {
-            return "redirect:/dashboard";
-        }
-        return "register";
-    }
+   
     @GetMapping("/dashboard")
     public String dashboard(HttpSession session) {
         if (session.getAttribute("email") == null) {

@@ -28,28 +28,30 @@ public class DataSeeder {
             Role admin = Role.builder()
                 .name("ADMIN")
                 .description("Administrator")
-                .build();
+                .rootRole(Role.RootRole.ADMIN)
+                .build();  
             Role cap = Role.builder()
                 .name("CAP")
                 .description("Captain")
+                .rootRole(Role.RootRole.SHIP)
                 .build();
             Role ce = Role.builder()
                 .name("C/E")
                 .description("Chief Engineer")
+                .rootRole(Role.RootRole.SHIP)
                 .build();
             Role tec = Role.builder()
                 .name("TEC")
                 .description("Technical")
+                .rootRole(Role.RootRole.COMPANY)
                 .build();
             Role com = Role.builder()
                 .name("COM")
                 .description("Communication")
+                .rootRole(Role.RootRole.SHIP)
                 .build();
-            Role user = Role.builder()
-                .name("USER")
-                .description("User")
-                .build();
-            roleRepository.saveAll(List.of(admin, cap, ce, tec, com, user));
+     
+            roleRepository.saveAll(List.of(admin, cap, ce, tec, com));
         }
         if (userRepository.count() == 0) {
             User admin = User.builder()

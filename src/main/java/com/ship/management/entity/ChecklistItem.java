@@ -22,7 +22,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Checklist {
+public class ChecklistItem {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -36,9 +36,11 @@ public class Checklist {
 
     private String orderNo;
 
+
+
     @ManyToOne
-    @JoinColumn(name = "review_plan_id")
-    private ReviewPlan reviewPlan;
+    @JoinColumn(name = "checklist_template_id")
+    private ChecklistTemplate checklistTemplate;
 
     @ManyToOne
     @JoinColumn(name = "assigned_to")
@@ -66,11 +68,10 @@ public class Checklist {
     @Column(name = "status")
     private String status;
 
-    @OneToMany(mappedBy = "checklist", cascade = CascadeType.ALL, orphanRemoval = true,fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "checklistItem", cascade = CascadeType.ALL, orphanRemoval = true,fetch = FetchType.EAGER)
     private List<Attachment> attachments;
     
-    @ManyToOne
-    @JoinColumn(name = "company_id", referencedColumnName = "id",nullable = false)
-    private Company company;
+
+    
 
 }

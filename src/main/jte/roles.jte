@@ -87,6 +87,7 @@
                                     <th>ID</th>
                                     <th>Tên vai trò</th>
                                     <th>Mô tả</th>
+                                    <th>Loại vai trò</th>
                                     <th>Thao tác</th>
                                 </tr>
                             </thead>
@@ -104,6 +105,15 @@
                                         </td>
                                         <td>
                                             <span x-text="role.description"></span>
+                                        </td>
+                                        <td>
+                                            <span class="badge" 
+                                                  :class="{
+                                                      'badge-error': role.rootRole === 'ADMIN',
+                                                      'badge-warning': role.rootRole === 'COMPANY', 
+                                                      'badge-info': role.rootRole === 'SHIP'
+                                                  }"
+                                                  x-text="getRootRoleDisplay(role.rootRole)"></span>
                                         </td>
                                         <td>
                                             <div class="flex items-center space-x-2">
@@ -201,6 +211,27 @@
                             </label>
                         </div>
 
+                        <!-- Root Role Selection -->
+                        <div class="form-control">
+                            <label class="label">
+                                <span class="label-text">Vai trò gốc <span class="text-error">*</span></span>
+                            </label>
+                            <select 
+                                class="select select-bordered"
+                                :class="{ 'select-error': errors.rootRole }"
+                                x-model="formData.rootRole"
+                                required
+                            >
+                                <option value="">Chọn vai trò gốc</option>
+                                <option value="ADMIN">ADMIN - Quản trị viên</option>
+                                <option value="COMPANY">COMPANY - Công ty</option>
+                                <option value="SHIP">SHIP - Tàu thuyền</option>
+                            </select>
+                            <label class="label" x-show="errors.rootRole">
+                                <span class="label-text-alt text-error" x-text="errors.rootRole"></span>
+                            </label>
+                        </div>
+
                         <!-- Role Guidelines -->
                         <div class="alert alert-info">
                             <i data-lucide="info" class="w-4 h-4"></i>
@@ -281,7 +312,8 @@
                     roleToDelete: null,
                     formData: {
                         name: '',
-                        description: ''
+                        description: '',
+                        rootRole: ''
                     },
                     errors: {},
                     notifications: [],
@@ -369,7 +401,7 @@
 
                     openAddModal() {
                         this.editingRole = null;
-                        this.formData = { name: '', description: '' };
+                        this.formData = { name: '', description: '', rootRole: '' };
                         this.errors = {};
                         this.showModal = true;
                     },
@@ -378,7 +410,8 @@
                         this.editingRole = role;
                         this.formData = { 
                             name: role.name, 
-                            description: role.description
+                            description: role.description,
+                            rootRole: role.rootRole
                         };
                         this.errors = {};
                         this.showModal = true;
@@ -391,7 +424,7 @@
                     closeModal() {
                         this.showModal = false;
                         this.editingRole = null;
-                        this.formData = { name: '', description: '' };
+                        this.formData = { name: '', description: '', rootRole: '' };
                         this.errors = {};
                     },
 
@@ -477,6 +510,19 @@
 
                     removeNotification(id) {
                         this.notifications = this.notifications.filter(n => n.id !== id);
+                    },
+
+                    getRootRoleDisplay(rootRole) {
+                        switch (rootRole) {
+                            case 'ADMIN':
+                                return 'Quản trị viên';
+                            case 'COMPANY':
+                                return 'Công ty';
+                            case 'SHIP':
+                                return 'Tàu thuyền';
+                            default:
+                                return 'UNKNOWN';
+                        }
                     }
                 }
             }

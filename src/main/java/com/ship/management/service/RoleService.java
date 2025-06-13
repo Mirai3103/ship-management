@@ -56,6 +56,7 @@ public class RoleService {
                     
                     existingRole.setName(roleDTO.getName());
                     existingRole.setDescription(roleDTO.getDescription());
+                    existingRole.setRootRole(roleDTO.getRootRole());
                     Role updatedRole = roleRepository.save(existingRole);
                     return convertToDTO(updatedRole);
                 });

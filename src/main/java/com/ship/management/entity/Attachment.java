@@ -25,8 +25,8 @@ public class Attachment {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "checklist_id")
-    private Checklist checklist;
+    @JoinColumn(name = "checklist_item_id")
+    private ChecklistItem checklistItem;
 
     @ManyToOne
     @JoinColumn(name = "uploaded_by")
