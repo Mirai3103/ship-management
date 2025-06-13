@@ -2,6 +2,9 @@ package com.ship.management.dto;
 
 import lombok.Data;
 import jakarta.validation.constraints.NotBlank;
+
+import com.ship.management.entity.Role;
+
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Size;
 
@@ -20,7 +23,9 @@ public class UserDTO {
     
     private Long roleId;
     private String roleName;
+    private Role.RootRole roleRootRole;
 
     private Long companyId;
     private String companyName;
+
 } 

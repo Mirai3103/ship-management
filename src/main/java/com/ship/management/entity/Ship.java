@@ -1,5 +1,7 @@
 package com.ship.management.entity;
 
+import java.util.List;
+
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -26,4 +28,10 @@ public class Ship {
     @ManyToOne
     @JoinColumn(name = "company_id", referencedColumnName = "id",nullable = false)
     private Company company;
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "user_ship",
+            joinColumns = @JoinColumn(name = "ship_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id"))
+    private List<User> users;
 }

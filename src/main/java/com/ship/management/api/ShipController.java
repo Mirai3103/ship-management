@@ -1,8 +1,13 @@
 package com.ship.management.api;
 
+import com.ship.management.dto.EditShipUserDTO;
 import com.ship.management.dto.ShipDTO;
+import com.ship.management.dto.UserDTO;
 import com.ship.management.service.ShipService;
 import lombok.RequiredArgsConstructor;
+
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -61,5 +66,17 @@ public class ShipController {
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.notFound().build();
+    }
+
+    @PostMapping("/{id}/edit-users")
+    public ResponseEntity<Void> editShipUsers(@PathVariable Long id, @Valid @RequestBody EditShipUserDTO editShipUserDTO) {
+        shipService.editShipUsers(editShipUserDTO);
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/{id}/users")
+    public ResponseEntity<List<UserDTO>> getUsersByShipId(@PathVariable Long id) {
+        List<UserDTO> users = shipService.getUsersByShipId(id);
+        return ResponseEntity.ok(users);
     }
 }

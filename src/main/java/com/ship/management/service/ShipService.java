@@ -1,17 +1,24 @@
 package com.ship.management.service;
 
+import com.ship.management.dto.EditShipUserDTO;
 import com.ship.management.dto.ShipDTO;
+import com.ship.management.dto.UserDTO;
 import com.ship.management.entity.Company;
 import com.ship.management.entity.Ship;
+import com.ship.management.entity.User;
 import com.ship.management.repository.CompanyRepository;
 import com.ship.management.repository.ShipRepository;
+import com.ship.management.repository.UserRepository;
+
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -20,7 +27,7 @@ public class ShipService {
     private final ShipRepository shipRepository;
     private final ModelMapper modelMapper;
     private final CompanyRepository companyRepository;
-
+    private final UserRepository userRepository;
     public Page<ShipDTO> getAllShips(Pageable pageable) {
         Page<Ship> ships = shipRepository.findAll(pageable);
         return ships.map(this::convertToDTO);
@@ -71,5 +78,20 @@ public class ShipService {
 
     private Ship convertToEntity(ShipDTO shipDTO) {
         return modelMapper.map(shipDTO, Ship.class);
+    }
+
+    public List<UserDTO> getUsersByShipId(Long shipId) {
+        return shipRepository.findUsersByShipId(shipId).stream()
+                .map(user -> modelMapper.map(user, UserDTO.class))
+                .collect(Collectors.toList());
+    }
+
+    public void editShipUsers(EditShipUserDTO editShipUserDTO) {
+        Ship ship = shipRepository.findById(editShipUserDTO.getShipId()).orElseThrow(() -> new RuntimeException("Tàu không tồn tại"));
+        List<User> addUsers = userRepository.findByIdIn(editShipUserDTO.getAddUserIds());
+        List<User> removeUsers = userRepository.findByIdIn(editShipUserDTO.getRemoveUserIds());
+        ship.getUsers().addAll(addUsers);
+        ship.getUsers().removeAll(removeUsers);
+        shipRepository.save(ship);  
     }
 } 

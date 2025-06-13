@@ -124,6 +124,9 @@
                                                 <button @click="editShip(ship)" class="btn btn-ghost btn-xs tooltip" data-tip="Chỉnh sửa">
                                                     <i data-lucide="edit" class="w-3 h-3"></i>
                                                 </button>
+                                                <button @click="editShipMembers(ship)" class="btn btn-ghost btn-xs tooltip" data-tip="Quản lý thành viên">
+                                                    <i data-lucide="users" class="w-3 h-3"></i>
+                                                </button>
                                                 <button @click="deleteShip(ship)" class="btn btn-ghost btn-xs text-error tooltip" data-tip="Xóa">
                                                     <i data-lucide="trash-2" class="w-3 h-3"></i>
                                                 </button>
@@ -371,6 +374,128 @@
                 <div class="modal-backdrop" @click="showDeleteModal = false"></div>
             </div>
 
+            <!-- Edit Ship Members Modal -->
+            <div class="modal" :class="{ 'modal-open': showMembersModal }">
+                <div class="modal-box max-w-4xl">
+                    <h3 class="font-bold text-lg mb-4">
+                        <i data-lucide="users" class="w-5 h-5 inline mr-2"></i>
+                        Quản lý thành viên tàu: <span x-text="editingMembersShip?.name"></span>
+                    </h3>
+                    
+                    <div x-show="loadingMembers" class="flex justify-center py-8">
+                        <span class="loading loading-spinner loading-lg"></span>
+                    </div>
+
+                    <div x-show="!loadingMembers" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <!-- Available Users Section -->
+                        <div class="space-y-4">
+                            <h4 class="font-semibold text-base flex items-center">
+                                <i data-lucide="user-plus" class="w-4 h-4 mr-2"></i>
+                                Thêm thành viên
+                            </h4>
+                            
+                            <!-- Company Filter Info -->
+                            <div class="alert alert-info" x-show="editingMembersShip?.companyName">
+                                <i data-lucide="info" class="w-4 h-4"></i>
+                                <span class="text-sm">
+                                    Hiển thị nhân viên từ công ty: <strong x-text="editingMembersShip?.companyName"></strong>
+                                </span>
+                            </div>
+                            
+                            <div class="alert alert-warning" x-show="!editingMembersShip?.companyId">
+                                <i data-lucide="alert-triangle" class="w-4 h-4"></i>
+                                <span class="text-sm">Tàu này chưa được gán cho công ty nào. Không thể thêm thành viên.</span>
+                            </div>
+
+                            <!-- Available Users List -->
+                            <div x-show="editingMembersShip?.companyId" class="space-y-2 max-h-64 overflow-y-auto border rounded-lg p-3">
+                                <template x-for="user in availableUsers" :key="user.id">
+                                    <div class="flex items-center justify-between p-2 hover:bg-base-200 rounded">
+                                        <div class="flex items-center space-x-3">
+                                            <div class="w-8 h-8 bg-primary/20 rounded-full flex items-center justify-center">
+                                                <i data-lucide="user" class="w-4 h-4 text-primary"></i>
+                                            </div>
+                                            <div>
+                                                <p class="font-medium" x-text="user.fullName"></p>
+                                                <p class="text-xs text-base-content/70" x-text="user.email"></p>
+                                                <span class="badge badge-ghost badge-xs" x-text="user.roleName"></span>
+                                            </div>
+                                        </div>
+                                        <button 
+                                            @click="addUserToShip(user)" 
+                                            class="btn btn-primary btn-xs"
+                                            :disabled="savingMembers"
+                                        >
+                                            <i data-lucide="plus" class="w-3 h-3"></i>
+                                        </button>
+                                    </div>
+                                </template>
+                                <div x-show="availableUsers.length === 0" class="text-center py-4 text-base-content/70">
+                                    <i data-lucide="users" class="w-8 h-8 mx-auto mb-2 opacity-50"></i>
+                                    <p class="text-sm">Không có nhân viên khả dụng</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Current Members Section -->
+                        <div class="space-y-4">
+                            <h4 class="font-semibold text-base flex items-center">
+                                <i data-lucide="users" class="w-4 h-4 mr-2"></i>
+                                Thành viên hiện tại (<span x-text="currentMembers.length"></span>)
+                            </h4>
+                            
+                            <!-- Current Members List -->
+                            <div class="space-y-2 max-h-64 overflow-y-auto border rounded-lg p-3">
+                                <template x-for="member in currentMembers" :key="member.id">
+                                    <div class="flex items-center justify-between p-2 hover:bg-base-200 rounded">
+                                        <div class="flex items-center space-x-3">
+                                            <div class="w-8 h-8 bg-success/20 rounded-full flex items-center justify-center">
+                                                <i data-lucide="user-check" class="w-4 h-4 text-success"></i>
+                                            </div>
+                                            <div>
+                                                <p class="font-medium" x-text="member.fullName"></p>
+                                                <p class="text-xs text-base-content/70" x-text="member.email"></p>
+                                                <span class="badge badge-success badge-xs" x-text="member.roleName"></span>
+                                            </div>
+                                        </div>
+                                        <button 
+                                            @click="removeUserFromShip(member)" 
+                                            class="btn btn-error btn-xs"
+                                            :disabled="savingMembers"
+                                        >
+                                            <i data-lucide="minus" class="w-3 h-3"></i>
+                                        </button>
+                                    </div>
+                                </template>
+                                <div x-show="currentMembers.length === 0" class="text-center py-4 text-base-content/70">
+                                    <i data-lucide="user-x" class="w-8 h-8 mx-auto mb-2 opacity-50"></i>
+                                    <p class="text-sm">Chưa có thành viên nào</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-action">
+                        <button class="btn btn-ghost" @click="closeMembersModal()">Đóng</button>
+                        <button 
+                            class="btn btn-primary" 
+                            @click="saveMemberChanges()"
+                            :disabled="savingMembers || (usersToAdd.length === 0 && usersToRemove.length === 0)"
+                        >
+                            <span x-show="savingMembers" class="loading loading-spinner loading-sm"></span>
+                            <span x-show="!savingMembers">
+                                Lưu thay đổi 
+                                <span x-show="usersToAdd.length > 0 || usersToRemove.length > 0" 
+                                      class="badge badge-primary badge-sm ml-1">
+                                    <span x-text="usersToAdd.length + usersToRemove.length"></span>
+                                </span>
+                            </span>
+                        </button>
+                    </div>
+                </div>
+                <div class="modal-backdrop" @click="closeMembersModal()"></div>
+            </div>
+
             <!-- Toast Notifications -->
             <div class="toast toast-top toast-end">
                 <template x-for="notification in notifications" :key="notification.id">
@@ -401,15 +526,23 @@
                     saving: false,
                     deleting: false,
                     loadingShipDetail: false,
+                    loadingMembers: false,
+                    savingMembers: false,
                     currentPage: 0,
                     pageSize: 10,
                     searchQuery: '',
                     showModal: false,
                     showDeleteModal: false,
                     showViewModal: false,
+                    showMembersModal: false,
                     editingShip: null,
                     shipToDelete: null,
                     viewingShip: null,
+                    editingMembersShip: null,
+                    currentMembers: [],
+                    availableUsers: [],
+                    usersToAdd: [],
+                    usersToRemove: [],
                     formData: {
                         name: '',
                         description: '',
@@ -664,6 +797,136 @@
 
                     removeNotification(id) {
                         this.notifications = this.notifications.filter(n => n.id !== id);
+                    },
+
+                    async editShipMembers(ship) {
+                        this.editingMembersShip = ship;
+                        this.showMembersModal = true;
+                        this.loadingMembers = true;
+                        this.currentMembers = [];
+                        this.availableUsers = [];
+                        this.usersToAdd = [];
+                        this.usersToRemove = [];
+
+                        try {
+                            // Load current ship members and available users from company in parallel
+                            const [membersResponse, usersResponse] = await Promise.all([
+                                fetch(`/api/ships/${ship.id}/users`),
+                                ship.companyId ? fetch(`/api/users/company/${ship.companyId}`) : Promise.resolve({ ok: false })
+                            ]);
+
+                            if (membersResponse.ok) {
+                                this.currentMembers = await membersResponse.json();
+                            }
+
+                            if (usersResponse.ok) {
+                                const companyUsers = await usersResponse.json();
+                                // Filter out users who are already members of this ship
+                                const currentMemberIds = this.currentMembers.map(member => member.id);
+                                this.availableUsers = companyUsers.filter(user => !currentMemberIds.includes(user.id));
+                            }
+                        } catch (error) {
+                            this.showNotification('error', 'Lỗi khi tải danh sách thành viên: ' + error.message, 'alert-triangle');
+                        } finally {
+                            this.loadingMembers = false;
+                            this.$nextTick(() => lucide.createIcons());
+                        }
+                    },
+
+                    addUserToShip(user) {
+                        // Remove from available users and add to pending additions
+                        this.availableUsers = this.availableUsers.filter(u => u.id !== user.id);
+                        
+                        // If this user was previously marked for removal, just remove from removal list
+                        const removeIndex = this.usersToRemove.findIndex(u => u.id === user.id);
+                        if (removeIndex > -1) {
+                            this.usersToRemove.splice(removeIndex, 1);
+                            this.currentMembers.push(user);
+                        } else {
+                            // Add to current members and pending additions
+                            this.currentMembers.push(user);
+                            this.usersToAdd.push(user);
+                        }
+                    },
+
+                    removeUserFromShip(user) {
+                        // Remove from current members
+                        this.currentMembers = this.currentMembers.filter(m => m.id !== user.id);
+                        
+                        // If this user was previously marked for addition, just remove from addition list
+                        const addIndex = this.usersToAdd.findIndex(u => u.id === user.id);
+                        if (addIndex > -1) {
+                            this.usersToAdd.splice(addIndex, 1);
+                        } else {
+                            // Add to pending removals
+                            this.usersToRemove.push(user);
+                        }
+                        
+                        // Add back to available users if from same company
+                        if (this.editingMembersShip.companyId && user.companyId === this.editingMembersShip.companyId) {
+                            this.availableUsers.push(user);
+                            // Sort available users by name
+                            this.availableUsers.sort((a, b) => a.fullName.localeCompare(b.fullName));
+                        }
+                    },
+
+                    async saveMemberChanges() {
+                        if (this.usersToAdd.length === 0 && this.usersToRemove.length === 0) {
+                            this.showNotification('warning', 'Không có thay đổi nào để lưu', 'info');
+                            return;
+                        }
+
+                        this.savingMembers = true;
+                        try {
+                            const editData = {
+                                shipId: this.editingMembersShip.id,
+                                addUserIds: this.usersToAdd.map(user => user.id),
+                                removeUserIds: this.usersToRemove.map(user => user.id)
+                            };
+
+                            const response = await fetch(`/api/ships/${this.editingMembersShip.id}/edit-users`, {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                },
+                                body: JSON.stringify(editData)
+                            });
+
+                            if (response.ok) {
+                                this.closeMembersModal();
+                                
+                                const addedCount = this.usersToAdd.length;
+                                const removedCount = this.usersToRemove.length;
+                                let message = '';
+                                
+                                if (addedCount > 0 && removedCount > 0) {
+                                    message = `Đã thêm ${addedCount} và xóa ${removedCount} thành viên khỏi tàu "${this.editingMembersShip.name}"`;
+                                } else if (addedCount > 0) {
+                                    message = `Đã thêm ${addedCount} thành viên vào tàu "${this.editingMembersShip.name}"`;
+                                } else if (removedCount > 0) {
+                                    message = `Đã xóa ${removedCount} thành viên khỏi tàu "${this.editingMembersShip.name}"`;
+                                }
+                                
+                                this.showNotification('success', message, 'check-circle');
+                            } else {
+                                this.showNotification('error', 'Không thể cập nhật thành viên tàu', 'alert-triangle');
+                            }
+                        } catch (error) {
+                            this.showNotification('error', 'Lỗi kết nối: ' + error.message, 'alert-triangle');
+                        } finally {
+                            this.savingMembers = false;
+                        }
+                    },
+
+                    closeMembersModal() {
+                        this.showMembersModal = false;
+                        this.editingMembersShip = null;
+                        this.currentMembers = [];
+                        this.availableUsers = [];
+                        this.usersToAdd = [];
+                        this.usersToRemove = [];
+                        this.loadingMembers = false;
+                        this.savingMembers = false;
                     }
                 }
             }

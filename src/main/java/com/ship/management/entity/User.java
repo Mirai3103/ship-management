@@ -34,6 +34,9 @@ public class User implements UserDetails {
     private Company company;
 
 
+
+
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority(role.getName()));

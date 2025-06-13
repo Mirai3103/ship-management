@@ -1,5 +1,8 @@
 package com.ship.management.ssr;
 
+import java.security.Principal;
+
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,16 +15,14 @@ import jakarta.servlet.http.HttpSession;
 @RequestMapping("")
 public class MainController {
     @GetMapping("")
-    public String index(HttpSession session) {
-        if (session.getAttribute("email") != null) {
-            return "redirect:/dashboard";
-        }
+    public String index() {
+        
         return "redirect:/login";
     }
 
     @GetMapping("/login")
-    public String login(HttpSession session) {
-        if (session.getAttribute("email") != null) {
+    public String login(Principal principal) {
+        if (principal != null) {
             return "redirect:/dashboard";
         }
         return "login";
@@ -29,17 +30,14 @@ public class MainController {
     
    
     @GetMapping("/dashboard")
-    public String dashboard(HttpSession session) {
-        if (session.getAttribute("email") == null) {
-            return "redirect:/login";
-        }
+    @PreAuthorize("isAuthenticated()")
+    public String dashboard() {
+
         return "dashboard";
     }
     @GetMapping("/ships")
-    public String ships(HttpSession session) {
-        if (session.getAttribute("email") == null) {
-            return "redirect:/login";
-        }
+    public String ships() {
+
         return "ships";
     }
     @GetMapping("/companies")
@@ -50,24 +48,15 @@ public class MainController {
     public String roles() {
         return "roles";
     }
-    @GetMapping("/logout")
-    public String logout(HttpSession session) {
-        session.invalidate();
-        return "redirect:/login";
-    }
-  
+ 
     @GetMapping("/users")
-    public String users(HttpSession session) {
-        if (session.getAttribute("email") == null) {
-            return "redirect:/login";
-        }
+    public String users() {
+
         return "users";
     }
     @GetMapping("/reviews-ship")
-    public String reviewsShip(HttpSession session) {
-        if (session.getAttribute("email") == null) {
-            return "redirect:/login";
-        }
+    public String reviewsShip() {
+
         return "reviews-ship";
     }
 }

@@ -1,5 +1,6 @@
 package com.ship.management.service;
 
+import com.ship.management.dto.ChecklistItemDTO;
 import com.ship.management.dto.ChecklistTemplateDTO;
 import com.ship.management.entity.ChecklistTemplate;
 import com.ship.management.entity.Company;
@@ -156,6 +157,9 @@ public class ChecklistTemplateService {
             dto.setReviewPlanId(template.getReviewPlan().getId());
             // Assuming ReviewPlan has a name field - adjust if different
             // dto.setReviewPlanName(template.getReviewPlan().getName());
+        }
+        if(template.getChecklistItems()!=null){
+            dto.setChecklistItems(template.getChecklistItems().stream().map(item->modelMapper.map(item, ChecklistItemDTO.class)).toList());
         }
         
         // Set item count

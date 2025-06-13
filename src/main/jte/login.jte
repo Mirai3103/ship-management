@@ -43,26 +43,23 @@
             <!-- Login Form Card -->
             <div class="card bg-base-100 shadow-xl">
                 <div class="card-body">
-                    <form class="space-y-6" @submit.prevent="submitForm()">
+                    <!-- Spring Security Login Form -->
+                    <form action="/login" method="POST" class="space-y-6">
                         <!-- Email Field -->
                         <div class="form-control">
                             <label class="label">
                                 <span class="label-text font-medium">Email <span class="text-error">*</span></span>
                             </label>
-                            <label class="input input-bordered flex items-center gap-2 w-full" 
-                                   :class="{ 'input-error': errors.email }">
+                            <label class="input input-bordered flex items-center gap-2 w-full">
                                 <i data-lucide="mail" class="h-4 w-4 opacity-70"></i>
                                 <input 
                                     type="email" 
-                                    x-model="formData.email"
+                                    name="email"
                                     class="grow" 
                                     placeholder="example@company.com"
                                     required
                                     autocomplete="email"
                                 />
-                            </label>
-                            <label class="label" x-show="errors.email">
-                                <span class="label-text-alt text-error" x-text="errors.email"></span>
                             </label>
                         </div>
 
@@ -71,12 +68,11 @@
                             <label class="label">
                                 <span class="label-text font-medium">Mật khẩu <span class="text-error">*</span></span>
                             </label>
-                            <label class="input input-bordered flex items-center w-full gap-2" 
-                                   :class="{ 'input-error': errors.password }">
+                            <label class="input input-bordered flex items-center w-full gap-2">
                                 <i data-lucide="lock" class="h-4 w-4 opacity-70"></i>
                                 <input 
                                     :type="showPassword ? 'text' : 'password'"
-                                    x-model="formData.password"
+                                    name="password"
                                     class="grow" 
                                     placeholder="••••••••"
                                     required
@@ -91,15 +87,12 @@
                                     <i :data-lucide="showPassword ? 'eye-off' : 'eye'" class="h-4 w-4 opacity-70"></i>
                                 </button>
                             </label>
-                            <label class="label" x-show="errors.password">
-                                <span class="label-text-alt text-error" x-text="errors.password"></span>
-                            </label>
                         </div>
 
                         <!-- Remember me & Forgot password -->
                         <div class="flex items-center justify-between">
                             <label class="label cursor-pointer gap-2">
-                                <input type="checkbox" x-model="formData.remember" class="checkbox checkbox-primary checkbox-sm" />
+                                <input type="checkbox" name="remember-me" class="checkbox checkbox-primary checkbox-sm" />
                                 <span class="label-text">Ghi nhớ đăng nhập</span>
                             </label>
                             <a href="/forgot-password" class="link link-primary text-sm">
@@ -108,9 +101,8 @@
                         </div>
 
                         <!-- Submit Button -->
-                        <button type="submit" class="btn btn-primary w-full" :disabled="loading">
-                            <span x-show="loading" class="loading loading-spinner loading-sm"></span>
-                            <span x-show="!loading" class="flex items-center gap-2">
+                        <button type="submit" class="btn btn-primary w-full">
+                            <span class="flex items-center gap-2">
                                 <i data-lucide="log-in" class="h-5 w-5"></i>
                                 Đăng nhập
                             </span>
@@ -158,60 +150,7 @@
         function loginForm() {
             return {
                 showPassword: false,
-                loading: false,
-                formData: {
-                    email: '',
-                    password: '',
-                    remember: false
-                },
-                errors: {},
                 notifications: [],
-
-                async submitForm() {
-                    this.loading = true;
-                    this.errors = {};
-
-                    // Client-side validation
-                    if (!this.formData.email.trim()) {
-                        this.errors.email = 'Email là bắt buộc';
-                        this.loading = false;
-                        return;
-                    }
-
-                    if (!this.formData.password.trim()) {
-                        this.errors.password = 'Mật khẩu là bắt buộc';
-                        this.loading = false;
-                        return;
-                    }
-
-                    try {
-                        const response = await fetch('/api/auth/login', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                            },
-                            body: JSON.stringify(this.formData)
-                        });
-
-                        const data = await response.json();
-
-                        if (data.success) {
-                            this.showNotification('success', data.message, 'check-circle');
-                            // Navigate to home page on successful login
-                            setTimeout(() => {
-                                window.location.href = '/';
-                            }, 1000);
-                        } else {
-                            this.showNotification('error', data.message, 'alert-triangle');
-                        }
-                    } catch (error) {
-                        this.showNotification('error', 'Lỗi kết nối: ' + error.message, 'alert-triangle');
-                    } finally {
-                        this.loading = false;
-                        // Re-initialize Lucide icons after DOM changes
-                        this.$nextTick(() => lucide.createIcons());
-                    }
-                },
 
                 showNotification(type, message, icon) {
                     const notification = {
@@ -235,9 +174,24 @@
             }
         }
 
-        // Initialize Lucide icons on page load
+        // Show notifications based on URL parameters
         document.addEventListener('DOMContentLoaded', function() {
             lucide.createIcons();
+            
+            const urlParams = new URLSearchParams(window.location.search);
+            const loginForm = window.Alpine ? Alpine.evaluate(document.querySelector('[x-data="loginForm()"]'), 'loginForm()') : null;
+            
+            if (urlParams.has('error')) {
+                if (loginForm) {
+                    loginForm.showNotification('error', 'Email hoặc mật khẩu không đúng', 'alert-triangle');
+                }
+            }
+            
+            if (urlParams.has('logout')) {
+                if (loginForm) {
+                    loginForm.showNotification('success', 'Đăng xuất thành công', 'check-circle');
+                }
+            }
         });
     </script>
 </body>

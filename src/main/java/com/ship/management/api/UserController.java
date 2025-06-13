@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -29,6 +30,18 @@ public class UserController {
     public ResponseEntity<Page<UserDTO>> getAllUsers(
             @PageableDefault(size = 10, sort = "id") Pageable pageable) {
         Page<UserDTO> users = userService.getAllUsers(pageable);
+        return ResponseEntity.ok(users);
+    }
+
+    @GetMapping("/company/{companyId}")
+    public ResponseEntity<List<UserDTO>> getUsersByCompanyId(@PathVariable Long companyId) {
+        List<UserDTO> users = userService.getUsersByCompanyId(companyId);
+        return ResponseEntity.ok(users);
+    }
+
+    @GetMapping("/ship/{shipId}")
+    public ResponseEntity<List<UserDTO>> getUsersByShipId(@PathVariable Long shipId) {
+        List<UserDTO> users = userService.getUsersByShipId(shipId);
         return ResponseEntity.ok(users);
     }
 

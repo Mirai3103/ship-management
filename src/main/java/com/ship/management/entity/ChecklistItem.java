@@ -27,9 +27,6 @@ public class ChecklistItem {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "section")
-    private String section;
-
     private String content;
 
     private String guide;

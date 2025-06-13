@@ -9,6 +9,7 @@ import com.ship.management.entity.Role;
 import com.ship.management.entity.User;
 import com.ship.management.repository.CompanyRepository;
 import com.ship.management.repository.RoleRepository;
+import com.ship.management.repository.ShipRepository;
 import com.ship.management.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -20,7 +21,9 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -30,6 +33,7 @@ public class UserService implements UserDetailsService {
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
     private final CompanyRepository companyRepository;
+    private final ShipRepository shipRepository;
     private final ModelMapper modelMapper;
 
     @Override
@@ -182,5 +186,17 @@ public class UserService implements UserDetailsService {
             userDTO.setRoleName(user.getRole().getName());
         }
         return userDTO;
+    }
+
+    public List<UserDTO> getUsersByCompanyId(Long companyId) {
+        return userRepository.findByCompanyId(companyId).stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
+
+    public List<UserDTO> getUsersByShipId(Long shipId) {
+        return shipRepository.findUsersByShipId(shipId).stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
     }
 } 

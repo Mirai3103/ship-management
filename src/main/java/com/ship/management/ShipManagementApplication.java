@@ -8,9 +8,11 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.data.web.config.EnableSpringDataWebSupport;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 
 @SpringBootApplication
 @EnableSpringDataWebSupport
+@EnableMethodSecurity
 public class ShipManagementApplication {
 
     public static void main(String[] args) {
