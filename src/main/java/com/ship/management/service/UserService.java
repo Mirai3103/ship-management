@@ -15,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -198,5 +199,26 @@ public class UserService implements UserDetailsService {
         return shipRepository.findUsersByShipId(shipId).stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
+    }
+
+    public User getCurrentUser() {
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return null;
+        }
+    
+        Object principal = authentication.getPrincipal();
+        if (principal instanceof UserDetails) {
+            return ((User) principal);
+        } else {
+            return null;
+        }
+    }
+    public Role.RootRole getCurrentUserRootRole() {
+        var currentUser = getCurrentUser();
+        if(currentUser == null) {
+            return null;
+        }
+        return currentUser.getRole().getRootRole();
     }
 } 

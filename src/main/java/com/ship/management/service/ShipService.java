@@ -6,6 +6,7 @@ import com.ship.management.dto.UserDTO;
 import com.ship.management.entity.Company;
 import com.ship.management.entity.Ship;
 import com.ship.management.entity.User;
+import com.ship.management.entity.Role.RootRole;
 import com.ship.management.repository.CompanyRepository;
 import com.ship.management.repository.ShipRepository;
 import com.ship.management.repository.UserRepository;
@@ -13,6 +14,7 @@ import com.ship.management.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -28,9 +30,18 @@ public class ShipService {
     private final ModelMapper modelMapper;
     private final CompanyRepository companyRepository;
     private final UserRepository userRepository;
+    private final UserService userService;
+
     public Page<ShipDTO> getAllShips(Pageable pageable) {
-        Page<Ship> ships = shipRepository.findAll(pageable);
-        return ships.map(this::convertToDTO);
+        var rootRole = userService.getCurrentUserRootRole();
+        if (RootRole.ADMIN.equals(rootRole)) {
+            Page<Ship> ships = shipRepository.findAll(pageable);
+            return ships.map(this::convertToDTO);
+        }
+        var userShip = shipRepository.findByUserId(userService.getCurrentUser().getId());
+        return new PageImpl<>(userShip.stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList()), pageable, userShip.size());
     }
 
     public Optional<ShipDTO> getShipById(Long id) {
@@ -46,7 +57,8 @@ public class ShipService {
     public ShipDTO createShip(ShipDTO shipDTO) {
         Ship ship = convertToEntity(shipDTO);
         ship.setId(null); // Ensure it's a new entity
-        Company company = companyRepository.findById(shipDTO.getCompanyId()).orElseThrow(() -> new RuntimeException("Công ty không tồn tại"));
+        Company company = companyRepository.findById(shipDTO.getCompanyId())
+                .orElseThrow(() -> new RuntimeException("Công ty không tồn tại"));
         ship.setCompany(company);
         Ship savedShip = shipRepository.save(ship);
         return convertToDTO(savedShip);
@@ -57,7 +69,8 @@ public class ShipService {
                 .map(existingShip -> {
                     existingShip.setName(shipDTO.getName());
                     existingShip.setDescription(shipDTO.getDescription());
-                    Company company = companyRepository.findById(shipDTO.getCompanyId()).orElseThrow(() -> new RuntimeException("Công ty không tồn tại"));
+                    Company company = companyRepository.findById(shipDTO.getCompanyId())
+                            .orElseThrow(() -> new RuntimeException("Công ty không tồn tại"));
                     existingShip.setCompany(company);
                     Ship updatedShip = shipRepository.save(existingShip);
                     return convertToDTO(updatedShip);
@@ -87,11 +100,12 @@ public class ShipService {
     }
 
     public void editShipUsers(EditShipUserDTO editShipUserDTO) {
-        Ship ship = shipRepository.findById(editShipUserDTO.getShipId()).orElseThrow(() -> new RuntimeException("Tàu không tồn tại"));
+        Ship ship = shipRepository.findById(editShipUserDTO.getShipId())
+                .orElseThrow(() -> new RuntimeException("Tàu không tồn tại"));
         List<User> addUsers = userRepository.findByIdIn(editShipUserDTO.getAddUserIds());
         List<User> removeUsers = userRepository.findByIdIn(editShipUserDTO.getRemoveUserIds());
         ship.getUsers().addAll(addUsers);
         ship.getUsers().removeAll(removeUsers);
-        shipRepository.save(ship);  
+        shipRepository.save(ship);
     }
-} 
+}

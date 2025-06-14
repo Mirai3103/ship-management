@@ -1,6 +1,11 @@
+@import com.ship.management.entity.User
+
+@param User currentUser
+
 @template.layout(
     title = "Quản lý người dùng",
     activePage = "users",
+    currentUser = currentUser,
     content = @`
         <div x-data="userManager()" x-init="loadUsers(); loadRoles(); loadCompanies()" class="space-y-6">
             <!-- Header Section -->

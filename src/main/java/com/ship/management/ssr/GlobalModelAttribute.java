@@ -17,8 +17,10 @@ public class GlobalModelAttribute {
     private final UserService userService;
 
     @ModelAttribute("currentUser")
-    public User getCurrentUser(HttpSession session) {
-        return (User) session.getAttribute("user");
-        
+    public User getCurrentUser(Principal principal) {
+        if (principal == null) {
+            return null;
+        }
+        return userService.findByEmail(principal.getName()).orElse(null);
     }
 }

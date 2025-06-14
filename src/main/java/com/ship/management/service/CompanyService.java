@@ -2,13 +2,16 @@ package com.ship.management.service;
 
 import com.ship.management.dto.CompanyDTO;
 import com.ship.management.entity.Company;
+import com.ship.management.entity.Role.RootRole;
 import com.ship.management.repository.CompanyRepository;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -17,11 +20,20 @@ public class CompanyService {
 
     private final CompanyRepository companyRepository;
     private final ModelMapper modelMapper;
+    private final UserService userService;
 
     public Page<CompanyDTO> getAllCompanies(Pageable pageable) {
-        Page<Company> companies = companyRepository.findAll(pageable);
-        return companies.map(this::convertToDTO);
+        var rootRole = userService.getCurrentUserRootRole();
+        if(rootRole == RootRole.ADMIN){
+            Page<Company> companies = companyRepository.findAll(pageable);
+            return companies.map(this::convertToDTO);
+        }
+        var currentUser = userService.getCurrentUser();
+        var userCompany = currentUser.getCompany();
+        return new PageImpl<>(List.of(convertToDTO(userCompany)), pageable, 1);
     }
+
+
 
     public Optional<CompanyDTO> getCompanyById(Long id) {
         return companyRepository.findById(id)

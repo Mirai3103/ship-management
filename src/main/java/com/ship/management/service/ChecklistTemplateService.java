@@ -6,6 +6,7 @@ import com.ship.management.entity.ChecklistTemplate;
 import com.ship.management.entity.Company;
 import com.ship.management.entity.Ship;
 import com.ship.management.entity.ReviewPlan;
+import com.ship.management.entity.Role;
 import com.ship.management.repository.ChecklistTemplateRepository;
 import com.ship.management.repository.CompanyRepository;
 import com.ship.management.repository.ShipRepository;
@@ -26,6 +27,7 @@ public class ChecklistTemplateService {
     private final ShipRepository shipRepository;
     private final CompanyRepository companyRepository;
     private final ModelMapper modelMapper;
+    private final UserService userService;
 
     public Page<ChecklistTemplateDTO> getAllChecklistTemplates(Pageable pageable) {
         Page<ChecklistTemplate> templates = checklistTemplateRepository.findAll(pageable);
@@ -58,11 +60,31 @@ public class ChecklistTemplateService {
     }
 
     public List<ChecklistTemplateDTO> getChecklistTemplatesByShipOrdered(Long shipId) {
-        return checklistTemplateRepository.findByShipIdOrderByOrderNoAsc(shipId)
-                .stream()
-                .map(this::convertToDTO)
-                .toList();
+        return handlePermission( checklistTemplateRepository.findByShipIdOrderByOrderNoAsc(shipId)
+        .stream()
+        .map(this::convertToDTO)
+        .toList());
     }
+
+    public List<ChecklistTemplateDTO> handlePermission(List<ChecklistTemplateDTO> templates) {
+        var currentUser = userService.getCurrentUser();
+        if(currentUser.getRole().getRootRole() == Role.RootRole.ADMIN){
+            return templates;
+        }
+        return templates.stream() 
+        .map(t->{
+            var listCheckList = t.getChecklistItems();
+            if(listCheckList!=null){
+                listCheckList=  listCheckList.stream().filter(
+                    item->List.of(item.getAssignedToId(), item.getComAssignedToId()).contains(currentUser.getId())
+                ).toList();
+            }
+            t.setChecklistItems(listCheckList);
+            return t;
+        }).filter(t->t.getChecklistItems().size()>0).toList();
+    }
+
+
 
     public ChecklistTemplateDTO createChecklistTemplate(ChecklistTemplateDTO templateDTO) throws Exception {
         // Validate ship exists

@@ -8,6 +8,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.ship.management.entity.User;
+import com.ship.management.service.UserService;
+
 import jakarta.servlet.http.HttpSession;
 
 
@@ -55,8 +58,9 @@ public class MainController {
         return "users";
     }
     @GetMapping("/reviews-ship")
-    public String reviewsShip() {
-
+    @PreAuthorize("isAuthenticated()")  
+    public String reviewsShip(Principal principal) {
+        
         return "reviews-ship";
     }
 }

@@ -1,6 +1,11 @@
+@import com.ship.management.entity.User
+
+@param User currentUser
+
 @template.layout(
     title = "Quản lý vai trò",
     activePage = "roles",
+    currentUser = currentUser,
     content = @`
         <div x-data="roleManager()" x-init="loadRoles()" class="space-y-6">
             <!-- Header Section -->

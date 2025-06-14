@@ -1,5 +1,6 @@
 package com.ship.management.entity;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import jakarta.persistence.CascadeType;
@@ -58,6 +59,10 @@ public class ChecklistItem {
 
     @Column(name = "com_remark")
     private String comRemark;
+
+    private LocalDateTime comReviewAt = null;
+
+    private LocalDateTime vesselReviewAt = null;
 
     @Column(name = "note")
     private String note;

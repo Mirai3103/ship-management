@@ -1,5 +1,8 @@
 package com.ship.management.dto;
 
+import java.time.LocalDateTime;
+import java.util.List;
+
 import jakarta.persistence.Id;
 import lombok.Data;
 
@@ -21,6 +24,9 @@ public class ChecklistItemDTO {
     private String assignedToFullName;
     private String assignedToRoleName;
     private String assignedToRoleRootRole;
+    private LocalDateTime comReviewAt;
+
+    private LocalDateTime vesselReviewAt;
 
     private String vesselResult;
 
@@ -39,4 +45,5 @@ public class ChecklistItemDTO {
 
     private String status;
 
+    private List<AttachmentDTO> attachments;
 }

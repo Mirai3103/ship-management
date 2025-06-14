@@ -90,14 +90,12 @@
                         </div>
 
                         <!-- Remember me & Forgot password -->
-                        <div class="flex items-center justify-between">
+                        <div class="flex items-center justify-start">
                             <label class="label cursor-pointer gap-2">
                                 <input type="checkbox" name="remember-me" class="checkbox checkbox-primary checkbox-sm" />
                                 <span class="label-text">Ghi nhớ đăng nhập</span>
                             </label>
-                            <a href="/forgot-password" class="link link-primary text-sm">
-                                Quên mật khẩu?
-                            </a>
+                          
                         </div>
 
                         <!-- Submit Button -->
@@ -108,25 +106,12 @@
                             </span>
                         </button>
 
-                        <!-- Register Link -->
-                        <div class="text-center">
-                            <p class="text-sm text-gray-600">
-                                Chưa có tài khoản?
-                                <a href="/register" class="link link-primary font-medium">
-                                    Đăng ký ngay
-                                </a>
-                            </p>
-                        </div>
+                     
                     </form>
                 </div>
             </div>
 
-            <!-- Footer -->
-            <div class="text-center">
-                <p class="text-xs text-gray-500">
-                    © 2024 Ship Management System. All rights reserved.
-                </p>
-            </div>
+         
         </div>
     </div>
 

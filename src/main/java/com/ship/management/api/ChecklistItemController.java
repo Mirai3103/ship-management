@@ -10,8 +10,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ship.management.dto.ChecklistItemDTO;
+import com.ship.management.dto.ReviewDTO;
 import com.ship.management.dto.UpdateItemDTO;
+import com.ship.management.entity.Role.RootRole;
 import com.ship.management.service.ChecklistItemService;
+import com.ship.management.service.UserService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -20,6 +23,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ChecklistItemController {
     private final ChecklistItemService checklistItemService;
+    private final UserService userService;
 
     @PostMapping
     public ChecklistItemDTO createChecklistItem(@RequestBody ChecklistItemDTO checklistItemDTO) {
@@ -35,5 +39,17 @@ public class ChecklistItemController {
     public ChecklistItemDTO updateChecklistItem(@PathVariable Long id, @RequestBody UpdateItemDTO updateItemDTO) {
         updateItemDTO.setId(id);
         return checklistItemService.updateChecklistItem(updateItemDTO);
+    }
+
+    @PatchMapping("/{id}/review")
+    public ChecklistItemDTO reviewChecklistItem(@PathVariable Long id, @RequestBody ReviewDTO reviewItemDTO) {
+        reviewItemDTO.setChecklistItemId(id);
+        var currentRootRole = userService.getCurrentUserRootRole();
+        if(currentRootRole == RootRole.SHIP) {
+            return checklistItemService.reviewFromShip(reviewItemDTO);
+        } else if(currentRootRole == RootRole.COMPANY) {
+            return checklistItemService.reviewFromCompany(reviewItemDTO);
+        }
+        throw new RuntimeException("User not found");
     }
 }

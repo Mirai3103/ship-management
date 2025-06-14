@@ -104,7 +104,7 @@ public class AttachmentService {
 
         String originalFilename = StringUtils.cleanPath(file.getOriginalFilename());
         String fileExtension = getFileExtension(originalFilename);
-        String uniqueFilename = UUID.randomUUID().toString() + "_" + System.currentTimeMillis() + fileExtension;
+        String uniqueFilename = UUID.randomUUID() + "_" + System.currentTimeMillis() + fileExtension;
 
         Path targetLocation = uploadPath.resolve(uniqueFilename);
         Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
@@ -139,11 +139,9 @@ public class AttachmentService {
     }
 
     public AttachmentDTO createAttachment(AttachmentDTO attachmentDTO) {
-        // Validate checklist item exists
         ChecklistItem checklistItem = checklistItemRepository.findById(attachmentDTO.getChecklistItemId())
                 .orElseThrow(() -> new RuntimeException("Checklist item không tồn tại"));
 
-        // Validate user exists
         User uploadedBy = userRepository.findById(attachmentDTO.getUploadedById())
                 .orElseThrow(() -> new RuntimeException("Người dùng không tồn tại"));
 

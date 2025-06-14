@@ -17,6 +17,8 @@ import org.springframework.web.multipart.MultipartFile;
 import jakarta.validation.Valid;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -104,21 +106,27 @@ public class AttachmentController {
     public ResponseEntity<Resource> downloadFile(@PathVariable String filename) {
         try {
             Resource resource = attachmentService.downloadFile(filename);
-            
-            // Get original filename for download
             String originalFilename = attachmentService.getOriginalFilename(filename);
-            
+    
+            // Suy đoán content-type từ tên file
+            String contentType = Files.probeContentType(Path.of(resource.getFile().getAbsolutePath()));
+            if (contentType == null) {
+                contentType = "application/octet-stream"; // fallback
+            }
+    
             return ResponseEntity.ok()
-                    .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                    .contentType(MediaType.parseMediaType(contentType))
+                    // Không ép trình duyệt tải về nếu hỗ trợ
                     .header(HttpHeaders.CONTENT_DISPOSITION, 
-                           "attachment; filename=\"" + originalFilename + "\"")
+                            "inline; filename=\"" + originalFilename + "\"")
                     .body(resource);
-        } catch (MalformedURLException e) {
+        } catch ( IOException e) {
             return ResponseEntity.notFound().build();
         } catch (RuntimeException e) {
             return ResponseEntity.notFound().build();
         }
     }
+    
 
     @PostMapping
     public ResponseEntity<Map<String, Object>> createAttachment(@Valid @RequestBody AttachmentDTO attachmentDTO) {

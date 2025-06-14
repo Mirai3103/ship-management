@@ -1,5 +1,7 @@
 package com.ship.management.service;
 
+import java.time.LocalDateTime;
+
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
@@ -50,17 +52,19 @@ public class ChecklistItemService {
         ChecklistItem checklistItem = checklistItemRepository.findById(reviewDTO.getChecklistItemId()).orElseThrow(() -> new RuntimeException("Checklist item not found"));
         checklistItem.setVesselResult(reviewDTO.getResult());
         checklistItem.setVesselRemark(reviewDTO.getRemark());
-        checklistItem = checklistItemRepository.save(checklistItem);
-        return modelMapper.map(checklistItem, ChecklistItemDTO.class);
+        checklistItem.setVesselReviewAt(LocalDateTime.now());
+        checklistItemRepository.save(checklistItem);
+        return new ChecklistItemDTO();
     }
 
     public ChecklistItemDTO reviewFromCompany(ReviewDTO reviewDTO) {
         ChecklistItem checklistItem = checklistItemRepository.findById(reviewDTO.getChecklistItemId()).orElseThrow(() -> new RuntimeException("Checklist item not found"));
         checklistItem.setComResult(reviewDTO.getResult());
         checklistItem.setComRemark(reviewDTO.getRemark());
+        checklistItem.setComReviewAt(LocalDateTime.now());
         checklistItem.setNote(reviewDTO.getNote());
-        checklistItem = checklistItemRepository.save(checklistItem);
-        return modelMapper.map(checklistItem, ChecklistItemDTO.class);
+    checklistItemRepository.save(checklistItem);
+        return new ChecklistItemDTO();
     }
 
     

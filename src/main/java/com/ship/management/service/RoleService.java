@@ -17,7 +17,6 @@ public class RoleService {
 
     private final RoleRepository roleRepository;
     private final ModelMapper modelMapper;
-
     public Page<RoleDTO> getAllRoles(Pageable pageable) {
         Page<Role> roles = roleRepository.findAll(pageable);
         return roles.map(this::convertToDTO);
