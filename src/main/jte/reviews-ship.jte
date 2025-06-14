@@ -173,21 +173,22 @@ content = @`
                                 <th class="text-center w-24">Đánh giá từ Cty</th>
                                 <th class="min-w-32">Remark từ Cty</th>
                                 <th class="min-w-32">Note</th>
+                                <th class="text-center w-20">Thao tác</th>
                             </tr>
                         </thead>
                       <template x-for="template in displayedTemplates" :key="template.id">
     <tbody>
         <!-- Template Header Row -->
         <tr class="bg-base-200 border-t-2 border-base-300">
-            <td colspan="11" class="p-4">
+            <td colspan="12" class="p-4">
                 <div class="flex items-center justify-between">
                     <div class="flex items-center gap-4">
                         <h3 class="text-lg font-bold" x-text="template.section"></h3>
                         <span class="badge badge-outline" x-text="'Thứ tự: ' + template.orderNo"></span>
-                        <span class="badge badge-info" x-text="getFakeItemCount(template.id) + ' mục'"></span>
+                        <span class="badge badge-info" x-text="getItemCount(template) + ' mục'"></span>
                     </div>
                     <div class="flex items-center gap-2">
-                        <button class="btn btn-ghost btn-sm tooltip" data-tip="Thêm chi tiết">
+                        <button @click="openCreateItemModal(template)" class="btn btn-ghost btn-sm tooltip" data-tip="Thêm chi tiết">
                             <i data-lucide="plus" class="w-4 h-4"></i>
                         </button>
                         <button @click="editTemplate(template)" class="btn btn-ghost btn-sm tooltip" data-tip="Chỉnh sửa mục">
@@ -202,71 +203,74 @@ content = @`
         </tr>
 
         <!-- Template Items -->
-        <template x-for="(item, index) in getFakeItems(template.id)" :key="template.id + '_' + index">
+        <template x-for="(item, index) in getItems(template)" :key="template.id + '_' + index">
             <tr>
                 <td class="text-center font-mono" x-text="String(index + 1).padStart(2, '0')"></td>
                 <td class="max-w-xs">
                     <div class="font-medium" x-text="item.content"></div>
-                    <div class="text-xs text-gray-500" x-text="item.description"></div>
                 </td>
                 <td class="max-w-xs">
-                    <div class="text-xs" x-text="item.guidance"></div>
+                    <div class="text-xs" x-text="item.guide"></div>
                 </td>
                 <td>
-                    <div class="flex flex-col gap-1">
-                        <template x-for="doc in item.documents" :key="doc">
-                            <span class="badge badge-outline badge-xs" x-text="doc"></span>
-                        </template>
-                    </div>
+                    <!-- Attachments placeholder - not implemented yet -->
+                    <span class="text-xs text-gray-400">-</span>
                 </td>
                 <td>
                     <div class="flex items-center gap-2">
-                        <div class="avatar">
-                            <div class="w-6 h-6 rounded-full">
-                                <img :src="item.inspector.avatar" :alt="item.inspector.name" />
-                            </div>
+                        <div>
+                            <div class="text-xs font-medium" x-text="item.assignedToFullName"></div>
+                            <div class="text-xs text-gray-500" x-text="item.assignedToRoleName"></div>
                         </div>
-                        <span class="text-xs" x-text="item.inspector.name"></span>
                     </div>
                 </td>
                 <td class="text-center">
                     <span class="badge"
                           :class="{
-                              'badge-success': item.evaluation === 'YES',
-                              'badge-warning': item.evaluation === 'NO',
-                              'badge-neutral': item.evaluation === 'NA'
+                              'badge-success': item.vesselResult === 'YES',
+                              'badge-warning': item.vesselResult === 'NO',
+                              'badge-neutral': !item.vesselResult || item.vesselResult === 'NA'
                           }"
-                          x-text="item.evaluation">
+                          x-text="item.vesselResult || 'N/A'">
                     </span>
                 </td>
                 <td class="max-w-xs">
-                    <div class="text-xs" x-text="item.remark"></div>
+                    <div class="text-xs" x-text="item.vesselRemark || '-'"></div>
                 </td>
                 <td>
                     <div class="flex items-center gap-2">
-                        <div class="avatar">
-                            <div class="w-6 h-6 rounded-full">
-                                <img :src="item.companyInspector.avatar" :alt="item.companyInspector.name" />
-                            </div>
+                
+                        <div>
+                            <div class="text-xs font-medium" x-text="item.comAssignedToFullName"></div>
+                            <div class="text-xs text-gray-500" x-text="item.comAssignedToRoleName"></div>
                         </div>
-                        <span class="text-xs" x-text="item.companyInspector.name"></span>
                     </div>
                 </td>
                 <td class="text-center">
                     <span class="badge"
                           :class="{
-                              'badge-success': item.companyEvaluation === 'YES',
-                              'badge-warning': item.companyEvaluation === 'NO',
-                              'badge-neutral': item.companyEvaluation === 'NA'
+                              'badge-success': item.comResult === 'YES',
+                              'badge-warning': item.comResult === 'NO',
+                              'badge-neutral': !item.comResult || item.comResult === 'NA'
                           }"
-                          x-text="item.companyEvaluation">
+                          x-text="item.comResult || 'N/A'">
                     </span>
                 </td>
                 <td class="max-w-xs">
-                    <div class="text-xs" x-text="item.companyRemark"></div>
+                    <div class="text-xs" x-text="item.comRemark || '-'"></div>
                 </td>
                 <td class="max-w-xs">
-                    <div class="text-xs" x-text="item.note"></div>
+                    <div class="text-xs" x-text="item.note || '-'"></div>
+                </td>
+                <td class="text-center">
+                    <div class="flex items-center gap-1">
+                        <button @click="editChecklistItem(item)" class="btn btn-ghost btn-xs tooltip" data-tip="Chỉnh sửa">
+                            <i data-lucide="edit" class="w-3 h-3"></i>
+                        </button>
+                        <button @click="deleteChecklistItem(item)" class="btn btn-ghost btn-xs text-error tooltip" data-tip="Xóa">
+                            <i data-lucide="trash-2" class="w-3 h-3"></i>
+                        </button>
+                    </div>
                 </td>
             </tr>
         </template>
@@ -387,6 +391,252 @@ content = @`
             <div class="modal-backdrop" @click="showDeleteModal = false"></div>
         </div>
 
+        <!-- Create Checklist Item Modal -->
+        <div class="modal" :class="{ 'modal-open': showCreateItemModal }">
+            <div class="modal-box max-w-2xl">
+                <h3 class="font-bold text-lg mb-4">Thêm mục kiểm tra mới</h3>
+                <p class="text-sm text-base-content/70 mb-4" x-show="selectedTemplate">
+                    Template: <span class="font-medium" x-text="selectedTemplate?.section"></span>
+                </p>
+                
+                <form @submit.prevent="saveChecklistItem()" class="space-y-4">
+                    <!-- Content -->
+                    <div class="form-control">
+                        <label class="label">
+                            <span class="label-text">Nội dung kiểm tra <span class="text-error">*</span></span>
+                        </label>
+                        <textarea 
+                            placeholder="Mô tả chi tiết nội dung cần kiểm tra" 
+                            class="textarea textarea-bordered h-20"
+                            :class="{ 'textarea-error': itemErrors.content }"
+                            x-model="itemForm.content"
+                            required
+                        ></textarea>
+                        <label class="label" x-show="itemErrors.content">
+                            <span class="label-text-alt text-error" x-text="itemErrors.content"></span>
+                        </label>
+                    </div>
+
+                    <!-- Guide -->
+                    <div class="form-control">
+                        <label class="label">
+                            <span class="label-text">Hướng dẫn</span>
+                        </label>
+                        <textarea 
+                            placeholder="Hướng dẫn thực hiện kiểm tra" 
+                            class="textarea textarea-bordered h-20"
+                            :class="{ 'textarea-error': itemErrors.guide }"
+                            x-model="itemForm.guide"
+                        ></textarea>
+                        <label class="label" x-show="itemErrors.guide">
+                            <span class="label-text-alt text-error" x-text="itemErrors.guide"></span>
+                        </label>
+                    </div>
+
+                    <!-- Order Number -->
+                    <div class="form-control">
+                        <label class="label">
+                            <span class="label-text">Số thứ tự</span>
+                        </label>
+                        <input 
+                            type="text" 
+                            placeholder="VD: 1.1, 2.3, A.1" 
+                            class="input input-bordered"
+                            :class="{ 'input-error': itemErrors.orderNo }"
+                            x-model="itemForm.orderNo"
+                        />
+                        <label class="label" x-show="itemErrors.orderNo">
+                            <span class="label-text-alt text-error" x-text="itemErrors.orderNo"></span>
+                        </label>
+                    </div>
+
+                    <!-- Assigned To (SHIP users) -->
+                    <div class="form-control">
+                        <label class="label">
+                            <span class="label-text">Người phụ trách (Tàu) <span class="text-error">*</span></span>
+                        </label>
+                        <select 
+                            class="select select-bordered"
+                            :class="{ 'select-error': itemErrors.assignedToId }"
+                            x-model="itemForm.assignedToId"
+                            required
+                        >
+                            <option value="">Chọn người phụ trách</option>
+                            <template x-for="user in getShipUsers()" :key="user.id">
+                                <option :value="user.id" x-text="user.fullName + ' (' + user.roleName + ')'"></option>
+                            </template>
+                        </select>
+                        <label class="label" x-show="itemErrors.assignedToId">
+                            <span class="label-text-alt text-error" x-text="itemErrors.assignedToId"></span>
+                        </label>
+                    </div>
+
+                    <!-- Company Assigned To (COMPANY users) -->
+                    <div class="form-control">
+                        <label class="label">
+                            <span class="label-text">Người phụ trách (Công ty) <span class="text-error">*</span></span>
+                        </label>
+                        <select 
+                            class="select select-bordered"
+                            :class="{ 'select-error': itemErrors.comAssignedToId }"
+                            x-model="itemForm.comAssignedToId"
+                            required
+                        >
+                            <option value="">Chọn người phụ trách</option>
+                            <template x-for="user in getCompanyUsers()" :key="user.id">
+                                <option :value="user.id" x-text="user.fullName + ' (' + user.roleName + ')'"></option>
+                            </template>
+                        </select>
+                        <label class="label" x-show="itemErrors.comAssignedToId">
+                            <span class="label-text-alt text-error" x-text="itemErrors.comAssignedToId"></span>
+                        </label>
+                    </div>
+
+                    <div class="modal-action">
+                        <button type="button" class="btn btn-ghost" @click="closeCreateItemModal()">Hủy</button>
+                        <button type="submit" class="btn btn-primary" :disabled="savingItem">
+                            <span x-show="savingItem" class="loading loading-spinner loading-sm"></span>
+                            <span x-show="!savingItem">Thêm mục kiểm tra</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-backdrop" @click="closeCreateItemModal()"></div>
+        </div>
+
+        <!-- Edit Checklist Item Modal -->
+        <div class="modal" :class="{ 'modal-open': showEditItemModal }">
+            <div class="modal-box max-w-2xl">
+                <h3 class="font-bold text-lg mb-4">Chỉnh sửa mục kiểm tra</h3>
+                <p class="text-sm text-base-content/70 mb-4" x-show="editingItem">
+                    Mục: <span class="font-medium" x-text="editingItem?.content"></span>
+                </p>
+                
+                <form @submit.prevent="saveEditChecklistItem()" class="space-y-4">
+                    <!-- Content -->
+                    <div class="form-control">
+                        <label class="label">
+                            <span class="label-text">Nội dung kiểm tra <span class="text-error">*</span></span>
+                        </label>
+                        <textarea 
+                            placeholder="Mô tả chi tiết nội dung cần kiểm tra" 
+                            class="textarea textarea-bordered h-20"
+                            :class="{ 'textarea-error': editItemErrors.content }"
+                            x-model="editItemForm.content"
+                            required
+                        ></textarea>
+                        <label class="label" x-show="editItemErrors.content">
+                            <span class="label-text-alt text-error" x-text="editItemErrors.content"></span>
+                        </label>
+                    </div>
+
+                    <!-- Guide -->
+                    <div class="form-control">
+                        <label class="label">
+                            <span class="label-text">Hướng dẫn</span>
+                        </label>
+                        <textarea 
+                            placeholder="Hướng dẫn thực hiện kiểm tra" 
+                            class="textarea textarea-bordered h-20"
+                            :class="{ 'textarea-error': editItemErrors.guide }"
+                            x-model="editItemForm.guide"
+                        ></textarea>
+                        <label class="label" x-show="editItemErrors.guide">
+                            <span class="label-text-alt text-error" x-text="editItemErrors.guide"></span>
+                        </label>
+                    </div>
+
+                    <!-- Order Number -->
+                    <div class="form-control">
+                        <label class="label">
+                            <span class="label-text">Số thứ tự</span>
+                        </label>
+                        <input 
+                            type="text" 
+                            placeholder="VD: 1.1, 2.3, A.1" 
+                            class="input input-bordered"
+                            :class="{ 'input-error': editItemErrors.orderNo }"
+                            x-model="editItemForm.orderNo"
+                        />
+                        <label class="label" x-show="editItemErrors.orderNo">
+                            <span class="label-text-alt text-error" x-text="editItemErrors.orderNo"></span>
+                        </label>
+                    </div>
+
+                    <!-- Assigned To (SHIP users) -->
+                    <div class="form-control">
+                        <label class="label">
+                            <span class="label-text">Người phụ trách (Tàu) <span class="text-error">*</span></span>
+                        </label>
+                        <select 
+                            class="select select-bordered"
+                            :class="{ 'select-error': editItemErrors.assignedToId }"
+                            x-model="editItemForm.assignedToId"
+                            required
+                        >
+                            <option value="">Chọn người phụ trách</option>
+                            <template x-for="user in getShipUsers()" :key="user.id">
+                                <option :value="user.id" x-text="user.fullName + ' (' + user.roleName + ')'"></option>
+                            </template>
+                        </select>
+                        <label class="label" x-show="editItemErrors.assignedToId">
+                            <span class="label-text-alt text-error" x-text="editItemErrors.assignedToId"></span>
+                        </label>
+                    </div>
+
+                    <!-- Company Assigned To (COMPANY users) -->
+                    <div class="form-control">
+                        <label class="label">
+                            <span class="label-text">Người phụ trách (Công ty) <span class="text-error">*</span></span>
+                        </label>
+                        <select 
+                            class="select select-bordered"
+                            :class="{ 'select-error': editItemErrors.comAssignedToId }"
+                            x-model="editItemForm.comAssignedToId"
+                            required
+                        >
+                            <option value="">Chọn người phụ trách</option>
+                            <template x-for="user in getCompanyUsers()" :key="user.id">
+                                <option :value="user.id" x-text="user.fullName + ' (' + user.roleName + ')'"></option>
+                            </template>
+                        </select>
+                        <label class="label" x-show="editItemErrors.comAssignedToId">
+                            <span class="label-text-alt text-error" x-text="editItemErrors.comAssignedToId"></span>
+                        </label>
+                    </div>
+
+                    <div class="modal-action">
+                        <button type="button" class="btn btn-ghost" @click="closeEditItemModal()">Hủy</button>
+                        <button type="submit" class="btn btn-primary" :disabled="savingEditItem">
+                            <span x-show="savingEditItem" class="loading loading-spinner loading-sm"></span>
+                            <span x-show="!savingEditItem">Cập nhật</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-backdrop" @click="closeEditItemModal()"></div>
+        </div>
+
+        <!-- Delete Checklist Item Confirmation Modal -->
+        <div class="modal" :class="{ 'modal-open': showDeleteItemModal }">
+            <div class="modal-box">
+                <h3 class="font-bold text-lg mb-4 text-error">Xác nhận xóa</h3>
+                <p class="mb-4">
+                    Bạn có chắc chắn muốn xóa mục kiểm tra này không? 
+                    <br><strong x-text="itemToDelete?.content"></strong>
+                    <br>Hành động này không thể hoàn tác.
+                </p>
+                <div class="modal-action">
+                    <button class="btn btn-ghost" @click="showDeleteItemModal = false">Hủy</button>
+                    <button class="btn btn-error" @click="confirmDeleteChecklistItem()" :disabled="deletingItem">
+                        <span x-show="deletingItem" class="loading loading-spinner loading-sm"></span>
+                        <span x-show="!deletingItem">Xóa</span>
+                    </button>
+                </div>
+            </div>
+            <div class="modal-backdrop" @click="showDeleteItemModal = false"></div>
+        </div>
+
         <!-- Toast Notifications -->
         <div class="toast toast-top toast-end">
             <template x-for="notification in notifications" :key="notification.id">
@@ -433,6 +683,35 @@ content = @`
                 },
                 templateErrors: {},
                 notifications: [],
+
+                // Checklist Item management
+                showCreateItemModal: false,
+                selectedTemplate: null,
+                savingItem: false,
+                itemForm: {
+                    content: '',
+                    guide: '',
+                    orderNo: '',
+                    assignedToId: '',
+                    comAssignedToId: ''
+                },
+                itemErrors: {},
+
+                // Edit/Delete Checklist Item management
+                showEditItemModal: false,
+                showDeleteItemModal: false,
+                editingItem: null,
+                itemToDelete: null,
+                savingEditItem: false,
+                deletingItem: false,
+                editItemForm: {
+                    content: '',
+                    guide: '',
+                    orderNo: '',
+                    assignedToId: '',
+                    comAssignedToId: ''
+                },
+                editItemErrors: {},
 
                 async loadCompanies() {
                     try {
@@ -669,61 +948,18 @@ content = @`
                     }
                 },
 
-                // Fake data generation for checklist items
-                getFakeItems(templateId) {
-                    const fakeData = [
-                        {
-                            content: "Kiểm tra giấy tờ tàu",
-                            description: "Xác minh tính hợp lệ của các giấy tờ",
-                            guidance: "Kiểm tra đăng ký tàu, giấy phép hoạt động, bảo hiểm",
-                            documents: ["File_001.pdf", "Doc_checklist.xlsx"],
-                            inspector: {
-                                name: "Nguyễn Văn A",
-                                avatar: "https://ui-avatars.com/api/?name=Nguyen+Van+A&background=0d9488&color=fff&size=32"
-                            },
-                            evaluation: "YES",
-                            remark: "Tất cả giấy tờ đầy đủ và hợp lệ",
-                            companyInspector: {
-                                name: "Trần Thị B",
-                                avatar: "https://ui-avatars.com/api/?name=Tran+Thi+B&background=dc2626&color=fff&size=32"
-                            },
-                            companyEvaluation: "YES",
-                            companyRemark: "Đã xác nhận với bộ phận pháp lý",
-                            note: "Cần cập nhật bảo hiểm trong 30 ngày"
-                        },
-                        {
-                            content: "Kiểm tra an toàn thiết bị",
-                            description: "Đánh giá tình trạng thiết bị an toàn",
-                            guidance: "Kiểm tra áo phao, bè cứu sinh, hệ thống báo cháy",
-                            documents: ["Safety_check.pdf"],
-                            inspector: {
-                                name: "Lê Văn C",
-                                avatar: "https://ui-avatars.com/api/?name=Le+Van+C&background=059669&color=fff&size=32"
-                            },
-                            evaluation: "NO",
-                            remark: "Một số áo phao cần thay thế",
-                            companyInspector: {
-                                name: "Phạm Văn D",
-                                avatar: "https://ui-avatars.com/api/?name=Pham+Van+D&background=7c3aed&color=fff&size=32"
-                            },
-                            companyEvaluation: "NO",
-                            companyRemark: "Đồng ý cần cải thiện thiết bị",
-                            note: "Ưu tiên cao - cần xử lý ngay"
-                        }
-                    ];
-
-                    // Return different number of items for different templates for variety
-                    const itemCount = (templateId % 3) + 2; // 2-4 items per template
-                    return fakeData.slice(0, itemCount);
+                // Get checklist items from template
+                getItems(template) {
+                    return template.checklistItems || [];
                 },
 
-                getFakeItemCount(templateId) {
-                    return this.getFakeItems(templateId).length;
+                getItemCount(template) {
+                    return template.checklistItems ? template.checklistItems.length : 0;
                 },
 
                 getTotalItems() {
                     return this.displayedTemplates.reduce((total, template) => {
-                        return total + this.getFakeItemCount(template.id);
+                        return total + this.getItemCount(template);
                     }, 0);
                 },
 
@@ -731,10 +967,10 @@ content = @`
                     let yes = 0, no = 0, na = 0;
                     
                     this.displayedTemplates.forEach(template => {
-                        const items = this.getFakeItems(template.id);
+                        const items = this.getItems(template);
                         items.forEach(item => {
-                            if (item.evaluation === 'YES') yes++;
-                            else if (item.evaluation === 'NO') no++;
+                            if (item.vesselResult === 'YES') yes++;
+                            else if (item.vesselResult === 'NO') no++;
                             else na++;
                         });
                     });
@@ -759,7 +995,184 @@ content = @`
 
                 removeNotification(id) {
                     this.notifications = this.notifications.filter(n => n.id !== id);
-                }
+                },
+
+                // Checklist Item Functions
+                openCreateItemModal(template) {
+                    this.selectedTemplate = template;
+                    this.itemForm = {
+                        content: '',
+                        guide: '',
+                        orderNo: '',
+                        assignedToId: '',
+                        comAssignedToId: ''
+                    };
+                    this.itemErrors = {};
+                    this.showCreateItemModal = true;
+                },
+
+                closeCreateItemModal() {
+                    this.showCreateItemModal = false;
+                    this.selectedTemplate = null;
+                    this.itemForm = {
+                        content: '',
+                        guide: '',
+                        orderNo: '',
+                        assignedToId: '',
+                        comAssignedToId: ''
+                    };
+                    this.itemErrors = {};
+                },
+
+                async saveChecklistItem() {
+                    this.savingItem = true;
+                    this.itemErrors = {};
+
+                    const itemData = {
+                        ...this.itemForm,
+                        checklistTemplateId: this.selectedTemplate.id
+                    };
+
+                    try {
+                        const response = await fetch('/api/checklist-items', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify(itemData)
+                        });
+
+                        const data = await response.json();
+
+                        if (response.ok) {
+                            this.closeCreateItemModal();
+                            this.showNotification('success', 'Đã thêm mục kiểm tra thành công', 'check-circle');
+                            // Optionally reload the reviews to show the new item
+                            if (this.showSearchBar) {
+                                this.loadReviews();
+                            }
+                        } else {
+                            // Handle validation errors
+                            if (data.errors) {
+                                this.itemErrors = data.errors;
+                            } else {
+                                this.showNotification('error', data.message || 'Không thể thêm mục kiểm tra', 'alert-triangle');
+                            }
+                        }
+                    } catch (error) {
+                        this.showNotification('error', 'Lỗi kết nối: ' + error.message, 'alert-triangle');
+                    } finally {
+                        this.savingItem = false;
+                    }
+                },
+
+                getShipUsers() {
+                    return this.usersOfShip.filter(user => user.roleRootRole === 'SHIP');
+                },
+
+                getCompanyUsers() {
+                    return this.usersOfShip.filter(user => user.roleRootRole === 'COMPANY');
+                },
+
+                // Edit Checklist Item Functions
+                editChecklistItem(item) {
+                    this.editingItem = item;
+                    this.editItemForm = {
+                        content: item.content || '',
+                        guide: item.guide || '',
+                        orderNo: item.orderNo || '',
+                        assignedToId: item.assignedToId || '',
+                        comAssignedToId: item.comAssignedToId || ''
+                    };
+                    this.editItemErrors = {};
+                    this.showEditItemModal = true;
+                },
+
+                closeEditItemModal() {
+                    this.showEditItemModal = false;
+                    this.editingItem = null;
+                    this.editItemForm = {
+                        content: '',
+                        guide: '',
+                        orderNo: '',
+                        assignedToId: '',
+                        comAssignedToId: ''
+                    };
+                    this.editItemErrors = {};
+                },
+
+                async saveEditChecklistItem() {
+                    this.savingEditItem = true;
+                    this.editItemErrors = {};
+
+                    try {
+                        const response = await fetch(`/api/checklist-items/${this.editingItem.id}`, {
+                            method: 'PATCH',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify(this.editItemForm)
+                        });
+
+                        const data = await response.json();
+
+                        if (response.ok) {
+                            this.closeEditItemModal();
+                            this.showNotification('success', 'Đã cập nhật mục kiểm tra thành công', 'check-circle');
+                            // Reload checklist templates to get updated data
+                            await this.loadChecklistTemplates();
+                            if (this.showSearchBar) {
+                                this.loadReviews();
+                            }
+                        } else {
+                            // Handle validation errors
+                            if (data.errors) {
+                                this.editItemErrors = data.errors;
+                            } else {
+                                this.showNotification('error', data.message || 'Không thể cập nhật mục kiểm tra', 'alert-triangle');
+                            }
+                        }
+                    } catch (error) {
+                        this.showNotification('error', 'Lỗi kết nối: ' + error.message, 'alert-triangle');
+                    } finally {
+                        this.savingEditItem = false;
+                    }
+                },
+
+                // Delete Checklist Item Functions
+                deleteChecklistItem(item) {
+                    this.itemToDelete = item;
+                    this.showDeleteItemModal = true;
+                },
+
+                async confirmDeleteChecklistItem() {
+                    this.deletingItem = true;
+                    try {
+                        const response = await fetch(`/api/checklist-items/${this.itemToDelete.id}`, {
+                            method: 'DELETE'
+                        });
+
+                        if (response.ok) {
+                            this.showDeleteItemModal = false;
+                            this.showNotification('success', 'Đã xóa mục kiểm tra thành công', 'check-circle');
+                            // Reload checklist templates to get updated data
+                            await this.loadChecklistTemplates();
+                            if (this.showSearchBar) {
+                                this.loadReviews();
+                            }
+                        } else {
+                            const data = await response.json();
+                            this.showNotification('error', data.message || 'Không thể xóa mục kiểm tra', 'alert-triangle');
+                        }
+                    } catch (error) {
+                        this.showNotification('error', 'Lỗi kết nối: ' + error.message, 'alert-triangle');
+                    } finally {
+                        this.deletingItem = false;
+                        this.itemToDelete = null;
+                    }
+                },
+
+          
             }
         }
     </script>

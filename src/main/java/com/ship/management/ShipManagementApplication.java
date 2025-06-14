@@ -23,7 +23,7 @@ public class ShipManagementApplication {
     public ModelMapper modelMapper() {
         ModelMapper modelMapper = new ModelMapper();
         modelMapper.getConfiguration()
-                .setMatchingStrategy(MatchingStrategies.LOOSE);
+                .setMatchingStrategy(MatchingStrategies.STANDARD);
         return modelMapper;
     }
  
