@@ -14,7 +14,7 @@ content = @`
         <!-- Company, Ship and Template Selection -->
         <div class="card bg-base-100 shadow-xl">
             <div class="card-body">
-                <h3 class="font-semibold text-lg mb-4">Chọn công ty, tàu và template kiểm tra</h3>
+                <h3 class="font-semibold text-lg mb-4">Chọn công ty, tàu và mục kiểm tra</h3>
                 <div class="grid grid-cols-1 lg:grid-cols-5 gap-4">
                     <!-- Company Selection -->
                     <div class="form-control">
@@ -63,7 +63,7 @@ content = @`
                             x-model="selectedTemplateId"
                             :disabled="!selectedShipId || loadingTemplates"
                         >
-                            <option value="">Tất cả template</option>
+                            <option value="">Tất cả mục </option>
                             <template x-for="template in checklistTemplates" :key="template.id">
                                 <option :value="template.id" x-text="template.section"></option>
                             </template>
@@ -149,8 +149,8 @@ content = @`
                 <!-- Empty State -->
                 <div x-show="!loading && displayedTemplates.length === 0" class="text-center py-8">
                     <i data-lucide="clipboard" class="w-16 h-16 mx-auto text-base-content/30 mb-4"></i>
-                    <h3 class="text-lg font-medium mb-2">Chưa có template kiểm tra nào</h3>
-                    <p class="text-base-content/70 mb-4">Tạo template đầu tiên cho tàu này</p>
+                        <h3 class="text-lg font-medium mb-2">Chưa có mục kiểm tra nào</h3>
+                    <p class="text-base-content/70 mb-4">Tạo mục kiểm tra đầu tiên cho tàu này</p>
                     <button @click="openAddTemplateModal()" class="btn btn-primary">
                         <i data-lucide="plus" class="w-4 h-4"></i>
                         Thêm Mục Mới
@@ -177,7 +177,7 @@ content = @`
                             </tr>
                         </thead>
                       <template x-for="template in displayedTemplates" :key="template.id">
-    <tbody>
+                        <tbody>
         <!-- Template Header Row -->
         <tr class="bg-base-200 border-t-2 border-base-300">
             <td colspan="12" class="p-4">
@@ -186,8 +186,8 @@ content = @`
                         <h3 class="text-lg font-bold" x-text="template.section"></h3>
                         <span class="badge badge-outline" x-text="'Thứ tự: ' + template.orderNo"></span>
                         <span class="badge badge-info" x-text="getItemCount(template) + ' mục'"></span>
-                    </div>
-                    <div class="flex items-center gap-2">
+                                    </div>
+                                    <div class="flex items-center gap-2">
                         <button @click="openCreateItemModal(template)" class="btn btn-ghost btn-sm tooltip" data-tip="Thêm chi tiết">
                             <i data-lucide="plus" class="w-4 h-4"></i>
                         </button>
@@ -197,34 +197,34 @@ content = @`
                         <button @click="deleteTemplate(template)" class="btn btn-ghost btn-sm text-error tooltip" data-tip="Xóa mục">
                             <i data-lucide="trash-2" class="w-4 h-4"></i>
                         </button>
-                    </div>
-                </div>
-            </td>
-        </tr>
+                                            </div>
+                                        </div>
+                                </td>
+                            </tr>
 
         <!-- Template Items -->
         <template x-for="(item, index) in getItems(template)" :key="template.id + '_' + index">
-            <tr>
+                            <tr>
                 <td class="text-center font-mono" x-text="String(index + 1).padStart(2, '0')"></td>
-                <td class="max-w-xs">
+                                <td class="max-w-xs">
                     <div class="font-medium" x-text="item.content"></div>
-                </td>
-                <td class="max-w-xs">
+                                </td>
+                                <td class="max-w-xs">
                     <div class="text-xs" x-text="item.guide"></div>
-                </td>
-                <td>
+                                </td>
+                                <td>
                     <!-- Attachments placeholder - not implemented yet -->
                     <span class="text-xs text-gray-400">-</span>
-                </td>
-                <td>
-                    <div class="flex items-center gap-2">
+                                </td>
+                                <td>
+                                    <div class="flex items-center gap-2">
                         <div>
                             <div class="text-xs font-medium" x-text="item.assignedToFullName"></div>
                             <div class="text-xs text-gray-500" x-text="item.assignedToRoleName"></div>
-                        </div>
-                    </div>
-                </td>
-                <td class="text-center">
+                                            </div>
+                                    </div>
+                                </td>
+                                <td class="text-center">
                     <span class="badge"
                           :class="{
                               'badge-success': item.vesselResult === 'YES',
@@ -233,20 +233,20 @@ content = @`
                           }"
                           x-text="item.vesselResult || 'N/A'">
                     </span>
-                </td>
-                <td class="max-w-xs">
+                                </td>
+                                <td class="max-w-xs">
                     <div class="text-xs" x-text="item.vesselRemark || '-'"></div>
-                </td>
-                <td>
-                    <div class="flex items-center gap-2">
+                                </td>
+                                <td>
+                                    <div class="flex items-center gap-2">
                 
                         <div>
                             <div class="text-xs font-medium" x-text="item.comAssignedToFullName"></div>
                             <div class="text-xs text-gray-500" x-text="item.comAssignedToRoleName"></div>
-                        </div>
-                    </div>
-                </td>
-                <td class="text-center">
+                                            </div>
+                                    </div>
+                                </td>
+                                <td class="text-center">
                     <span class="badge"
                           :class="{
                               'badge-success': item.comResult === 'YES',
@@ -255,14 +255,14 @@ content = @`
                           }"
                           x-text="item.comResult || 'N/A'">
                     </span>
-                </td>
-                <td class="max-w-xs">
+                                </td>
+                                <td class="max-w-xs">
                     <div class="text-xs" x-text="item.comRemark || '-'"></div>
-                </td>
-                <td class="max-w-xs">
+                                </td>
+                                <td class="max-w-xs">
                     <div class="text-xs" x-text="item.note || '-'"></div>
-                </td>
-                <td class="text-center">
+                                </td>
+                                <td class="text-center">
                     <div class="flex items-center gap-1">
                         <button @click="editChecklistItem(item)" class="btn btn-ghost btn-xs tooltip" data-tip="Chỉnh sửa">
                             <i data-lucide="edit" class="w-3 h-3"></i>
@@ -270,11 +270,11 @@ content = @`
                         <button @click="deleteChecklistItem(item)" class="btn btn-ghost btn-xs text-error tooltip" data-tip="Xóa">
                             <i data-lucide="trash-2" class="w-3 h-3"></i>
                         </button>
-                    </div>
-                </td>
-            </tr>
+                                    </div>
+                                </td>
+                            </tr>
         </template>
-    </tbody>
+                        </tbody>
 </template>
 
                     </table>
@@ -377,7 +377,7 @@ content = @`
             <div class="modal-box">
                 <h3 class="font-bold text-lg mb-4 text-error">Xác nhận xóa</h3>
                 <p class="mb-4">
-                    Bạn có chắc chắn muốn xóa template <strong x-text="templateToDelete?.section"></strong>? 
+                    Bạn có chắc chắn muốn xóa mục kiểm tra <strong x-text="templateToDelete?.section"></strong>? 
                     Hành động này sẽ xóa tất cả checklist items bên trong và không thể hoàn tác.
                 </p>
                 <div class="modal-action">
@@ -821,9 +821,9 @@ content = @`
                         this.showSearchBar = true;
                         
                         if (this.displayedTemplates.length === 0) {
-                            this.showNotification('info', 'Chưa có template nào cho tàu này. Hãy thêm template mới!', 'info');
+                            this.showNotification('info', 'Chưa có mục kiểm tra nào cho tàu này. Hãy thêm mục kiểm tra mới!', 'info');
                         } else {
-                            this.showNotification('success', `Đã tải ${this.displayedTemplates.length} template thành công`, 'check-circle');
+                            this.showNotification('success', `Đã tải ${this.displayedTemplates.length} mục kiểm tra thành công`, 'check-circle');
                         }
                     } catch (error) {
                         console.error('Failed to load reviews:', error);
@@ -900,10 +900,7 @@ content = @`
 
                         if (response.ok) {
                             this.closeTemplateModal();
-                            await this.loadChecklistTemplates();
-                            if (this.showSearchBar) {
-                                this.loadReviews();
-                            }
+                            await this.refreshTable();
                             
                             const action = this.editingTemplate ? 'cập nhật' : 'thêm';
                             this.showNotification('success', data.message || `Đã ${action} Mục thành công`, 'check-circle');
@@ -916,7 +913,12 @@ content = @`
                         this.savingTemplate = false;
                     }
                 },
-
+                async refreshTable() {
+                    await this.loadChecklistTemplates();
+                    setTimeout(() => {
+                        this.loadReviews();
+                    }, 500);
+                },
                 deleteTemplate(template) {
                     this.templateToDelete = template;
                     this.showDeleteModal = true;
@@ -931,11 +933,8 @@ content = @`
 
                         if (response.ok) {
                             this.showDeleteModal = false;
-                            await this.loadChecklistTemplates();
-                            if (this.showSearchBar) {
-                                this.loadReviews();
-                            }
-                            this.showNotification('success', `Đã xóa template "${this.templateToDelete.section}" thành công`, 'check-circle');
+                            await this.refreshTable();
+                            this.showNotification('success', `Đã xóa mục kiểm tra "${this.templateToDelete.section}" thành công`, 'check-circle');
                         } else {
                             const data = await response.json();
                             this.showNotification('error', data.message || 'Không thể xóa template', 'alert-triangle');
@@ -979,8 +978,9 @@ content = @`
                 },
 
                 showNotification(type, message, icon) {
+                    const ranFrom1To1000 = Math.floor(Math.random() * 1000) + 1;
                     const notification = {
-                        id: Date.now(),
+                        id: Date.now().toString() + ranFrom1To1000,
                         type: type,
                         message: message,
                         icon: icon
@@ -1048,9 +1048,7 @@ content = @`
                             this.closeCreateItemModal();
                             this.showNotification('success', 'Đã thêm mục kiểm tra thành công', 'check-circle');
                             // Optionally reload the reviews to show the new item
-                            if (this.showSearchBar) {
-                                this.loadReviews();
-                            }
+                            await this.refreshTable();
                         } else {
                             // Handle validation errors
                             if (data.errors) {
@@ -1120,10 +1118,7 @@ content = @`
                             this.closeEditItemModal();
                             this.showNotification('success', 'Đã cập nhật mục kiểm tra thành công', 'check-circle');
                             // Reload checklist templates to get updated data
-                            await this.loadChecklistTemplates();
-                            if (this.showSearchBar) {
-                                this.loadReviews();
-                            }
+                            await this.refreshTable();
                         } else {
                             // Handle validation errors
                             if (data.errors) {
@@ -1156,10 +1151,7 @@ content = @`
                             this.showDeleteItemModal = false;
                             this.showNotification('success', 'Đã xóa mục kiểm tra thành công', 'check-circle');
                             // Reload checklist templates to get updated data
-                            await this.loadChecklistTemplates();
-                            if (this.showSearchBar) {
-                                this.loadReviews();
-                            }
+                            await this.refreshTable();
                         } else {
                             const data = await response.json();
                             this.showNotification('error', data.message || 'Không thể xóa mục kiểm tra', 'alert-triangle');

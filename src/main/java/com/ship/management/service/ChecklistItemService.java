@@ -4,6 +4,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import com.ship.management.dto.ChecklistItemDTO;
+import com.ship.management.dto.ReviewDTO;
 import com.ship.management.dto.UpdateItemDTO;
 import com.ship.management.entity.ChecklistItem;
 import com.ship.management.repository.ChecklistItemRepository;
@@ -44,5 +45,23 @@ public class ChecklistItemService {
         checklistItem = checklistItemRepository.save(checklistItem);
         return modelMapper.map(checklistItem, ChecklistItemDTO.class);
     }
-  
+
+    public ChecklistItemDTO reviewFromShip(ReviewDTO reviewDTO) {
+        ChecklistItem checklistItem = checklistItemRepository.findById(reviewDTO.getChecklistItemId()).orElseThrow(() -> new RuntimeException("Checklist item not found"));
+        checklistItem.setVesselResult(reviewDTO.getResult());
+        checklistItem.setVesselRemark(reviewDTO.getRemark());
+        checklistItem = checklistItemRepository.save(checklistItem);
+        return modelMapper.map(checklistItem, ChecklistItemDTO.class);
+    }
+
+    public ChecklistItemDTO reviewFromCompany(ReviewDTO reviewDTO) {
+        ChecklistItem checklistItem = checklistItemRepository.findById(reviewDTO.getChecklistItemId()).orElseThrow(() -> new RuntimeException("Checklist item not found"));
+        checklistItem.setComResult(reviewDTO.getResult());
+        checklistItem.setComRemark(reviewDTO.getRemark());
+        checklistItem.setNote(reviewDTO.getNote());
+        checklistItem = checklistItemRepository.save(checklistItem);
+        return modelMapper.map(checklistItem, ChecklistItemDTO.class);
+    }
+
+    
 }
