@@ -1,7 +1,9 @@
 @import com.ship.management.entity.User
+@import java.util.stream.Stream
 
 @param User currentUser
 !{var rootRole = currentUser.getRole().getRootRole().toString();}
+!{var permissions = currentUser.getListAuthorities();}
 @template.layout(
 title = "Đánh giá tàu",
 activePage = "reviews-ship",
@@ -100,7 +102,7 @@ content = @`
                     <label class="label">
                         <span class="label-text">&nbsp;</span>
                     </label>
-                    @if(rootRole == "ADMIN")
+                    @if(Stream.of("ROLE_ADMIN","REVIEW_MANAGEMENT").anyMatch(permissions::contains))
                     <button
                             class="btn btn-success"
                             @click="openAddTemplateModal()"
@@ -209,8 +211,8 @@ content = @`
                             </td>
                            
                            <td colspan="3">
-                               @if(rootRole == "ADMIN")
-                                    <div class="flex items-center gap-2 justify-end">
+                               @if(Stream.of("ROLE_ADMIN","REVIEW_MANAGEMENT").anyMatch(permissions::contains))
+                                   <div class="flex items-center gap-2 justify-end">
 
                                         <button @click="openCreateItemModal(template)"
                                                 class="btn btn-ghost btn-sm tooltip" data-tip="Thêm chi tiết">
@@ -315,7 +317,7 @@ content = @`
                                                 <i data-lucide="check-circle" class="w-4 h-4"></i>
                                             </button>
                                         @endif
-                                        @if(rootRole == "ADMIN")
+                                        @if(Stream.of("ROLE_ADMIN","REVIEW_MANAGEMENT").anyMatch(permissions::contains))
                                         <button @click="editChecklistItem(item)"
                                                 class="btn btn-ghost btn-xs tooltip" data-tip="Chỉnh sửa">
                                             <i data-lucide="edit" class="w-3 h-3"></i>
@@ -336,7 +338,7 @@ content = @`
             </div>
 
             <!-- Summary Section -->
-            @if(rootRole == "ADMIN")
+            @if(Stream.of("ROLE_ADMIN","REVIEW_MANAGEMENT").anyMatch(permissions::contains))
             <div x-show="!loading && displayedTemplates.length > 0"
                  class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div class="stat bg-success/10 rounded-lg">
@@ -731,7 +733,7 @@ content = @`
                                 <input type="file" 
                                        class="file-input file-input-bordered file-input-sm w-full" 
                                        @change="handleSingleFileSelect"
-                                       accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png,.txt">
+                                      >
                             </div>
                             <button @click="uploadSingleFile()" 
                                     :disabled="!selectedFile || uploadingSingle"
@@ -752,7 +754,7 @@ content = @`
                                        multiple
                                        class="file-input file-input-bordered file-input-sm w-full" 
                                        @change="handleMultipleFilesSelect"
-                                       accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png,.txt">
+                                      >
                             </div>
                             <button @click="uploadMultipleFiles()" 
                                     :disabled="!selectedFiles?.length || uploadingMultiple"

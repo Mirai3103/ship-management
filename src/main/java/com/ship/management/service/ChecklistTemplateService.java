@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -68,11 +69,12 @@ public class ChecklistTemplateService {
 
     public List<ChecklistTemplateDTO> handlePermission(List<ChecklistTemplateDTO> templates) {
         var currentUser = userService.getCurrentUser();
-        if(currentUser.getRole().getRootRole() == Role.RootRole.ADMIN){
+        var permissions = currentUser.getListAuthorities();
+        if(Stream.of("ROLE_ADMIN","REVIEW_MANAGEMENT").anyMatch(permissions::contains)) {
             return templates;
         }
         return templates.stream() 
-        .map(t->{
+        .peek(t->{
             var listCheckList = t.getChecklistItems();
             if(listCheckList!=null){
                 listCheckList=  listCheckList.stream().filter(
@@ -80,8 +82,7 @@ public class ChecklistTemplateService {
                 ).toList();
             }
             t.setChecklistItems(listCheckList);
-            return t;
-        }).filter(t->t.getChecklistItems().size()>0).toList();
+        }).filter(t-> !t.getChecklistItems().isEmpty()).toList();
     }
 
 
