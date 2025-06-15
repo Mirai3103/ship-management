@@ -121,12 +121,15 @@
                                                   x-text="getRootRoleDisplay(role.rootRole)"></span>
                                         </td>
                                         <td>
-                                            <div class="flex items-center space-x-2">
+                                            <div class="flex items-center space-x-2" x-show="role.name!='ADMIN'">
                                                 <button @click="viewRole(role)" class="btn btn-ghost btn-xs tooltip" data-tip="Xem chi tiết">
                                                     <i data-lucide="eye" class="w-3 h-3"></i>
                                                 </button>
                                                 <button @click="editRole(role)" class="btn btn-ghost btn-xs tooltip" data-tip="Chỉnh sửa">
                                                     <i data-lucide="edit" class="w-3 h-3"></i>
+                                                </button>
+                                                <button @click="editRolePermissions(role)" class="btn btn-ghost btn-xs text-info tooltip" data-tip="Quản lý quyền">
+                                                    <i data-lucide="shield" class="w-3 h-3"></i>
                                                 </button>
                                                 <button @click="deleteRole(role)" class="btn btn-ghost btn-xs text-error tooltip" data-tip="Xóa" 
                                                         :disabled="role.name === 'ADMIN' || role.name === 'USER'">
@@ -279,6 +282,81 @@
                 <div class="modal-backdrop" @click="showDeleteModal = false"></div>
             </div>
 
+            <!-- Edit Permissions Modal -->
+            <div class="modal" :class="{ 'modal-open': showPermissionsModal }">
+                <div class="modal-box max-w-2xl">
+                    <h3 class="font-bold text-lg mb-4 flex items-center gap-2">
+                        <i data-lucide="shield" class="w-5 h-5 text-info"></i>
+                        Quản lý quyền hạn - <span x-text="currentRole?.name" class="text-info"></span>
+                    </h3>
+                    
+                    <!-- Loading State -->
+                    <div x-show="loadingPermissions" class="flex justify-center py-8">
+                        <span class="loading loading-spinner loading-lg"></span>
+                    </div>
+
+                    <!-- Permissions Grid -->
+                    <div x-show="!loadingPermissions" class="space-y-4">
+                        <div class="alert alert-info">
+                            <i data-lucide="info" class="w-4 h-4"></i>
+                            <div class="text-sm">
+                                <strong>Hướng dẫn:</strong> Chọn các quyền mà vai trò này được phép thực hiện trong hệ thống.
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <template x-for="permission in availablePermissions" :key="permission.key">
+                                <div class="form-control">
+                                    <label class="label cursor-pointer justify-start gap-3 p-4 border rounded-lg hover:bg-base-200 transition-colors"
+                                           :class="{ 'bg-info/10 border-info': selectedPermissions.includes(permission.key) }">
+                                        <input 
+                                            type="checkbox" 
+                                            class="checkbox checkbox-info" 
+                                            :checked="selectedPermissions.includes(permission.key)"
+                                            @change="togglePermission(permission.key)"
+                                        />
+                                        <div class="flex-1">
+                                            <div class="font-medium flex items-center gap-2">
+                                                <i :data-lucide="permission.icon" class="w-4 h-4"></i>
+                                                <span x-text="permission.name"></span>
+                                            </div>
+                                            <div class="text-sm text-base-content/70" x-text="permission.description"></div>
+                                        </div>
+                                    </label>
+                                </div>
+                            </template>
+                        </div>
+
+                        <!-- Selected Permissions Summary -->
+                        <div x-show="selectedPermissions.length > 0" class="mt-6">
+                            <h4 class="font-medium mb-2">Quyền đã chọn:</h4>
+                            <div class="flex flex-wrap gap-2">
+                                <template x-for="permissionKey in selectedPermissions" :key="permissionKey">
+                                    <span class="badge badge-info gap-1">
+                                        <i :data-lucide="getPermissionIcon(permissionKey)" class="w-3 h-3"></i>
+                                        <span x-text="getPermissionName(permissionKey)"></span>
+                                    </span>
+                                </template>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-action">
+                        <button type="button" class="btn btn-ghost" @click="closePermissionsModal()">Hủy</button>
+                        <button 
+                            type="button" 
+                            class="btn btn-info" 
+                            @click="savePermissions()" 
+                            :disabled="savingPermissions || loadingPermissions"
+                        >
+                            <span x-show="savingPermissions" class="loading loading-spinner loading-sm"></span>
+                            <span x-show="!savingPermissions">Lưu thay đổi</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="modal-backdrop" @click="closePermissionsModal()"></div>
+            </div>
+
             <!-- Toast Notifications -->
             <div class="toast toast-top toast-end">
                 <template x-for="notification in notifications" :key="notification.id">
@@ -313,8 +391,45 @@
                     searchQuery: '',
                     showModal: false,
                     showDeleteModal: false,
+                    showPermissionsModal: false,
                     editingRole: null,
                     roleToDelete: null,
+                    currentRole: null,
+                    loadingPermissions: false,
+                    savingPermissions: false,
+                    selectedPermissions: [],
+                    availablePermissions: [
+                        {
+                            key: 'USER_MANAGEMENT',
+                            name: 'Quản lý người dùng',
+                            description: 'quản lý tài khoản người dùng',
+                            icon: 'users'
+                        },
+                        {
+                            key: 'ROLE_MANAGEMENT',
+                            name: 'Quản lý vai trò',
+                            description: 'Tạo, sửa, xóa vai trò và phân quyền',
+                            icon: 'shield-check'
+                        },
+                        {
+                            key: 'REVIEW_MANAGEMENT',
+                            name: 'Đánh giá tàu',
+                            description: 'Đánh giá tàu thuyền',
+                            icon: 'star'
+                        },
+                        {
+                            key: 'SHIP_MANAGEMENT',
+                            name: 'Quản lý tàu thuyền',
+                            description: 'Quản lý thông tin tàu thuyền và thành viên',
+                            icon: 'ship'
+                        },
+                        {
+                            key: 'COMPANY_MANAGEMENT',
+                            name: 'Quản lý công ty',
+                            description: 'Quản lý thông tin công ty',
+                            icon: 'building'
+                        }
+                    ],
                     formData: {
                         name: '',
                         description: '',
@@ -459,7 +574,7 @@
                                 this.loadRoles();
                                 
                                 const action = this.editingRole ? 'cập nhật' : 'thêm';
-                                this.showNotification('success', `Đã ${action} vai trò "${data.name}" thành công`, 'check-circle');
+                                this.showNotification('success', `Đã ${action}  thành công`, 'check-circle');
                             } else {
                                 this.showNotification('error', data.message || 'Không thể lưu thông tin vai trò', 'alert-triangle');
                             }
@@ -528,6 +643,84 @@
                             default:
                                 return 'UNKNOWN';
                         }
+                    },
+
+                    async editRolePermissions(role) {
+                        this.currentRole = role;
+                        this.showPermissionsModal = true;
+                        this.loadingPermissions = true;
+                        
+                        try {
+                            // Load current role permissions
+                            const response = await fetch('/api/roles/' + role.id);
+                            if (response.ok) {
+                                const roleData = await response.json();
+                                this.selectedPermissions = roleData.permissions?.map(rp => rp) || [];
+                                console.log(this.selectedPermissions);
+                            } else {
+                                this.showNotification('error', 'Không thể tải thông tin quyền hạn', 'alert-triangle');
+                            }
+                        } catch (error) {
+                            this.showNotification('error', 'Lỗi kết nối: ' + error.message, 'alert-triangle');
+                        } finally {
+                            this.loadingPermissions = false;
+                            this.$nextTick(() => lucide.createIcons());
+                        }
+                    },
+
+                    closePermissionsModal() {
+                        this.showPermissionsModal = false;
+                        this.currentRole = null;
+                        this.selectedPermissions = [];
+                        this.loadingPermissions = false;
+                        this.savingPermissions = false;
+                    },
+
+                    togglePermission(permissionKey) {
+                        const index = this.selectedPermissions.indexOf(permissionKey);
+                        if (index > -1) {
+                            this.selectedPermissions.splice(index, 1);
+                        } else {
+                            this.selectedPermissions.push(permissionKey);
+                        }
+                    },
+
+                    async savePermissions() {
+                        this.savingPermissions = true;
+                        
+                        try {
+                            const response = await fetch(`/api/roles/${this.currentRole.id}/permissions`, {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                },
+                                body: JSON.stringify({
+                                    permissions: this.selectedPermissions
+                                })
+                            });
+
+                            if (response.ok) {
+                                this.closePermissionsModal();
+                                this.loadRoles();
+                                this.showNotification('success', `Đã cập nhật quyền hạn cho vai trò  thành công`, 'check-circle');
+                            } else {
+                                this.showNotification('error', 'Không thể cập nhật quyền hạn', 'alert-triangle');
+                            }
+                        } catch (error) {
+                            this.showNotification('error', 'Lỗi kết nối: ' + error.message, 'alert-triangle');
+                        } finally {
+                            this.savingPermissions = false;
+                        }
+                    },
+
+                    getPermissionName(permissionKey) {
+                        const permission = this.availablePermissions.find(p => p.key === permissionKey);
+                        return permission ? permission.name : permissionKey;
+                    },
+
+                    getPermissionIcon(permissionKey) {
+                        const permission = this.availablePermissions.find(p => p.key === permissionKey);
+                        return permission ? permission.icon : 'shield';
                     }
                 }
             }

@@ -38,12 +38,23 @@ public class ShipService {
             Page<Ship> ships = shipRepository.findAll(pageable);
             return ships.map(this::convertToDTO);
         }
+            Page<Ship> ships = shipRepository.findByCompanyId(userService.getCurrentUser().getCompany().getId(),pageable);
+            return ships.map(this::convertToDTO);
+        
+
+    }
+
+    public Page<ShipDTO> getAllShipsStrict(Pageable pageable) {
+        var rootRole = userService.getCurrentUserRootRole();
+        if (RootRole.ADMIN.equals(rootRole)) {
+            Page<Ship> ships = shipRepository.findAll(pageable);
+            return ships.map(this::convertToDTO);
+        }
         var userShip = shipRepository.findByUserId(userService.getCurrentUser().getId());
         return new PageImpl<>(userShip.stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList()), pageable, userShip.size());
     }
-
     public Optional<ShipDTO> getShipById(Long id) {
         return shipRepository.findById(id)
                 .map(this::convertToDTO);

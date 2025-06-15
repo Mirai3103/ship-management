@@ -22,8 +22,9 @@ public class CompanyController {
 
     @GetMapping
     public ResponseEntity<PagedModel<CompanyDTO>> getAllCompanies(
-            @PageableDefault(size = 10, sort = "id") Pageable pageable) {
-        Page<CompanyDTO> companies = companyService.getAllCompanies(pageable);
+            @PageableDefault(size = 10, sort = "id") Pageable pageable,
+            @RequestParam(required = false, defaultValue = "false") Boolean strict) {
+        Page<CompanyDTO> companies = strict ? companyService.getAllCompaniesStrict(pageable) : companyService.getAllCompanies(pageable);
         return ResponseEntity.ok(new PagedModel<>(companies));
     }
 

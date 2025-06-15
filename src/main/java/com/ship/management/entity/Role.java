@@ -1,6 +1,7 @@
 package com.ship.management.entity;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -11,6 +12,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -33,4 +35,7 @@ public class Role {
     private RootRole rootRole;
     @OneToMany(mappedBy = "role")
     private List<User> users;
+    @OneToMany(mappedBy = "role",fetch = FetchType.EAGER)
+    @Builder.Default
+    private List<RolePermission> rolePermissions=new ArrayList<>();
 }

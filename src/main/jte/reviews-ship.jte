@@ -974,7 +974,7 @@ content = @`
 
                 async loadCompanies() {
                     try {
-                        const response = await fetch('/api/companies?page=0&size=1000');
+                        const response = await fetch('/api/companies?page=0&size=1000&strict=true');
                         if (response.ok) {
                             const data = await response.json();
                             this.companies = data.content || [];
@@ -1067,7 +1067,7 @@ content = @`
                     this.showSearchBar = false;
 
                     try {
-                        const response = await fetch(`/api/ships?page=0&size=1000`);
+                        const response = await fetch(`/api/ships?page=0&size=1000&strict=true`);
                         if (response.ok) {
                             const data = await response.json();
                             // Note: Need to filter by company once company relationship is available in Ship entity

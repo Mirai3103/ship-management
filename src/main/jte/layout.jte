@@ -1,4 +1,6 @@
 @import com.ship.management.entity.User
+@import java.util.List
+@import java.util.stream.Stream
 
 @param String title
 @param String activePage = ""
@@ -6,6 +8,7 @@
 
 @param User currentUser = null
 !{var rootRole = currentUser == null ? null : currentUser.getRole().getRootRole().toString();}
+!{var permissions = currentUser.getListAuthorities();}
 <!DOCTYPE html>
 <html lang="vi" data-theme="corporate">
 <head>
@@ -78,7 +81,7 @@
                         </a>
                     </li>
 
-                    @if(rootRole == "ADMIN")
+                    @if(Stream.of("ROLE_ADMIN", "SHIP_MANAGEMENT").anyMatch(permissions::contains))
                     <!-- Ships Management -->
                     <li>
                         <a href="/ships"
@@ -96,7 +99,7 @@
                             <span>Kiểm tra & Đánh giá tàu</span>
                         </a>
                     </li>
-                    @if(rootRole == "ADMIN")
+                    @if(Stream.of("ROLE_ADMIN", "USER_MANAGEMENT").anyMatch(permissions::contains))
                     <!-- User Management -->
                     <li>
                         <a href="/users"
@@ -105,8 +108,10 @@
                             <span>Quản lý người dùng</span>
                         </a>
                     </li>
+                        @endif
 
                     <!-- Company Management -->
+                    @if(Stream.of("ROLE_ADMIN", "COMPANY_MANAGEMENT").anyMatch(permissions::contains))
                     <li>
                         <a href="/companies"
                            class="flex items-center space-x-3 ${activePage.equals("companies") ? "active" : ""}">
@@ -114,8 +119,10 @@
                             <span>Quản lý công ty</span>
                         </a>
                     </li>
+                    @endif
 
                     <!-- Role Management -->
+                    @if(Stream.of("ROLE_ADMIN", "ROLE_MANAGEMENT").anyMatch(permissions::contains))
                     <li>
                         <a href="/roles"
                            class="flex items-center space-x-3 ${activePage.equals("roles") ? "active" : ""}">

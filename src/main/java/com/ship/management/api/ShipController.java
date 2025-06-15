@@ -27,8 +27,9 @@ public class ShipController {
 
     @GetMapping
     public ResponseEntity<PagedModel<ShipDTO>> getAllShips(
-            @PageableDefault(size = 10, sort = "id") Pageable pageable) {
-        Page<ShipDTO> ships = shipService.getAllShips(pageable);
+            @PageableDefault(size = 10, sort = "id") Pageable pageable,
+            @RequestParam(required = false, defaultValue = "false") Boolean strict) {
+        Page<ShipDTO> ships = strict ? shipService.getAllShipsStrict(pageable) : shipService.getAllShips(pageable);
         return ResponseEntity.ok(new PagedModel<>(ships));
     }
 

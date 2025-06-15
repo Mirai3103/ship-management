@@ -1,14 +1,22 @@
 package com.ship.management.service;
 
+import com.ship.management.dto.EditRolePermissionDTO;
 import com.ship.management.dto.RoleDTO;
 import com.ship.management.entity.Role;
+import com.ship.management.entity.RolePermission;
+import com.ship.management.repository.RolePermissionRepository;
 import com.ship.management.repository.RoleRepository;
+
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.val;
+
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Optional;
 
 @Service
@@ -17,18 +25,22 @@ public class RoleService {
 
     private final RoleRepository roleRepository;
     private final ModelMapper modelMapper;
+    private final RolePermissionRepository rolePermissionRepository;
     public Page<RoleDTO> getAllRoles(Pageable pageable) {
         Page<Role> roles = roleRepository.findAll(pageable);
         return roles.map(this::convertToDTO);
     }
 
     public Optional<RoleDTO> getRoleById(Long id) {
-        return roleRepository.findById(id)
-                .map(this::convertToDTO);
+        var role = roleRepository.findById(id);
+        role.ifPresent(r->r.getRolePermissions().size()); // force load role permissions
+        return role.map(this::convertToDTO);
     }
 
     public Optional<RoleDTO> getRoleByName(String name) {
-        return roleRepository.findByName(name)
+        var role = roleRepository.findByName(name);
+        role.ifPresent(r->r.getRolePermissions().size()); // force load role permissions
+        return  role
                 .map(this::convertToDTO);
     }
 
@@ -41,6 +53,7 @@ public class RoleService {
         Role role = convertToEntity(roleDTO);
         role.setId(null); // Ensure it's a new entity
         Role savedRole = roleRepository.save(role);
+
         return convertToDTO(savedRole);
     }
 
@@ -56,10 +69,26 @@ public class RoleService {
                     existingRole.setName(roleDTO.getName());
                     existingRole.setDescription(roleDTO.getDescription());
                     existingRole.setRootRole(roleDTO.getRootRole());
+            
                     Role updatedRole = roleRepository.save(existingRole);
                     return convertToDTO(updatedRole);
                 });
     }
+    @org.springframework.transaction.annotation.Transactional
+    public Optional<RoleDTO> editRolePermission(Long id, EditRolePermissionDTO editRolePermissionDTO) {
+        return roleRepository.findById(id)
+                .map(existingRole -> {
+                    rolePermissionRepository.deleteByRoleId(existingRole.getId());
+                    rolePermissionRepository.saveAll(editRolePermissionDTO.getPermissions().stream().map(p->{
+                        RolePermission rolePermission = new RolePermission();
+                        rolePermission.setRole(existingRole);
+                        rolePermission.setPermission(p);
+                        return rolePermission;
+                    }).toList());
+                    return convertToDTO(existingRole);
+                });
+    }
+    
 
     public boolean deleteRole(Long id) {
         if (roleRepository.existsById(id)) {
@@ -76,7 +105,10 @@ public class RoleService {
     }
 
     private RoleDTO convertToDTO(Role role) {
-        return modelMapper.map(role, RoleDTO.class);
+        var dto= modelMapper.map(role, RoleDTO.class);
+        dto.setPermissions(new ArrayList<>());
+        role.getRolePermissions().forEach(rp->dto.getPermissions().add(rp.getPermission()));
+        return dto;
     }
 
     private Role convertToEntity(RoleDTO roleDTO) {

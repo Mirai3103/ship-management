@@ -1,5 +1,6 @@
 package com.ship.management.api;
 
+import com.ship.management.dto.EditRolePermissionDTO;
 import com.ship.management.dto.RoleDTO;
 import com.ship.management.service.RoleService;
 import lombok.RequiredArgsConstructor;
@@ -76,6 +77,13 @@ public class RoleController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(new ErrorResponse("error", e.getMessage()));
         }
+    }
+
+    @PostMapping("/{id}/permissions")
+    public ResponseEntity<?> editRolePermission(@PathVariable Long id, @Valid @RequestBody EditRolePermissionDTO editRolePermissionDTO) {
+        return roleService.editRolePermission(id, editRolePermissionDTO)
+                .map(role -> ResponseEntity.ok(role))
+                .orElse(ResponseEntity.notFound().build());
     }
 
     // Error response class

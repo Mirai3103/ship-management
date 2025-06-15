@@ -23,8 +23,15 @@ public class CompanyService {
     private final UserService userService;
 
     public Page<CompanyDTO> getAllCompanies(Pageable pageable) {
+
+        Page<Company> companies = companyRepository.findAll(pageable);
+        return companies.map(this::convertToDTO);
+
+    }
+
+    public Page<CompanyDTO> getAllCompaniesStrict(Pageable pageable) {
         var rootRole = userService.getCurrentUserRootRole();
-        if(rootRole == RootRole.ADMIN){
+        if (rootRole == RootRole.ADMIN) {
             Page<Company> companies = companyRepository.findAll(pageable);
             return companies.map(this::convertToDTO);
         }
@@ -32,8 +39,6 @@ public class CompanyService {
         var userCompany = currentUser.getCompany();
         return new PageImpl<>(List.of(convertToDTO(userCompany)), pageable, 1);
     }
-
-
 
     public Optional<CompanyDTO> getCompanyById(Long id) {
         return companyRepository.findById(id)
@@ -84,4 +89,4 @@ public class CompanyService {
     private Company convertToEntity(CompanyDTO companyDTO) {
         return modelMapper.map(companyDTO, Company.class);
     }
-} 
+}

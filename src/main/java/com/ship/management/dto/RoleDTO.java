@@ -2,7 +2,10 @@ package com.ship.management.dto;
 
 import lombok.Data;
 
+import java.util.List;
+
 import com.ship.management.entity.Role;
+import com.ship.management.entity.RolePermission;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -22,4 +25,6 @@ public class RoleDTO {
 
     @NotNull(message = "Vai trò gốc là bắt buộc")
     private Role.RootRole rootRole;
+
+    private List<RolePermission.Permission> permissions;
 } 
