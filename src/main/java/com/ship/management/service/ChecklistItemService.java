@@ -1,7 +1,12 @@
 package com.ship.management.service;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
+import com.ship.management.dto.CopyCheckListDTO;
+import com.ship.management.entity.ChecklistTemplate;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +24,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ChecklistItemService {
     private final ChecklistItemRepository checklistItemRepository;
+
     private final ChecklistTemplateRepository checklistTemplateRepository;
     private final UserRepository userRepository;
     private final ModelMapper modelMapper;
@@ -65,6 +71,19 @@ public class ChecklistItemService {
         checklistItem.setNote(reviewDTO.getNote());
     checklistItemRepository.save(checklistItem);
         return new ChecklistItemDTO();
+    }
+
+    public void  copyCheckListToShip(CopyCheckListDTO copyCheckListDTO) {
+        var currentTemplate= checklistTemplateRepository.findById(copyCheckListDTO.getShipId())
+                .orElseThrow(() -> new RuntimeException("Ship not found"));
+        var checklists = checklistItemRepository.findByIdIsIn((copyCheckListDTO.getItems().stream().map(CopyCheckListDTO.CopyCheckListItemDTO::getChecklistId).toList()));
+        Map<ChecklistTemplate, List<ChecklistItem>> checklistMap = checklists.stream()
+                .collect(Collectors.groupingBy(ChecklistItem::getChecklistTemplate));
+
+//         đầu tiên kiếm mấy template trùng tên với cái có sẵn mà push vào
+
+
+        // sau đó push vào checklist item mới
     }
 
     

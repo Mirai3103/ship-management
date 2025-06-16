@@ -103,14 +103,19 @@ content = @`
                         <span class="label-text">&nbsp;</span>
                     </label>
                     @if(Stream.of("ROLE_ADMIN","REVIEW_MANAGEMENT").anyMatch(permissions::contains))
-                    <button
-                            class="btn btn-success"
-                            @click="openAddTemplateModal()"
-                            :disabled="!selectedShipId"
-                    >
-                        <i data-lucide="plus" class="w-4 h-4"></i>
-                        Thêm mục kiểm tra
-                    </button>
+                    <div class="flex gap-2">
+                        <button
+                                class="btn btn-success"
+                                @click="openAddTemplateModal()"
+                                :disabled="!selectedShipId"
+                        >
+                            <i data-lucide="plus" class="w-4 h-4"></i>
+                            Thêm mục kiểm tra
+                        </button>
+                        
+                        <!-- Import Button Component -->
+                        @template.import-btn()
+                    </div>
                     @endif
                 </div>
             </div>

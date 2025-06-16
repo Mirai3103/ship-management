@@ -16,6 +16,9 @@ public interface ChecklistTemplateRepository extends JpaRepository<ChecklistTemp
     
     // Find by ship
     Page<ChecklistTemplate> findByShipId(Long shipId, Pageable pageable);
+    List<ChecklistTemplate> findByIdIsIn(List<Long> ids);
+
+    Optional<ChecklistTemplate> findFirstByShipIdAndSection(Long shipId, String section);
     
     // Find by company
     Page<ChecklistTemplate> findByCompanyId(Long companyId, Pageable pageable);
