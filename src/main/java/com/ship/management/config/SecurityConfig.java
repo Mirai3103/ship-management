@@ -52,10 +52,10 @@ public class SecurityConfig {
             log.warn("Authentication failed for user: {} from IP: {} with User-Agent: {}. Reason: {}", 
                     email, clientIP, userAgent, exception.getMessage());
             
-            // Log the specific exception type for better debugging
+
             log.debug("Authentication failure details: ", exception);
             
-            // Redirect to login page with error parameter
+
             response.sendRedirect("/login?error=true");
         };
     }
@@ -74,15 +74,15 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(authorize -> authorize
-                        // Public endpoints - no authentication required
+
                         .requestMatchers("/login", "/register").permitAll()
                         .requestMatchers("/api/auth/login", "/api/auth/register").permitAll()
-                        // Static resources - no authentication required
+
                         .requestMatchers("/styles/**", "/js/**", "/images/**", "/favicon.ico").permitAll()
-                        // match /**.css
+
                         .requestMatchers("/**.css").permitAll()
                         .requestMatchers("/error").permitAll()
-                        // All other endpoints require authentication
+
                         .anyRequest().authenticated())
                 .formLogin(form -> form
                         .loginPage("/login")

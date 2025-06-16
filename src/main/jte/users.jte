@@ -8,8 +8,7 @@
     currentUser = currentUser,
     content = @`
         <div x-data="userManager()" x-init="loadUsers(); loadRoles(); loadCompanies()" class="space-y-6">
-            <!-- Header Section -->
-            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div>
                     <h1 class="text-2xl font-bold">Quản lý người dùng</h1>
                     <p class="text-base-content/70">Quản lý tài khoản người dùng và phân quyền trong hệ thống</p>
@@ -20,12 +19,10 @@
                 </button>
             </div>
 
-            <!-- Search and Filter Section -->
-            <div class="card bg-base-100 shadow-xl">
+                        <div class="card bg-base-100 shadow-xl">
                 <div class="card-body">
                     <div class="flex flex-col lg:flex-row gap-4">
-                        <!-- Search Input -->
-                        <div class="flex-1">
+                                                <div class="flex-1">
                             <div class="form-control">
                                 <div class="input-group">
                                     <input 
@@ -42,8 +39,7 @@
                             </div>
                         </div>
                         
-                        <!-- Page Size Selector -->
-                        <div class="form-control w-full max-w-xs">
+                                                <div class="form-control w-full max-w-xs">
                             <select class="select select-bordered" x-model="pageSize" @change="loadUsers()">
                                 <option value="5">5 người dùng/trang</option>
                                 <option value="10">10 người dùng/trang</option>
@@ -55,8 +51,7 @@
                 </div>
             </div>
 
-            <!-- Users Table -->
-            <div class="card bg-base-100 shadow-xl">
+                        <div class="card bg-base-100 shadow-xl">
                 <div class="card-body min-h-[50vh]">
                     <div class="flex items-center justify-between mb-4">
                         <h2 class="card-title">
@@ -68,13 +63,11 @@
                         </div>
                     </div>
 
-                    <!-- Loading State -->
-                    <div x-show="loading" class="flex justify-center py-8">
+                                        <div x-show="loading" class="flex justify-center py-8">
                         <span class="loading loading-spinner loading-lg"></span>
                     </div>
 
-                    <!-- Empty State -->
-                    <div x-show="!loading && users.content && users.content.length === 0" class="text-center py-8">
+                                        <div x-show="!loading && users.content && users.content.length === 0" class="text-center py-8">
                         <i data-lucide="users" class="w-16 h-16 mx-auto text-base-content/30 mb-4"></i>
                         <h3 class="text-lg font-medium mb-2">Chưa có người dùng nào</h3>
                         <p class="text-base-content/70 mb-4">Bắt đầu bằng cách thêm người dùng đầu tiên</p>
@@ -84,8 +77,7 @@
                         </button>
                     </div>
 
-                    <!-- Users Table -->
-                    <div x-show="!loading && users.content && users.content.length > 0" class="overflow-x-auto h-full min-h-[50vh]">
+                                        <div x-show="!loading && users.content && users.content.length > 0" class="overflow-x-auto h-full min-h-[50vh]">
                         <table class="table table-zebra w-full">
                             <thead>
                                 <tr>
@@ -178,8 +170,7 @@
                         </table>
                     </div>
 
-                    <!-- Pagination -->
-                    <div x-show="!loading && users.totalPages > 1" class="flex justify-center mt-6">
+                                        <div x-show="!loading && users.totalPages > 1" class="flex justify-center mt-6">
                         <div class="join">
                             <button 
                                 class="join-item btn" 
@@ -210,8 +201,7 @@
                 </div>
             </div>
 
-            <!-- Add/Edit User Modal -->
-            <div class="modal" :class="{ 'modal-open': showModal }">
+                        <div class="modal" :class="{ 'modal-open': showModal }">
                 <div class="modal-box max-w-2xl">
                     <h3 class="font-bold text-lg mb-4">
                         <span x-show="!editingUser">Thêm người dùng mới</span>
@@ -219,8 +209,7 @@
                     </h3>
                     
                     <form @submit.prevent="saveUser()" class="space-y-4">
-                        <!-- Full Name -->
-                        <div class="form-control">
+                                                <div class="form-control">
                             <label class="label">
                                 <span class="label-text">Họ và tên <span class="text-error">*</span></span>
                             </label>
@@ -237,8 +226,7 @@
                             </label>
                         </div>
 
-                        <!-- Email -->
-                        <div class="form-control">
+                                                <div class="form-control">
                             <label class="label">
                                 <span class="label-text">Email <span class="text-error">*</span></span>
                             </label>
@@ -255,8 +243,7 @@
                             </label>
                         </div>
 
-                        <!-- Role Selection -->
-                        <div class="form-control">
+                                                <div class="form-control">
                             <label class="label">
                                 <span class="label-text">Vai trò <span class="text-error">*</span></span>
                             </label>
@@ -276,8 +263,7 @@
                             </label>
                         </div>
 
-                        <!-- Company Selection -->
-                        <div class="form-control">
+                                                <div class="form-control">
                             <label class="label">
                                 <span class="label-text">Công ty</span>
                             </label>
@@ -296,8 +282,7 @@
                             </label>
                         </div>
 
-                        <!-- Default Password Notice -->
-                        <div x-show="!editingUser" class="alert alert-info">
+                                                <div x-show="!editingUser" class="alert alert-info">
                             <i data-lucide="info" class="w-4 h-4"></i>
                             <div class="text-sm">
                                 <strong>Lưu ý:</strong> Mật khẩu mặc định cho tài khoản mới là <strong>123456</strong>. 
@@ -320,8 +305,7 @@
                 <div class="modal-backdrop" @click="closeModal()"></div>
             </div>
 
-            <!-- Change Password Modal -->
-            <div class="modal" :class="{ 'modal-open': showPasswordModal }">
+                        <div class="modal" :class="{ 'modal-open': showPasswordModal }">
                 <div class="modal-box">
                     <h3 class="font-bold text-lg mb-4">Đổi mật khẩu</h3>
                     <p class="text-sm text-gray-600 mb-4">
@@ -329,8 +313,7 @@
                     </p>
                     
                     <form @submit.prevent="changePassword()" class="space-y-4">
-                        <!-- Current Password -->
-                        <div class="form-control">
+                                                <div class="form-control">
                             <label class="label">
                                 <span class="label-text">Mật khẩu hiện tại <span class="text-error">*</span></span>
                             </label>
@@ -347,8 +330,7 @@
                             </label>
                         </div>
 
-                        <!-- New Password -->
-                        <div class="form-control">
+                                                <div class="form-control">
                             <label class="label">
                                 <span class="label-text">Mật khẩu mới <span class="text-error">*</span></span>
                             </label>
@@ -366,8 +348,7 @@
                             </label>
                         </div>
 
-                        <!-- Confirm New Password -->
-                        <div class="form-control">
+                                                <div class="form-control">
                             <label class="label">
                                 <span class="label-text">Xác nhận mật khẩu mới <span class="text-error">*</span></span>
                             </label>
@@ -396,8 +377,7 @@
                 <div class="modal-backdrop" @click="closePasswordModal()"></div>
             </div>
 
-            <!-- Assign Role Modal -->
-            <div class="modal" :class="{ 'modal-open': showRoleModal }">
+                        <div class="modal" :class="{ 'modal-open': showRoleModal }">
                 <div class="modal-box">
                     <h3 class="font-bold text-lg mb-4">Gán vai trò</h3>
                     <p class="text-sm text-gray-600 mb-4">
@@ -408,8 +388,7 @@
                     </p>
                     
                     <form @submit.prevent="assignRole()" class="space-y-4">
-                        <!-- Role Selection -->
-                        <div class="form-control">
+                                                <div class="form-control">
                             <label class="label">
                                 <span class="label-text">Chọn vai trò mới <span class="text-error">*</span></span>
                             </label>
@@ -437,8 +416,7 @@
                 <div class="modal-backdrop" @click="closeRoleModal()"></div>
             </div>
 
-            <!-- View User Detail Modal -->
-            <div class="modal" :class="{ 'modal-open': showViewModal }">
+                        <div class="modal" :class="{ 'modal-open': showViewModal }">
                 <div class="modal-box max-w-2xl">
                     <h3 class="font-bold text-lg mb-6">
                         <i data-lucide="user" class="w-5 h-5 inline mr-2"></i>
@@ -450,8 +428,7 @@
                     </div>
 
                     <div x-show="!loadingUserDetail && viewingUser" class="space-y-6">
-                        <!-- User Avatar and Basic Info -->
-                        <div class="flex items-center space-x-4 p-4 bg-base-200 rounded-lg">
+                                                <div class="flex items-center space-x-4 p-4 bg-base-200 rounded-lg">
                             <div class="avatar">
                                 <div class="w-16 h-16 rounded-full">
                                     <img :src="'https://ui-avatars.com/api/?name=' + encodeURIComponent(viewingUser?.fullName || '') + '&background=0d9488&color=fff&size=64'" 
@@ -478,10 +455,8 @@
                             </div>
                         </div>
 
-                        <!-- Detailed Information -->
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <!-- User ID -->
-                            <div class="form-control">
+                                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                        <div class="form-control">
                                 <label class="label">
                                     <span class="label-text font-medium">ID người dùng</span>
                                 </label>
@@ -490,8 +465,7 @@
                                 </div>
                             </div>
 
-                            <!-- Full Name -->
-                            <div class="form-control">
+                                                        <div class="form-control">
                                 <label class="label">
                                     <span class="label-text font-medium">Họ và tên</span>
                                 </label>
@@ -500,8 +474,7 @@
                                 </div>
                             </div>
 
-                            <!-- Email -->
-                            <div class="form-control md:col-span-2">
+                                                        <div class="form-control md:col-span-2">
                                 <label class="label">
                                     <span class="label-text font-medium">Địa chỉ email</span>
                                 </label>
@@ -511,8 +484,7 @@
                                 </div>
                             </div>
 
-                            <!-- Role -->
-                            <div class="form-control">
+                                                        <div class="form-control">
                                 <label class="label">
                                     <span class="label-text font-medium">Vai trò</span>
                                 </label>
@@ -522,8 +494,7 @@
                                 </div>
                             </div>
 
-                            <!-- Role ID -->
-                            <div class="form-control">
+                                                        <div class="form-control">
                                 <label class="label">
                                     <span class="label-text font-medium">ID vai trò</span>
                                 </label>
@@ -532,8 +503,7 @@
                                 </div>
                             </div>
 
-                            <!-- Company -->
-                            <div class="form-control">
+                                                        <div class="form-control">
                                 <label class="label">
                                     <span class="label-text font-medium">Công ty</span>
                                 </label>
@@ -543,8 +513,7 @@
                                 </div>
                             </div>
 
-                            <!-- Company ID -->
-                            <div class="form-control" x-show="viewingUser?.companyId">
+                                                        <div class="form-control" x-show="viewingUser?.companyId">
                                 <label class="label">
                                     <span class="label-text font-medium">ID công ty</span>
                                 </label>
@@ -554,8 +523,7 @@
                             </div>
                         </div>
 
-                        <!-- Additional Information -->
-                        <div class="alert alert-info">
+                                                <div class="alert alert-info">
                             <i data-lucide="info" class="w-4 h-4"></i>
                             <div class="text-sm">
                                 <strong>Lưu ý:</strong> Thông tin chi tiết này chỉ dành cho mục đích quản trị. 
@@ -575,8 +543,7 @@
                 <div class="modal-backdrop" @click="closeViewModal()"></div>
             </div>
 
-            <!-- Delete Confirmation Modal -->
-            <div class="modal" :class="{ 'modal-open': showDeleteModal }">
+                        <div class="modal" :class="{ 'modal-open': showDeleteModal }">
                 <div class="modal-box">
                     <h3 class="font-bold text-lg mb-4 text-error">Xác nhận xóa</h3>
                     <p class="mb-4">
@@ -594,8 +561,7 @@
                 <div class="modal-backdrop" @click="showDeleteModal = false"></div>
             </div>
 
-            <!-- Toast Notifications -->
-            <div class="toast toast-top toast-end">
+                        <div class="toast toast-top toast-end">
                 <template x-for="notification in notifications" :key="notification.id">
                     <div class="alert" :class="'alert-' + notification.type">
                         <i :data-lucide="notification.icon" class="w-4 h-4"></i>
@@ -879,7 +845,7 @@
                         this.changingPassword = true;
                         this.passwordErrors = {};
 
-                        // Client-side validation
+
                         if (this.passwordForm.newPassword !== this.passwordForm.confirmNewPassword) {
                             this.passwordErrors.confirmNewPassword = 'Mật khẩu xác nhận không khớp';
                             this.changingPassword = false;

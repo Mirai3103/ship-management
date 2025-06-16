@@ -43,11 +43,9 @@
 <div class="drawer" :class="{ 'lg:drawer-open': sidebarOpen && !isMobile }">
     <input id="drawer-toggle" type="checkbox" class="drawer-toggle" x-model="sidebarOpen"/>
 
-    <!-- Sidebar -->
     <div class="drawer-side">
         <label for="drawer-toggle" class="drawer-overlay" @click="sidebarOpen = false"></label>
         <aside class="min-h-full w-72 bg-base-100 text-base-content">
-            <!-- Sidebar Header -->
             <div class="p-4 border-b border-base-300">
                 <div class="flex items-center justify-between">
                     <div class="flex items-center space-x-3">
@@ -59,7 +57,6 @@
                             <p class="text-xs text-base-content/70">Hệ thống quản lý tàu</p>
                         </div>
                     </div>
-                    <!-- Close button for mobile -->
                     <button
                             class="btn btn-ghost btn-sm lg:hidden"
                             @click="sidebarOpen = false"
@@ -69,10 +66,8 @@
                 </div>
             </div>
 
-            <!-- Navigation Menu -->
             <nav class="p-4">
                 <ul class="menu menu-vertical space-y-2">
-                    <!-- Dashboard -->
                     <li>
                         <a href="/dashboard"
                            class="flex items-center space-x-3 ${activePage.equals("dashboard") ? "active" : ""}">
@@ -82,16 +77,14 @@
                     </li>
 
                     @if(Stream.of("ROLE_ADMIN", "SHIP_MANAGEMENT").anyMatch(permissions::contains))
-                    <!-- Ships Management -->
-                    <li>
-                        <a href="/ships"
-                           class="flex items-center space-x-3 ${activePage.equals("ships") ? "active" : ""}">
-                            <i data-lucide="ship" class="w-5 h-5"></i>
-                            <span>Quản lý tàu</span>
-                        </a>
-                    </li>
+                        <li>
+                            <a href="/ships"
+                               class="flex items-center space-x-3 ${activePage.equals("ships") ? "active" : ""}">
+                                <i data-lucide="ship" class="w-5 h-5"></i>
+                                <span>Quản lý tàu</span>
+                            </a>
+                        </li>
                     @endif
-                    <!-- Reviews Ship -->
                     <li>
                         <a href="/reviews-ship"
                            class="flex items-center space-x-3 ${activePage.equals("reviews-ship") ? "active" : ""}">
@@ -100,57 +93,53 @@
                         </a>
                     </li>
                     @if(Stream.of("ROLE_ADMIN", "USER_MANAGEMENT").anyMatch(permissions::contains))
-                    <!-- User Management -->
-                    <li>
-                        <a href="/users"
-                           class="flex items-center space-x-3 ${activePage.equals("users") ? "active" : ""}">
-                            <i data-lucide="users" class="w-5 h-5"></i>
-                            <span>Quản lý người dùng</span>
-                        </a>
-                    </li>
-                        @endif
-
-                    <!-- Company Management -->
-                    @if(Stream.of("ROLE_ADMIN", "COMPANY_MANAGEMENT").anyMatch(permissions::contains))
-                    <li>
-                        <a href="/companies"
-                           class="flex items-center space-x-3 ${activePage.equals("companies") ? "active" : ""}">
-                            <i data-lucide="building" class="w-5 h-5"></i>
-                            <span>Quản lý công ty</span>
-                        </a>
-                    </li>
+                        <li>
+                            <a href="/users"
+                               class="flex items-center space-x-3 ${activePage.equals("users") ? "active" : ""}">
+                                <i data-lucide="users" class="w-5 h-5"></i>
+                                <span>Quản lý người dùng</span>
+                            </a>
+                        </li>
                     @endif
 
-                    <!-- Role Management -->
+                    @if(Stream.of("ROLE_ADMIN", "COMPANY_MANAGEMENT").anyMatch(permissions::contains))
+                        <li>
+                            <a href="/companies"
+                               class="flex items-center space-x-3 ${activePage.equals("companies") ? "active" : ""}">
+                                <i data-lucide="building" class="w-5 h-5"></i>
+                                <span>Quản lý công ty</span>
+                            </a>
+                        </li>
+                    @endif
+
                     @if(Stream.of("ROLE_ADMIN", "ROLE_MANAGEMENT").anyMatch(permissions::contains))
-                    <li>
-                        <a href="/roles"
-                           class="flex items-center space-x-3 ${activePage.equals("roles") ? "active" : ""}">
-                            <i data-lucide="shield-check" class="w-5 h-5"></i>
-                            <span>Quản lý vai trò</span>
-                        </a>
-                    </li>
+                        <li>
+                            <a href="/roles"
+                               class="flex items-center space-x-3 ${activePage.equals("roles") ? "active" : ""}">
+                                <i data-lucide="shield-check" class="w-5 h-5"></i>
+                                <span>Quản lý vai trò</span>
+                            </a>
+                        </li>
                     @endif
                 </ul>
             </nav>
 
-            <!-- User Profile -->
             <div class="absolute bottom-0 left-0 right-0 p-4 border-t border-base-300">
                 <div class="dropdown dropdown-top dropdown-end w-full">
-                    @if (currentUser != null) 
-                    <label tabindex="0" class="btn btn-ghost w-full justify-start">
-                        <div class="avatar">
-                            <div class="w-8 h-8 rounded-full">
-                                <img src="https://ui-avatars.com/api/?name=${currentUser.getUsername()}&background=0d9488&color=fff"
-                                     alt="User Avatar"/>
+                    @if (currentUser != null)
+                        <label tabindex="0" class="btn btn-ghost w-full justify-start">
+                            <div class="avatar">
+                                <div class="w-8 h-8 rounded-full">
+                                    <img src="https://ui-avatars.com/api/?name=${currentUser.getUsername()}&background=0d9488&color=fff"
+                                         alt="User Avatar"/>
+                                </div>
                             </div>
-                        </div>
 
-                        <div class="text-left">
-                            <div class="font-medium">${currentUser.getFullName()}</div>
-                            <div class="text-xs text-base-content/70">${currentUser.getEmail()}</div>
-                        </div>
-                    </label>
+                            <div class="text-left">
+                                <div class="font-medium">${currentUser.getFullName()}</div>
+                                <div class="text-xs text-base-content/70">${currentUser.getEmail()}</div>
+                            </div>
+                        </label>
                     @endif
                     <ul tabindex="0" class="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52 mb-2">
                         <li><a href="/profile"><i data-lucide="user" class="w-4 h-4"></i> Hồ sơ</a></li>
@@ -166,12 +155,9 @@
         </aside>
     </div>
 
-    <!-- Main Content -->
     <div class="drawer-content flex flex-col">
-        <!-- Header -->
         <header class="navbar bg-base-100 border-b border-base-300 px-4">
             <div class="flex-none">
-                <!-- Sidebar toggle button - works on both mobile and desktop -->
                 <button
                         class="btn btn-square btn-ghost"
                         @click="sidebarOpen = !sidebarOpen"
@@ -186,7 +172,6 @@
             </div>
 
             <div class="flex-none space-x-2">
-                <!-- Notification button -->
                 <button class="btn btn-ghost btn-circle">
                     <div class="indicator">
                         <i data-lucide="bell" class="w-5 h-5"></i>
@@ -194,14 +179,12 @@
                     </div>
                 </button>
 
-                <!-- Settings button -->
                 <button class="btn btn-ghost btn-circle">
                     <i data-lucide="settings" class="w-5 h-5"></i>
                 </button>
             </div>
         </header>
 
-        <!-- Page Content -->
         <main class="flex-1 p-6">
             ${content}
         </main>
@@ -212,7 +195,7 @@
 <script>
     lucide.createIcons();
 
-    // Auto-close sidebar on mobile when clicking nav links
+
     document.addEventListener('DOMContentLoaded', function () {
         const navLinks = document.querySelectorAll('.drawer-side a[href]');
         navLinks.forEach(link => {

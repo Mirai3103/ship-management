@@ -8,8 +8,7 @@
     currentUser = currentUser,
     content = @`
         <div x-data="shipManager()" x-init="loadShips(); loadCompanies()" class="space-y-6">
-            <!-- Header Section -->
-            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div>
                     <h1 class="text-2xl font-bold">Quản lý tàu</h1>
                     <p class="text-base-content/70">Quản lý thông tin và trạng thái các tàu trong đội</p>
@@ -20,12 +19,10 @@
                 </button>
             </div>
 
-            <!-- Search and Filter Section -->
-            <div class="card bg-base-100 shadow-xl">
+                        <div class="card bg-base-100 shadow-xl">
                 <div class="card-body">
                     <div class="flex flex-col lg:flex-row gap-4">
-                        <!-- Search Input -->
-                        <div class="flex-1">
+                                                <div class="flex-1">
                             <div class="form-control">
                                 <div class="input-group">
                                     <input 
@@ -42,8 +39,7 @@
                             </div>
                         </div>
                         
-                        <!-- Page Size Selector -->
-                        <div class="form-control w-full max-w-xs">
+                                                <div class="form-control w-full max-w-xs">
                             <select class="select select-bordered" x-model="pageSize" @change="loadShips()">
                                 <option value="5">5 tàu/trang</option>
                                 <option value="10">10 tàu/trang</option>
@@ -55,8 +51,7 @@
                 </div>
             </div>
 
-            <!-- Ships Table -->
-            <div class="card bg-base-100 shadow-xl">
+                        <div class="card bg-base-100 shadow-xl">
                 <div class="card-body">
                     <div class="flex items-center justify-between mb-4">
                         <h2 class="card-title">
@@ -68,13 +63,11 @@
                         </div>
                     </div>
 
-                    <!-- Loading State -->
-                    <div x-show="loading" class="flex justify-center py-8">
+                                        <div x-show="loading" class="flex justify-center py-8">
                         <span class="loading loading-spinner loading-lg"></span>
                     </div>
 
-                    <!-- Empty State -->
-                    <div x-show="!loading && ships.content && ships.content.length === 0" class="text-center py-8">
+                                        <div x-show="!loading && ships.content && ships.content.length === 0" class="text-center py-8">
                         <i data-lucide="ship" class="w-16 h-16 mx-auto text-base-content/30 mb-4"></i>
                         <h3 class="text-lg font-medium mb-2">Chưa có tàu nào</h3>
                         <p class="text-base-content/70 mb-4">Bắt đầu bằng cách thêm tàu đầu tiên của bạn</p>
@@ -84,8 +77,7 @@
                         </button>
                     </div>
 
-                    <!-- Ships Table -->
-                    <div x-show="!loading && ships.content && ships.content.length > 0" class="overflow-x-auto">
+                                        <div x-show="!loading && ships.content && ships.content.length > 0" class="overflow-x-auto">
                         <table class="table table-zebra w-full">
                             <thead>
                                 <tr>
@@ -143,8 +135,7 @@
                         </table>
                     </div>
 
-                    <!-- Pagination -->
-                    <div x-show="!loading && ships.totalPages > 1" class="flex justify-center mt-6">
+                                        <div x-show="!loading && ships.totalPages > 1" class="flex justify-center mt-6">
                         <div class="join">
                             <button 
                                 class="join-item btn" 
@@ -175,8 +166,7 @@
                 </div>
             </div>
 
-            <!-- Add/Edit Modal -->
-            <div class="modal" :class="{ 'modal-open': showModal }">
+                        <div class="modal" :class="{ 'modal-open': showModal }">
                 <div class="modal-box">
                     <h3 class="font-bold text-lg mb-4">
                         <span x-show="!editingShip">Thêm tàu mới</span>
@@ -184,8 +174,7 @@
                     </h3>
                     
                     <form @submit.prevent="saveShip()" class="space-y-4">
-                        <!-- Ship Name -->
-                        <div class="form-control">
+                                                <div class="form-control">
                             <label class="label">
                                 <span class="label-text">Tên tàu <span class="text-error">*</span></span>
                             </label>
@@ -202,8 +191,7 @@
                             </label>
                         </div>
 
-                        <!-- Ship Description -->
-                        <div class="form-control">
+                                                <div class="form-control">
                             <label class="label">
                                 <span class="label-text">Mô tả <span class="text-error">*</span></span>
                             </label>
@@ -219,8 +207,7 @@
                             </label>
                         </div>
 
-                        <!-- Company Selection -->
-                        <div class="form-control">
+                                                <div class="form-control">
                             <label class="label">
                                 <span class="label-text">Công ty</span>
                             </label>
@@ -254,8 +241,7 @@
                 <div class="modal-backdrop" @click="closeModal()"></div>
             </div>
 
-            <!-- View Ship Detail Modal -->
-            <div class="modal" :class="{ 'modal-open': showViewModal }">
+                        <div class="modal" :class="{ 'modal-open': showViewModal }">
                 <div class="modal-box max-w-2xl">
                     <h3 class="font-bold text-lg mb-6">
                         <i data-lucide="ship" class="w-5 h-5 inline mr-2"></i>
@@ -267,8 +253,7 @@
                     </div>
 
                     <div x-show="!loadingShipDetail && viewingShip" class="space-y-6">
-                        <!-- Ship Header -->
-                        <div class="flex items-center space-x-4 p-4 bg-base-200 rounded-lg">
+                                                <div class="flex items-center space-x-4 p-4 bg-base-200 rounded-lg">
                             <div class="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center">
                                 <i data-lucide="ship" class="w-8 h-8 text-primary"></i>
                             </div>
@@ -285,10 +270,8 @@
                             </div>
                         </div>
 
-                        <!-- Detailed Information -->
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <!-- Ship ID -->
-                            <div class="form-control">
+                                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                        <div class="form-control">
                                 <label class="label">
                                     <span class="label-text font-medium">ID tàu</span>
                                 </label>
@@ -297,8 +280,7 @@
                                 </div>
                             </div>
 
-                            <!-- Ship Name -->
-                            <div class="form-control">
+                                                        <div class="form-control">
                                 <label class="label">
                                     <span class="label-text font-medium">Tên tàu</span>
                                 </label>
@@ -307,8 +289,7 @@
                                 </div>
                             </div>
 
-                            <!-- Description -->
-                            <div class="form-control md:col-span-2">
+                                                        <div class="form-control md:col-span-2">
                                 <label class="label">
                                     <span class="label-text font-medium">Mô tả</span>
                                 </label>
@@ -317,8 +298,7 @@
                                 </div>
                             </div>
 
-                            <!-- Company -->
-                            <div class="form-control">
+                                                        <div class="form-control">
                                 <label class="label">
                                     <span class="label-text font-medium">Công ty</span>
                                 </label>
@@ -328,8 +308,7 @@
                                 </div>
                             </div>
 
-                            <!-- Company ID -->
-                            <div class="form-control" x-show="viewingShip?.companyId">
+                                                        <div class="form-control" x-show="viewingShip?.companyId">
                                 <label class="label">
                                     <span class="label-text font-medium">ID công ty</span>
                                 </label>
@@ -339,8 +318,7 @@
                             </div>
                         </div>
 
-                        <!-- Additional Information -->
-                        <div class="alert alert-info">
+                                                <div class="alert alert-info">
                             <i data-lucide="info" class="w-4 h-4"></i>
                             <div class="text-sm">
                                 <strong>Lưu ý:</strong> Thông tin chi tiết này chỉ dành cho mục đích quản trị. 
@@ -360,8 +338,7 @@
                 <div class="modal-backdrop" @click="closeViewModal()"></div>
             </div>
 
-            <!-- Delete Confirmation Modal -->
-            <div class="modal" :class="{ 'modal-open': showDeleteModal }">
+                        <div class="modal" :class="{ 'modal-open': showDeleteModal }">
                 <div class="modal-box">
                     <h3 class="font-bold text-lg mb-4 text-error">Xác nhận xóa</h3>
                     <p class="mb-4">
@@ -379,8 +356,7 @@
                 <div class="modal-backdrop" @click="showDeleteModal = false"></div>
             </div>
 
-            <!-- Edit Ship Members Modal -->
-            <div class="modal" :class="{ 'modal-open': showMembersModal }">
+                        <div class="modal" :class="{ 'modal-open': showMembersModal }">
                 <div class="modal-box max-w-4xl">
                     <h3 class="font-bold text-lg mb-4">
                         <i data-lucide="users" class="w-5 h-5 inline mr-2"></i>
@@ -392,15 +368,13 @@
                     </div>
 
                     <div x-show="!loadingMembers" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        <!-- Available Users Section -->
-                        <div class="space-y-4">
+                                                <div class="space-y-4">
                             <h4 class="font-semibold text-base flex items-center">
                                 <i data-lucide="user-plus" class="w-4 h-4 mr-2"></i>
                                 Thêm thành viên
                             </h4>
                             
-                            <!-- Company Filter Info -->
-                            <div class="alert alert-info" x-show="editingMembersShip?.companyName">
+                                                        <div class="alert alert-info" x-show="editingMembersShip?.companyName">
                                 <i data-lucide="info" class="w-4 h-4"></i>
                                 <span class="text-sm">
                                     Hiển thị nhân viên từ công ty: <strong x-text="editingMembersShip?.companyName"></strong>
@@ -412,8 +386,7 @@
                                 <span class="text-sm">Tàu này chưa được gán cho công ty nào. Không thể thêm thành viên.</span>
                             </div>
 
-                            <!-- Available Users List -->
-                            <div x-show="editingMembersShip?.companyId" class="space-y-2 max-h-64 overflow-y-auto border rounded-lg p-3">
+                                                        <div x-show="editingMembersShip?.companyId" class="space-y-2 max-h-64 overflow-y-auto border rounded-lg p-3">
                                 <template x-for="user in availableUsers" :key="user.id">
                                     <div class="flex items-center justify-between p-2 hover:bg-base-200 rounded">
                                         <div class="flex items-center space-x-3">
@@ -442,15 +415,13 @@
                             </div>
                         </div>
 
-                        <!-- Current Members Section -->
-                        <div class="space-y-4">
+                                                <div class="space-y-4">
                             <h4 class="font-semibold text-base flex items-center">
                                 <i data-lucide="users" class="w-4 h-4 mr-2"></i>
                                 Thành viên hiện tại (<span x-text="currentMembers.length"></span>)
                             </h4>
                             
-                            <!-- Current Members List -->
-                            <div class="space-y-2 max-h-64 overflow-y-auto border rounded-lg p-3">
+                                                        <div class="space-y-2 max-h-64 overflow-y-auto border rounded-lg p-3">
                                 <template x-for="member in currentMembers" :key="member.id">
                                     <div class="flex items-center justify-between p-2 hover:bg-base-200 rounded">
                                         <div class="flex items-center space-x-3">
@@ -501,8 +472,7 @@
                 <div class="modal-backdrop" @click="closeMembersModal()"></div>
             </div>
 
-            <!-- Toast Notifications -->
-            <div class="toast toast-top toast-end">
+                        <div class="toast toast-top toast-end">
                 <template x-for="notification in notifications" :key="notification.id">
                     <div class="alert" :class="'alert-' + notification.type">
                         <i :data-lucide="notification.icon" class="w-4 h-4"></i>
@@ -575,7 +545,7 @@
                             this.showNotification('error', 'Lỗi kết nối: ' + error.message, 'alert-triangle');
                         } finally {
                             this.loading = false;
-                            // Re-initialize Lucide icons after DOM update
+
                             this.$nextTick(() => lucide.createIcons());
                         }
                     },
@@ -777,7 +747,7 @@
                     },
 
                     handleValidationErrors(errorData) {
-                        // Handle Spring Boot validation errors
+
                         if (errorData.errors) {
                             errorData.errors.forEach(error => {
                                 this.errors[error.field] = error.defaultMessage;
@@ -814,7 +784,7 @@
                         this.usersToRemove = [];
 
                         try {
-                            // Load current ship members and available users from company in parallel
+
                             const [membersResponse, usersResponse] = await Promise.all([
                                 fetch(`/api/ships/${ship.id}/users`),
                                 ship.companyId ? fetch(`/api/users/company/${ship.companyId}`) : Promise.resolve({ ok: false })
@@ -826,7 +796,7 @@
 
                             if (usersResponse.ok) {
                                 const companyUsers = await usersResponse.json();
-                                // Filter out users who are already members of this ship
+
                                 const currentMemberIds = this.currentMembers.map(member => member.id);
                                 this.availableUsers = companyUsers.filter(user => !currentMemberIds.includes(user.id));
                             }
@@ -839,38 +809,38 @@
                     },
 
                     addUserToShip(user) {
-                        // Remove from available users and add to pending additions
+
                         this.availableUsers = this.availableUsers.filter(u => u.id !== user.id);
                         
-                        // If this user was previously marked for removal, just remove from removal list
+
                         const removeIndex = this.usersToRemove.findIndex(u => u.id === user.id);
                         if (removeIndex > -1) {
                             this.usersToRemove.splice(removeIndex, 1);
                             this.currentMembers.push(user);
                         } else {
-                            // Add to current members and pending additions
+
                             this.currentMembers.push(user);
                             this.usersToAdd.push(user);
                         }
                     },
 
                     removeUserFromShip(user) {
-                        // Remove from current members
+
                         this.currentMembers = this.currentMembers.filter(m => m.id !== user.id);
                         
-                        // If this user was previously marked for addition, just remove from addition list
+
                         const addIndex = this.usersToAdd.findIndex(u => u.id === user.id);
                         if (addIndex > -1) {
                             this.usersToAdd.splice(addIndex, 1);
                         } else {
-                            // Add to pending removals
+
                             this.usersToRemove.push(user);
                         }
                         
-                        // Add back to available users if from same company
+
                         if (this.editingMembersShip.companyId && user.companyId === this.editingMembersShip.companyId) {
                             this.availableUsers.push(user);
-                            // Sort available users by name
+
                             this.availableUsers.sort((a, b) => a.fullName.localeCompare(b.fullName));
                         }
                     },

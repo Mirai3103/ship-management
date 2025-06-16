@@ -174,9 +174,9 @@ public class AttachmentService {
     public Optional<AttachmentDTO> updateAttachment(Long id, AttachmentDTO attachmentDTO) {
         return attachmentRepository.findById(id)
                 .map(existingAttachment -> {
-                    // Update only allowed fields (not checklistItem, uploadedBy, uploadedAt)
+
                     existingAttachment.setFilename(attachmentDTO.getFilename());
-                    // Don't update fileUrl as it should be managed by file upload
+
                     Attachment updatedAttachment = attachmentRepository.save(existingAttachment);
                     return convertToDTO(updatedAttachment);
                 });
@@ -203,8 +203,8 @@ public class AttachmentService {
     }
 
     public String getOriginalFilename(String filename) {
-        // Extract original filename from unique filename
-        // Format: UUID_timestamp_originalname.ext
+
+
         if (filename.contains("_")) {
             String[] parts = filename.split("_", 3);
             if (parts.length >= 3) {
@@ -270,10 +270,10 @@ public class AttachmentService {
             }
 
             if (originalSize > 300 * 1024) {
-                // >300KB: giảm chất lượng còn 50%, giữ nguyên kích thước
+
                 quality = 0.5f;
             } else {
-                // ≤300KB: giảm kích thước còn 80%, giữ nguyên chất lượng
+
                 scale = 0.8;
             }
 

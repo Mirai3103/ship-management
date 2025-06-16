@@ -31,7 +31,7 @@ public class AuthController {
     public ResponseEntity<?> login(@Valid @RequestBody LoginRequestDTO loginRequest, 
                                   HttpSession session) {
         try {
-            // Authenticate user
+
             Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                     loginRequest.getEmail(),
@@ -39,27 +39,27 @@ public class AuthController {
                 )
             );
 
-            // Set authentication in security context
+
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
-            // Get user details
+
             User user = (User) authentication.getPrincipal();
 
-            // Store user info in session
+
             session.setAttribute("userId", user.getId());
             session.setAttribute("email", user.getEmail());
             session.setAttribute("fullName", user.getFullName());
             session.setAttribute("userRole", user.getRole().getName());
             session.setAttribute("user", user);
 
-            // Set session timeout (30 minutes default, 7 days if remember me)
+
             if (loginRequest.isRemember()) {
                 session.setMaxInactiveInterval(7 * 24 * 60 * 60); // 7 days
             } else {
                 session.setMaxInactiveInterval(30 * 60); // 30 minutes
             }
 
-            // Return success response
+
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);
             response.put("message", "Đăng nhập thành công");
@@ -107,10 +107,10 @@ public class AuthController {
 
     @PostMapping("/logout")
     public ResponseEntity<?> logout(HttpSession session) {
-        // Clear security context
+
         SecurityContextHolder.clearContext();
         
-        // Invalidate session
+
         session.invalidate();
 
         Map<String, Object> response = new HashMap<>();

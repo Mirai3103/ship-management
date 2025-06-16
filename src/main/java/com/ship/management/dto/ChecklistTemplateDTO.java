@@ -33,6 +33,6 @@ public class ChecklistTemplateDTO {
 
     private List<ChecklistItemDTO> checklistItems;
     
-    // Number of checklist items for display purposes
+
     private int itemCount = 0;
 } 

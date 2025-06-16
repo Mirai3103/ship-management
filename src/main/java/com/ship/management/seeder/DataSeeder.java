@@ -36,7 +36,7 @@ public class DataSeeder {
     @EventListener(ApplicationReadyEvent.class)
     public void seedData() {
         if (roleRepository.count() == 0) {
-            // (admin, CAP, C/E, TEC, COM)
+
             Role admin = Role.builder()
                     .name("ADMIN")
                     .description("Administrator")
@@ -110,7 +110,7 @@ public class DataSeeder {
                     .role(roleRepository.findByName("ADMIN").orElseThrow())
                     .build();
             userRepository.save(admin);
-            // add some users for each company
+
             for (Company company : companyRepository.findAll()) {
                 var numberOfUsers = faker.number().numberBetween(1, 10);
                 for (int i = 0; i < numberOfUsers; i++) {
@@ -135,7 +135,7 @@ public class DataSeeder {
                     .description(faker.lorem().sentence())
                     .users(new ArrayList<User>())
                     .company(company).build();
-                    // add some users for each ship
+
                     var numberOfUsers = faker.number().numberBetween(1, userOfCompany.size());
                     for(int j = 0; j < numberOfUsers; j++) {
                         User user = userOfCompany.get(faker.number().numberBetween(0, userOfCompany.size() - 1));

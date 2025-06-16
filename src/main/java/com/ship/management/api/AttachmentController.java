@@ -108,7 +108,7 @@ public class AttachmentController {
             Resource resource = attachmentService.downloadFile(filename);
             String originalFilename = attachmentService.getOriginalFilename(filename);
     
-            // Suy đoán content-type từ tên file
+
             String contentType = Files.probeContentType(Path.of(resource.getFile().getAbsolutePath()));
             if (contentType == null) {
                 contentType = "application/octet-stream"; // fallback
@@ -116,7 +116,7 @@ public class AttachmentController {
     
             return ResponseEntity.ok()
                     .contentType(MediaType.parseMediaType(contentType))
-                    // Không ép trình duyệt tải về nếu hỗ trợ
+
                     .header(HttpHeaders.CONTENT_DISPOSITION, 
                             "inline; filename=\"" + originalFilename + "\"")
                     .body(resource);
@@ -160,7 +160,7 @@ public class AttachmentController {
         }
     }
 
-    // Additional utility endpoints
+
     
     @GetMapping("/count/checklist-item/{checklistItemId}")
     public ResponseEntity<Map<String, Object>> countByChecklistItemId(@PathVariable Long checklistItemId) {

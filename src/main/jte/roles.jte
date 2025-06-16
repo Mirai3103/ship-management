@@ -8,8 +8,7 @@
     currentUser = currentUser,
     content = @`
         <div x-data="roleManager()" x-init="loadRoles()" class="space-y-6">
-            <!-- Header Section -->
-            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div>
                     <h1 class="text-2xl font-bold">Quản lý vai trò</h1>
                     <p class="text-base-content/70">Quản lý các vai trò và quyền hạn trong hệ thống</p>
@@ -20,12 +19,10 @@
                 </button>
             </div>
 
-            <!-- Search and Filter Section -->
-            <div class="card bg-base-100 shadow-xl">
+                        <div class="card bg-base-100 shadow-xl">
                 <div class="card-body">
                     <div class="flex flex-col lg:flex-row gap-4">
-                        <!-- Search Input -->
-                        <div class="flex-1">
+                                                <div class="flex-1">
                             <div class="form-control">
                                 <div class="input-group">
                                     <input 
@@ -42,8 +39,7 @@
                             </div>
                         </div>
                         
-                        <!-- Page Size Selector -->
-                        <div class="form-control w-full max-w-xs">
+                                                <div class="form-control w-full max-w-xs">
                             <select class="select select-bordered" x-model="pageSize" @change="loadRoles()">
                                 <option value="5">5 vai trò/trang</option>
                                 <option value="10">10 vai trò/trang</option>
@@ -55,8 +51,7 @@
                 </div>
             </div>
 
-            <!-- Roles Table -->
-            <div class="card bg-base-100 shadow-xl">
+                        <div class="card bg-base-100 shadow-xl">
                 <div class="card-body">
                     <div class="flex items-center justify-between mb-4">
                         <h2 class="card-title">
@@ -68,13 +63,11 @@
                         </div>
                     </div>
 
-                    <!-- Loading State -->
-                    <div x-show="loading" class="flex justify-center py-8">
+                                        <div x-show="loading" class="flex justify-center py-8">
                         <span class="loading loading-spinner loading-lg"></span>
                     </div>
 
-                    <!-- Empty State -->
-                    <div x-show="!loading && roles.content && roles.content.length === 0" class="text-center py-8">
+                                        <div x-show="!loading && roles.content && roles.content.length === 0" class="text-center py-8">
                         <i data-lucide="shield-check" class="w-16 h-16 mx-auto text-base-content/30 mb-4"></i>
                         <h3 class="text-lg font-medium mb-2">Chưa có vai trò nào</h3>
                         <p class="text-base-content/70 mb-4">Bắt đầu bằng cách thêm vai trò đầu tiên</p>
@@ -84,8 +77,7 @@
                         </button>
                     </div>
 
-                    <!-- Roles Table -->
-                    <div x-show="!loading && roles.content && roles.content.length > 0" class="overflow-x-auto">
+                                        <div x-show="!loading && roles.content && roles.content.length > 0" class="overflow-x-auto">
                         <table class="table table-zebra w-full">
                             <thead>
                                 <tr>
@@ -143,8 +135,7 @@
                         </table>
                     </div>
 
-                    <!-- Pagination -->
-                    <div x-show="!loading && roles.totalPages > 1" class="flex justify-center mt-6">
+                                        <div x-show="!loading && roles.totalPages > 1" class="flex justify-center mt-6">
                         <div class="join">
                             <button 
                                 class="join-item btn" 
@@ -175,8 +166,7 @@
                 </div>
             </div>
 
-            <!-- Add/Edit Modal -->
-            <div class="modal" :class="{ 'modal-open': showModal }">
+                        <div class="modal" :class="{ 'modal-open': showModal }">
                 <div class="modal-box">
                     <h3 class="font-bold text-lg mb-4">
                         <span x-show="!editingRole">Thêm vai trò mới</span>
@@ -184,8 +174,7 @@
                     </h3>
                     
                     <form @submit.prevent="saveRole()" class="space-y-4">
-                        <!-- Role Name -->
-                        <div class="form-control">
+                                                <div class="form-control">
                             <label class="label">
                                 <span class="label-text">Tên vai trò <span class="text-error">*</span></span>
                             </label>
@@ -202,8 +191,7 @@
                             </label>
                         </div>
 
-                        <!-- Role Description -->
-                        <div class="form-control">
+                                                <div class="form-control">
                             <label class="label">
                                 <span class="label-text">Mô tả <span class="text-error">*</span></span>
                             </label>
@@ -219,8 +207,7 @@
                             </label>
                         </div>
 
-                        <!-- Root Role Selection -->
-                        <div class="form-control">
+                                                <div class="form-control">
                             <label class="label">
                                 <span class="label-text">Vai trò gốc <span class="text-error">*</span></span>
                             </label>
@@ -240,8 +227,7 @@
                             </label>
                         </div>
 
-                        <!-- Role Guidelines -->
-                        <div class="alert alert-info">
+                                                <div class="alert alert-info">
                             <i data-lucide="info" class="w-4 h-4"></i>
                             <div class="text-sm">
                                 <strong>Lưu ý:</strong> Tên vai trò nên sử dụng chữ in hoa và không dấu (VD: ADMIN, USER, MANAGER)
@@ -263,8 +249,7 @@
                 <div class="modal-backdrop" @click="closeModal()"></div>
             </div>
 
-            <!-- Delete Confirmation Modal -->
-            <div class="modal" :class="{ 'modal-open': showDeleteModal }">
+                        <div class="modal" :class="{ 'modal-open': showDeleteModal }">
                 <div class="modal-box">
                     <h3 class="font-bold text-lg mb-4 text-error">Xác nhận xóa</h3>
                     <p class="mb-4">
@@ -282,21 +267,18 @@
                 <div class="modal-backdrop" @click="showDeleteModal = false"></div>
             </div>
 
-            <!-- Edit Permissions Modal -->
-            <div class="modal" :class="{ 'modal-open': showPermissionsModal }">
+                        <div class="modal" :class="{ 'modal-open': showPermissionsModal }">
                 <div class="modal-box max-w-2xl">
                     <h3 class="font-bold text-lg mb-4 flex items-center gap-2">
                         <i data-lucide="shield" class="w-5 h-5 text-info"></i>
                         Quản lý quyền hạn - <span x-text="currentRole?.name" class="text-info"></span>
                     </h3>
                     
-                    <!-- Loading State -->
-                    <div x-show="loadingPermissions" class="flex justify-center py-8">
+                                        <div x-show="loadingPermissions" class="flex justify-center py-8">
                         <span class="loading loading-spinner loading-lg"></span>
                     </div>
 
-                    <!-- Permissions Grid -->
-                    <div x-show="!loadingPermissions" class="space-y-4">
+                                        <div x-show="!loadingPermissions" class="space-y-4">
                         <div class="alert alert-info">
                             <i data-lucide="info" class="w-4 h-4"></i>
                             <div class="text-sm">
@@ -327,8 +309,7 @@
                             </template>
                         </div>
 
-                        <!-- Selected Permissions Summary -->
-                        <div x-show="selectedPermissions.length > 0" class="mt-6">
+                                                <div x-show="selectedPermissions.length > 0" class="mt-6">
                             <h4 class="font-medium mb-2">Quyền đã chọn:</h4>
                             <div class="flex flex-wrap gap-2">
                                 <template x-for="permissionKey in selectedPermissions" :key="permissionKey">
@@ -357,8 +338,7 @@
                 <div class="modal-backdrop" @click="closePermissionsModal()"></div>
             </div>
 
-            <!-- Toast Notifications -->
-            <div class="toast toast-top toast-end">
+                        <div class="toast toast-top toast-end">
                 <template x-for="notification in notifications" :key="notification.id">
                     <div class="alert" :class="'alert-' + notification.type">
                         <i :data-lucide="notification.icon" class="w-4 h-4"></i>
@@ -651,7 +631,7 @@
                         this.loadingPermissions = true;
                         
                         try {
-                            // Load current role permissions
+
                             const response = await fetch('/api/roles/' + role.id);
                             if (response.ok) {
                                 const roleData = await response.json();

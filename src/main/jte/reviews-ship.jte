@@ -12,21 +12,18 @@ content = @`
     <script src="https://cdn.jsdelivr.net/npm/dayjs@1/dayjs.min.js"></script>
 
     <div x-data="reviewManager()" x-init="loadCompanies()" class="space-y-6">
-    <!-- Header Section -->
-    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
             <h1 class="text-2xl font-bold">Kiểm tra & Đánh giá tàu</h1>
             <p class="text-base-content/70">RIGHTSHIP INSPECTION & REVIEW</p>
         </div>
     </div>
 
-    <!-- Company, Ship and Template Selection -->
-    <div class="card bg-base-100 shadow-xl">
+        <div class="card bg-base-100 shadow-xl">
         <div class="card-body">
             <h3 class="font-semibold text-lg mb-4">Chọn công ty, tàu và mục kiểm tra</h3>
             <div class="grid grid-cols-1 lg:grid-cols-6 gap-4">
-                <!-- Company Selection -->
-                <div class="form-control">
+                                <div class="form-control">
                     <label class="label">
                         <span class="label-text">Công ty <span class="text-error">*</span></span>
                     </label>
@@ -43,8 +40,7 @@ content = @`
                     </select>
                 </div>
 
-                <!-- Ship Selection -->
-                <div class="form-control">
+                                <div class="form-control">
                     <label class="label">
                         <span class="label-text">Tàu <span class="text-error">*</span></span>
                     </label>
@@ -62,8 +58,7 @@ content = @`
                     </select>
                 </div>
 
-                <!-- Template Selection -->
-                <div class="form-control">
+                                <div class="form-control">
                     <label class="label">
                         <span class="label-text">Mục kiểm tra</span>
                     </label>
@@ -79,8 +74,7 @@ content = @`
                     </select>
                 </div>
 
-                <!-- Load Button -->
-                <div class="form-control">
+                                <div class="form-control">
                     <label class="label">
                         <span class="label-text">&nbsp;</span>
                     </label>
@@ -97,8 +91,7 @@ content = @`
                     </button>
                 </div>
 
-                <!-- Add Template Button -->
-             
+
                     @if(Stream.of("ROLE_ADMIN","REVIEW_MANAGEMENT").anyMatch(permissions::contains))
                         <button
                                 class="btn btn-success"
@@ -110,15 +103,13 @@ content = @`
                         </button>
                         @template.import-btn()
 
-                        <!-- Import Button Component -->
 
                     @endif
                 
 
             </div>
 
-            <!-- Search Bar (only shown after loading) -->
-            <div class="flex flex-col lg:flex-row gap-4 mt-4" x-show="showSearchBar">
+                        <div class="flex flex-col lg:flex-row gap-4 mt-4" x-show="showSearchBar">
                 <div class="flex-1">
                     <div class="form-control">
                         <div class="input-group">
@@ -139,8 +130,7 @@ content = @`
         </div>
     </div>
 
-    <!-- Reviews Table (only shown after loading) -->
-    <div x-show="showSearchBar" class="card bg-base-100 shadow-xl">
+        <div x-show="showSearchBar" class="card bg-base-100 shadow-xl">
         <div class="card-body">
             <div class="flex items-center justify-between mb-4">
                 <h2 class="card-title">
@@ -155,20 +145,17 @@ content = @`
                 </div>
             </div>
 
-            <!-- Loading State -->
-            <div x-show="loading" class="flex justify-center py-8">
+                        <div x-show="loading" class="flex justify-center py-8">
                 <span class="loading loading-spinner loading-lg"></span>
             </div>
 
-            <!-- Empty State -->
-            <div x-show="!loading && displayedTemplates.length === 0" class="text-center py-8">
+                        <div x-show="!loading && displayedTemplates.length === 0" class="text-center py-8">
                 <i data-lucide="clipboard" class="w-16 h-16 mx-auto text-base-content/30 mb-4"></i>
                 <h3 class="text-lg font-medium mb-2">Chưa có mục kiểm tra nào</h3>
 
             </div>
 
-            <!-- Unified Templates and Items Table -->
-            <div x-show="!loading && displayedTemplates.length > 0" class="overflow-x-auto">
+                        <div x-show="!loading && displayedTemplates.length > 0" class="overflow-x-auto">
                 <table class="table w-full ">
                     <thead>
                     <tr class="bg-base-100">
@@ -189,8 +176,7 @@ content = @`
                     </thead>
                     <template x-for="template in displayedTemplates" :key="template.id">
                         <tbody>
-                        <!-- Template Header Row -->
-                        <tr class="bg-base-200 border-t-2 border-base-300 bg-base-400">
+                                                <tr class="bg-base-200 border-t-2 border-base-300 bg-base-400">
                         <%-- 12 --%>
                             <td colspan="5" class="p-4">
                                 <div class="flex items-center justify-start">
@@ -233,8 +219,7 @@ content = @`
                            </td>
                         </tr>
 
-                        <!-- Template Items -->
-                        <template x-for="(item, index) in getItems(template)" :key="template.id + '_' + index">
+                                                <template x-for="(item, index) in getItems(template)" :key="template.id + '_' + index">
                             <tr>
                                 <td class="text-center font-mono" x-text="String(index + 1).padStart(2, '0')"></td>
                                 <td class="max-w-xs">
@@ -339,8 +324,7 @@ content = @`
                 </table>
             </div>
 
-            <!-- Summary Section -->
-            @if(Stream.of("ROLE_ADMIN","REVIEW_MANAGEMENT").anyMatch(permissions::contains))
+                        @if(Stream.of("ROLE_ADMIN","REVIEW_MANAGEMENT").anyMatch(permissions::contains))
             <div x-show="!loading && displayedTemplates.length > 0"
                  class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div class="stat bg-success/10 rounded-lg">
@@ -374,8 +358,7 @@ content = @`
         </div>
     </div>
 
-    <!-- Add/Edit Template Modal -->
-    <div class="modal" :class="{ 'modal-open': showTemplateModal }">
+        <div class="modal" :class="{ 'modal-open': showTemplateModal }">
         <div class="modal-box">
             <h3 class="font-bold text-lg mb-4">
                 <span x-show="!editingTemplate">Thêm Mục Mới</span>
@@ -383,8 +366,7 @@ content = @`
             </h3>
 
             <form @submit.prevent="saveTemplate()" class="space-y-4">
-                <!-- Section Name -->
-                <div class="form-control">
+                                <div class="form-control">
                     <label class="label">
                         <span class="label-text">Tên phần kiểm tra <span class="text-error">*</span></span>
                     </label>
@@ -462,8 +444,7 @@ content = @`
                 </div>
             </form>
         </div>
-        <!-- Delete Template Confirmation Modal -->
-        <div class="modal" :class="{ 'modal-open': showDeleteModal }">
+                <div class="modal" :class="{ 'modal-open': showDeleteModal }">
             <div class="modal-box">
                 <h3 class="font-bold text-lg mb-4 text-error">Xác nhận xóa</h3>
                 <p class="mb-4">
@@ -481,8 +462,7 @@ content = @`
             <div class="modal-backdrop" @click="showDeleteModal = false"></div>
         </div>
 
-        <!-- Create Checklist Item Modal -->
-        <div class="modal" :class="{ 'modal-open': showCreateItemModal }">
+                <div class="modal" :class="{ 'modal-open': showCreateItemModal }">
             <div class="modal-box max-w-2xl">
                 <h3 class="font-bold text-lg mb-4">Thêm mục kiểm tra mới</h3>
                 <p class="text-sm text-base-content/70 mb-4" x-show="selectedTemplate">
@@ -490,8 +470,7 @@ content = @`
                 </p>
 
                 <form @submit.prevent="saveChecklistItem()" class="space-y-4">
-                    <!-- Content -->
-                    <div class="form-control">
+                                        <div class="form-control">
                         <label class="label">
                             <span class="label-text">Nội dung kiểm tra <span class="text-error">*</span></span>
                         </label>
@@ -507,8 +486,7 @@ content = @`
                         </label>
                     </div>
 
-                    <!-- Guide -->
-                    <div class="form-control">
+                                        <div class="form-control">
                         <label class="label">
                             <span class="label-text">Hướng dẫn</span>
                         </label>
@@ -523,8 +501,7 @@ content = @`
                         </label>
                     </div>
 
-                    <!-- Assigned To (SHIP users) -->
-                    <div class="form-control">
+                                        <div class="form-control">
                         <label class="label">
                             <span class="label-text">Người phụ trách (Tàu) <span class="text-error">*</span></span>
                         </label>
@@ -544,8 +521,7 @@ content = @`
                         </label>
                     </div>
 
-                    <!-- Company Assigned To (COMPANY users) -->
-                    <div class="form-control">
+                                        <div class="form-control">
                         <label class="label">
                             <span class="label-text">Người phụ trách (Công ty) <span class="text-error">*</span></span>
                         </label>
@@ -577,8 +553,7 @@ content = @`
             <div class="modal-backdrop" @click="closeCreateItemModal()"></div>
         </div>
 
-        <!-- Edit Checklist Item Modal -->
-        <div class="modal" :class="{ 'modal-open': showEditItemModal }">
+                <div class="modal" :class="{ 'modal-open': showEditItemModal }">
             <div class="modal-box max-w-2xl">
                 <h3 class="font-bold text-lg mb-4">Chỉnh sửa mục kiểm tra</h3>
                 <p class="text-sm text-base-content/70 mb-4" x-show="editingItem">
@@ -586,8 +561,7 @@ content = @`
                 </p>
 
                 <form @submit.prevent="saveEditChecklistItem()" class="space-y-4">
-                    <!-- Content -->
-                    <div class="form-control">
+                                        <div class="form-control">
                         <label class="label">
                             <span class="label-text">Nội dung kiểm tra <span class="text-error">*</span></span>
                         </label>
@@ -603,8 +577,7 @@ content = @`
                         </label>
                     </div>
 
-                    <!-- Guide -->
-                    <div class="form-control">
+                                        <div class="form-control">
                         <label class="label">
                             <span class="label-text">Hướng dẫn</span>
                         </label>
@@ -619,8 +592,7 @@ content = @`
                         </label>
                     </div>
 
-                    <!-- Order Number -->
-                    <div class="form-control">
+                                        <div class="form-control">
                         <label class="label">
                             <span class="label-text">Số thứ tự</span>
                         </label>
@@ -636,8 +608,7 @@ content = @`
                         </label>
                     </div>
 
-                    <!-- Assigned To (SHIP users) -->
-                    <div class="form-control">
+                                        <div class="form-control">
                         <label class="label">
                             <span class="label-text">Người phụ trách (Tàu) <span class="text-error">*</span></span>
                         </label>
@@ -657,8 +628,7 @@ content = @`
                         </label>
                     </div>
 
-                    <!-- Company Assigned To (COMPANY users) -->
-                    <div class="form-control">
+                                        <div class="form-control">
                         <label class="label">
                             <span class="label-text">Người phụ trách (Công ty) <span class="text-error">*</span></span>
                         </label>
@@ -690,8 +660,7 @@ content = @`
             <div class="modal-backdrop" @click="closeEditItemModal()"></div>
         </div>
 
-        <!-- Delete Checklist Item Confirmation Modal -->
-        <div class="modal" :class="{ 'modal-open': showDeleteItemModal }">
+                <div class="modal" :class="{ 'modal-open': showDeleteItemModal }">
             <div class="modal-box">
                 <h3 class="font-bold text-lg mb-4 text-error">Xác nhận xóa</h3>
                 <p class="mb-4">
@@ -710,8 +679,7 @@ content = @`
             <div class="modal-backdrop" @click="showDeleteItemModal = false"></div>
         </div>
 
-        <!-- Attachment Management Modal -->
-        <div class="modal" :class="{ 'modal-open': showAttachmentModal }">
+                <div class="modal" :class="{ 'modal-open': showAttachmentModal }">
             <div class="modal-box max-w-4xl">
                 <h3 class="font-bold text-lg mb-4">
                     <i data-lucide="paperclip" class="w-5 h-5 inline mr-2"></i>
@@ -721,16 +689,14 @@ content = @`
                     Mục kiểm tra: <span class="font-medium" x-text="selectedAttachmentItem?.content"></span>
                 </p>
 
-                <!-- Upload Section -->
-                @if(rootRole == "SHIP")
+                                @if(rootRole == "SHIP")
                 <div
                 x-show="isAllowReview(selectedAttachmentItem)"
                  class="card bg-base-200 mb-6">
                     <div class="card-body p-4">
                         <h4 class="font-medium mb-3">Tải lên tài liệu mới</h4>
                         
-                        <!-- Single File Upload -->
-                        <div class="flex flex-col lg:flex-row gap-4 mb-4">
+                                                <div class="flex flex-col lg:flex-row gap-4 mb-4">
                             <div class="flex-1">
                                 <input type="file" 
                                        class="file-input file-input-bordered file-input-sm w-full" 
@@ -748,8 +714,7 @@ content = @`
                             </button>
                         </div>
 
-                        <!-- Multiple Files Upload -->
-                        <div class="divider text-xs">HOẶC</div>
+                                                <div class="divider text-xs">HOẶC</div>
                         <div class="flex flex-col lg:flex-row gap-4">
                             <div class="flex-1">
                                 <input type="file" 
@@ -772,8 +737,7 @@ content = @`
                 </div>
                 @endif
 
-                <!-- Files List Section -->
-                <div class="card bg-base-100">
+                                <div class="card bg-base-100">
                     <div class="card-body p-4">
                         <div class="flex items-center justify-between mb-4">
                             <h4 class="font-medium">Danh sách tài liệu</h4>
@@ -783,20 +747,17 @@ content = @`
                             </button>
                         </div>
 
-                        <!-- Loading State -->
-                        <div x-show="loadingAttachments" class="flex justify-center py-8">
+                                                <div x-show="loadingAttachments" class="flex justify-center py-8">
                             <span class="loading loading-spinner loading-lg"></span>
                         </div>
 
-                        <!-- Empty State -->
-                        <div x-show="!loadingAttachments && attachments.length === 0" class="text-center py-8">
+                                                <div x-show="!loadingAttachments && attachments.length === 0" class="text-center py-8">
                             <i data-lucide="file-x" class="w-16 h-16 mx-auto text-base-content/30 mb-4"></i>
                             <h5 class="text-lg font-medium mb-2">Chưa có tài liệu nào</h5>
                             <p class="text-base-content/70">Tải lên tài liệu đầu tiên cho mục kiểm tra này</p>
                         </div>
 
-                        <!-- Files Table -->
-                        <div x-show="!loadingAttachments && attachments.length > 0" class="overflow-x-auto">
+                                                <div x-show="!loadingAttachments && attachments.length > 0" class="overflow-x-auto">
                             <table class="table table-zebra w-full text-sm">
                                 <thead>
                                     <tr>
@@ -856,8 +817,7 @@ content = @`
             <div class="modal-backdrop" @click="closeAttachmentModal()"></div>
         </div>
 
-        <!-- Delete Attachment Confirmation Modal -->
-        <div class="modal" :class="{ 'modal-open': showDeleteAttachmentModal }">
+                <div class="modal" :class="{ 'modal-open': showDeleteAttachmentModal }">
             <div class="modal-box">
                 <h3 class="font-bold text-lg mb-4 text-error">Xác nhận xóa tài liệu</h3>
                 <p class="mb-4">
@@ -876,8 +836,7 @@ content = @`
             <div class="modal-backdrop" @click="showDeleteAttachmentModal = false"></div>
         </div>
 
-        <!-- Toast Notifications -->
-        <div class="toast toast-top toast-end">
+                <div class="toast toast-top toast-end">
             <template x-for="notification in notifications" :key="notification.id">
                 <div class="alert" :class="'alert-' + notification.type">
                     <i :data-lucide="notification.icon" class="w-4 h-4"></i>
@@ -920,7 +879,7 @@ content = @`
                     note: ''
                 },
 
-                // Template management
+
                 showTemplateModal: false,
                 showDeleteModal: false,
                 editingTemplate: null,
@@ -934,7 +893,7 @@ content = @`
                 templateErrors: {},
                 notifications: [],
 
-                // Checklist Item management
+
                 showCreateItemModal: false,
                 selectedTemplate: null,
                 savingItem: false,
@@ -947,7 +906,7 @@ content = @`
                 },
                 itemErrors: {},
 
-                // Edit/Delete Checklist Item management
+
                 showEditItemModal: false,
                 showDeleteItemModal: false,
                 editingItem: null,
@@ -963,7 +922,7 @@ content = @`
                 },
                 editItemErrors: {},
 
-                // Attachment management
+
                 showAttachmentModal: false,
                 showDeleteAttachmentModal: false,
                 selectedAttachmentItem: null,
@@ -990,7 +949,7 @@ content = @`
                 },
                 openReviewModal(item) {
                     this.reviewItem = item;
-                    // Initialize form with existing values if any
+
                     this.reviewForm = {
                         result: '',
                         remark: '',
@@ -1038,7 +997,7 @@ content = @`
                             this.closeReviewModal();
                             this.showNotification('success', 'Đã lưu đánh giá thành công', 'check-circle');
 
-                            // Update the item in the current display
+
                             this.updateItemInTemplates(data);
                             await this.refreshTable()
 
@@ -1074,7 +1033,7 @@ content = @`
                         const response = await fetch(`/api/ships?page=0&size=1000&strict=true`);
                         if (response.ok) {
                             const data = await response.json();
-                            // Note: Need to filter by company once company relationship is available in Ship entity
+
                             this.ships = data.content || [];
                         }
                     } catch (error) {
@@ -1098,7 +1057,7 @@ content = @`
                     this.selectedTemplateId = '';
                     this.showSearchBar = false;
 
-                    // Set selected ship name
+
                     const selectedShip = this.ships.find(ship => ship.id == this.selectedShipId);
                     this.selectedShipName = selectedShip ? selectedShip.name : '';
 
@@ -1132,7 +1091,7 @@ content = @`
                     console.log('Loading reviews for ship:', this.selectedShipId, 'Available templates:', this.checklistTemplates.length);
 
                     try {
-                        // Filter templates based on selection
+
                         if (this.selectedTemplateId) {
                             this.displayedTemplates = this.checklistTemplates.filter(
                                 template => template.id == this.selectedTemplateId
@@ -1143,7 +1102,7 @@ content = @`
 
                         console.log('Displayed templates:', this.displayedTemplates.length);
 
-                        // Show search bar after successful load
+
                         this.showSearchBar = true;
 
                         if (this.displayedTemplates.length === 0) {
@@ -1172,7 +1131,7 @@ content = @`
                     );
                 },
 
-                // Template Management Functions
+
                 openAddTemplateModal() {
                     this.editingTemplate = null;
                     this.templateForm = {section: '', orderNo: 0};
@@ -1273,7 +1232,7 @@ content = @`
                     }
                 },
 
-                // Get checklist items from template
+
                 getItems(template) {
                     return template.checklistItems || [];
                 },
@@ -1332,12 +1291,12 @@ content = @`
                 },
 
                 updateItemInTemplates(updatedItem) {
-                    // Find and update the item in displayedTemplates
+
                     this.displayedTemplates.forEach(template => {
                         if (template.checklistItems) {
                             const itemIndex = template.checklistItems.findIndex(item => item.id === updatedItem.id);
                             if (itemIndex !== -1) {
-                                // Update the item with new data from the API response
+
                                 template.checklistItems[itemIndex] = {
                                     ...template.checklistItems[itemIndex],
                                     ...updatedItem
@@ -1346,7 +1305,7 @@ content = @`
                         }
                     });
 
-                    // Also update in the main checklistTemplates array
+
                     this.checklistTemplates.forEach(template => {
                         if (template.checklistItems) {
                             const itemIndex = template.checklistItems.findIndex(item => item.id === updatedItem.id);
@@ -1360,7 +1319,7 @@ content = @`
                     });
                 },
 
-                // Checklist Item Functions
+
                 openCreateItemModal(template) {
                     this.selectedTemplate = template;
                     this.itemForm = {
@@ -1410,10 +1369,10 @@ content = @`
                         if (response.ok) {
                             this.closeCreateItemModal();
                             this.showNotification('success', 'Đã thêm mục kiểm tra thành công', 'check-circle');
-                            // Optionally reload the reviews to show the new item
+
                             await this.refreshTable();
                         } else {
-                            // Handle validation errors
+
                             if (data.errors) {
                                 this.itemErrors = data.errors;
                             } else {
@@ -1435,7 +1394,7 @@ content = @`
                     return this.usersOfShip.filter(user => user.roleRootRole === 'COMPANY');
                 },
 
-                // Edit Checklist Item Functions
+
                 editChecklistItem(item) {
                     this.editingItem = item;
                     this.editItemForm = {
@@ -1480,10 +1439,10 @@ content = @`
                         if (response.ok) {
                             this.closeEditItemModal();
                             this.showNotification('success', 'Đã cập nhật mục kiểm tra thành công', 'check-circle');
-                            // Reload checklist templates to get updated data
+
                             await this.refreshTable();
                         } else {
-                            // Handle validation errors
+
                             if (data.errors) {
                                 this.editItemErrors = data.errors;
                             } else {
@@ -1497,7 +1456,7 @@ content = @`
                     }
                 },
 
-                // Delete Checklist Item Functions
+
                 deleteChecklistItem(item) {
                     this.itemToDelete = item;
                     this.showDeleteItemModal = true;
@@ -1513,7 +1472,7 @@ content = @`
                         if (response.ok) {
                             this.showDeleteItemModal = false;
                             this.showNotification('success', 'Đã xóa mục kiểm tra thành công', 'check-circle');
-                            // Reload checklist templates to get updated data
+
                             await this.refreshTable();
                         } else {
                             const data = await response.json();
@@ -1527,7 +1486,7 @@ content = @`
                     }
                 },
 
-                // Attachment management functions
+
                 handleSingleFileSelect(event) {
                     const file = event.target.files[0];
                     this.selectedFile = file;
@@ -1545,17 +1504,17 @@ content = @`
                     this.attachments = [];
                     this.selectedFile = null;
                     this.selectedFiles = null;
-                    // Reset file inputs
+
                     const fileInputs = document.querySelectorAll('input[type="file"]');
                     fileInputs.forEach(input => input.value = '');
                 },
 
                 getAttachmentCount(item) {
-                    // If this item is currently selected in attachment modal, use real-time count
+
                     if (this.selectedAttachmentItem && this.selectedAttachmentItem.id === item.id) {
                         return this.attachments.length;
                     }
-                    // For now return 0, this should be updated when attachments are properly linked
+
                     return item.attachmentCount || 0;
                 },
 
@@ -1603,7 +1562,7 @@ content = @`
                         if (response.ok && data.success) {
                             this.showNotification('success', data.message || 'Tài liệu đã được tải lên thành công', 'check-circle');
                             await this.loadAttachments(); // Reload attachments list
-                            // Clear file input
+
                             this.selectedFile = null;
                             const fileInput = document.querySelector('input[type="file"]:not([multiple])');
                             if (fileInput) fileInput.value = '';
@@ -1644,7 +1603,7 @@ content = @`
                         if (response.ok && data.success) {
                             this.showNotification('success', data.message || 'Tài liệu đã được tải lên thành công', 'check-circle');
                             await this.loadAttachments(); // Reload attachments list
-                            // Clear file inputs
+
                             this.selectedFiles = null;
                             const fileInput = document.querySelector('input[type="file"][multiple]');
                             if (fileInput) fileInput.value = '';
@@ -1678,11 +1637,11 @@ content = @`
                     }
                 },
                 downloadFile(attachment) {
-                    // Extract filename from fileUrl or use the stored filename
+
                     const filename = attachment.fileUrl ? attachment.fileUrl.split('/').pop() : attachment.filename;
                     const downloadUrl = `/api/attachments/download/${filename}`;
                     
-                    // Create a temporary anchor element and trigger download
+
                     const link = document.createElement('a');
                     link.href = downloadUrl;
                     link.target = '_blank';

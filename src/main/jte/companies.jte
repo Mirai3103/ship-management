@@ -8,8 +8,7 @@
     currentUser = currentUser,
     content = @`
         <div x-data="companyManager()" x-init="loadCompanies()" class="space-y-6">
-            <!-- Header Section -->
-            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div>
                     <h1 class="text-2xl font-bold">Quản lý công ty</h1>
                     <p class="text-base-content/70">Quản lý thông tin các công ty vận tải biển</p>
@@ -20,12 +19,10 @@
                 </button>
             </div>
 
-            <!-- Search and Filter Section -->
-            <div class="card bg-base-100 shadow-xl">
+                        <div class="card bg-base-100 shadow-xl">
                 <div class="card-body">
                     <div class="flex flex-col lg:flex-row gap-4">
-                        <!-- Search Input -->
-                        <div class="flex-1">
+                                                <div class="flex-1">
                             <div class="form-control">
                                 <div class="input-group">
                                     <input 
@@ -42,8 +39,7 @@
                             </div>
                         </div>
                         
-                        <!-- Page Size Selector -->
-                        <div class="form-control w-full max-w-xs">
+                                                <div class="form-control w-full max-w-xs">
                             <select class="select select-bordered" x-model="pageSize" @change="loadCompanies()">
                                 <option value="5">5 công ty/trang</option>
                                 <option value="10">10 công ty/trang</option>
@@ -55,8 +51,7 @@
                 </div>
             </div>
 
-            <!-- Companies Table -->
-            <div class="card bg-base-100 shadow-xl">
+                        <div class="card bg-base-100 shadow-xl">
                 <div class="card-body">
                     <div class="flex items-center justify-between mb-4">
                         <h2 class="card-title">
@@ -68,13 +63,11 @@
                         </div>
                     </div>
 
-                    <!-- Loading State -->
-                    <div x-show="loading" class="flex justify-center py-8">
+                                        <div x-show="loading" class="flex justify-center py-8">
                         <span class="loading loading-spinner loading-lg"></span>
                     </div>
 
-                    <!-- Empty State -->
-                    <div x-show="!loading && companies.content && companies.content.length === 0" class="text-center py-8">
+                                        <div x-show="!loading && companies.content && companies.content.length === 0" class="text-center py-8">
                         <i data-lucide="building-2" class="w-16 h-16 mx-auto text-base-content/30 mb-4"></i>
                         <h3 class="text-lg font-medium mb-2">Chưa có công ty nào</h3>
                         <p class="text-base-content/70 mb-4">Bắt đầu bằng cách thêm công ty đầu tiên</p>
@@ -84,8 +77,7 @@
                         </button>
                     </div>
 
-                    <!-- Companies Table -->
-                    <div x-show="!loading && companies.content && companies.content.length > 0" class="overflow-x-auto">
+                                        <div x-show="!loading && companies.content && companies.content.length > 0" class="overflow-x-auto">
                         <table class="table table-zebra w-full">
                             <thead>
                                 <tr>
@@ -137,8 +129,7 @@
                         </table>
                     </div>
 
-                    <!-- Pagination -->
-                    <div x-show="!loading && companies.totalPages > 1" class="flex justify-center mt-6">
+                                        <div x-show="!loading && companies.totalPages > 1" class="flex justify-center mt-6">
                         <div class="join">
                             <button 
                                 class="join-item btn" 
@@ -169,8 +160,7 @@
                 </div>
             </div>
 
-            <!-- Add/Edit Modal -->
-            <div class="modal" :class="{ 'modal-open': showModal }">
+                        <div class="modal" :class="{ 'modal-open': showModal }">
                 <div class="modal-box max-w-2xl">
                     <h3 class="font-bold text-lg mb-4">
                         <span x-show="!editingCompany">Thêm công ty mới</span>
@@ -178,8 +168,7 @@
                     </h3>
                     
                     <form @submit.prevent="saveCompany()" class="space-y-4">
-                        <!-- Company Name -->
-                        <div class="form-control">
+                                                <div class="form-control">
                             <label class="label">
                                 <span class="label-text">Tên công ty <span class="text-error">*</span></span>
                             </label>
@@ -196,8 +185,7 @@
                             </label>
                         </div>
 
-                        <!-- Address -->
-                        <div class="form-control">
+                                                <div class="form-control">
                             <label class="label">
                                 <span class="label-text">Địa chỉ <span class="text-error">*</span></span>
                             </label>
@@ -213,10 +201,8 @@
                             </label>
                         </div>
 
-                        <!-- Phone and Email Row -->
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <!-- Phone -->
-                            <div class="form-control">
+                                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                        <div class="form-control">
                                 <label class="label">
                                     <span class="label-text">Số điện thoại <span class="text-error">*</span></span>
                                 </label>
@@ -233,8 +219,7 @@
                                 </label>
                             </div>
 
-                            <!-- Email -->
-                            <div class="form-control">
+                                                        <div class="form-control">
                                 <label class="label">
                                     <span class="label-text">Email <span class="text-error">*</span></span>
                                 </label>
@@ -267,8 +252,7 @@
                 <div class="modal-backdrop" @click="closeModal()"></div>
             </div>
 
-            <!-- Delete Confirmation Modal -->
-            <div class="modal" :class="{ 'modal-open': showDeleteModal }">
+                        <div class="modal" :class="{ 'modal-open': showDeleteModal }">
                 <div class="modal-box">
                     <h3 class="font-bold text-lg mb-4 text-error">Xác nhận xóa</h3>
                     <p class="mb-4">
@@ -286,8 +270,7 @@
                 <div class="modal-backdrop" @click="showDeleteModal = false"></div>
             </div>
 
-            <!-- Toast Notifications -->
-            <div class="toast toast-top toast-end">
+                        <div class="toast toast-top toast-end">
                 <template x-for="notification in notifications" :key="notification.id">
                     <div class="alert" :class="'alert-' + notification.type">
                         <i :data-lucide="notification.icon" class="w-4 h-4"></i>

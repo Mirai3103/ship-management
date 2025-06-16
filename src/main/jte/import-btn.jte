@@ -1,7 +1,5 @@
-<!-- Import Button Component -->
 <div x-data="importManager()" class="inline-block">
-    <!-- Import Button -->
-    <button
+        <button
         class="btn btn-info"
         @click="openImportModal()"
         :disabled="!canImport || !selectedShipId"
@@ -10,24 +8,21 @@
         Nhập từ tàu khác
     </button>
 
-    <!-- Import Modal -->
-    <div class="modal" :class="{ 'modal-open': showImportModal }">
+        <div class="modal" :class="{ 'modal-open': showImportModal }">
         <div class="modal-box max-w-full" style="width: 700px;">
             <h3 class="font-bold text-lg mb-4">
                 <i data-lucide="download" class="w-5 h-5 inline mr-2"></i>
                 Nhập mục kiểm tra từ tàu khác
             </h3>
 
-            <!-- Step 1: Company and Ship Selection -->
-            <div x-show="currentStep === 1" class="space-y-4">
+                        <div x-show="currentStep === 1" class="space-y-4">
                 <div class="alert alert-info">
                     <i data-lucide="info" class="w-4 h-4"></i>
                     <span>Bước 1: Chọn công ty và tàu nguồn để nhập mục kiểm tra</span>
                 </div>
 
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                    <!-- Company Selection -->
-                    <div class="form-control">
+                                        <div class="form-control">
                         <label class="label">
                             <span class="label-text">Công ty nguồn <span class="text-error">*</span></span>
                         </label>
@@ -44,8 +39,7 @@
                         </select>
                     </div>
 
-                    <!-- Ship Selection -->
-                    <div class="form-control">
+                                        <div class="form-control">
                         <label class="label">
                             <span class="label-text">Tàu nguồn <span class="text-error">*</span></span>
                         </label>
@@ -76,8 +70,7 @@
                 </div>
             </div>
 
-            <!-- Step 2: Checklist Selection -->
-            <div x-show="currentStep === 2" class="space-y-4">
+                        <div x-show="currentStep === 2" class="space-y-4">
                 <div class="alert alert-success">
                     <i data-lucide="check-circle" class="w-4 h-4"></i>
                     <span>Bước 2: Chọn mục kiểm tra muốn nhập</span>
@@ -86,8 +79,7 @@
                     </div>
                 </div>
 
-                <!-- Selection Controls -->
-                <div class="flex items-center justify-between bg-base-200 p-4 rounded-lg">
+                                <div class="flex items-center justify-between bg-base-200 p-4 rounded-lg">
                     <div class="flex items-center gap-4">
                         <label class="label cursor-pointer">
                             <input type="checkbox" 
@@ -107,20 +99,17 @@
                     </button>
                 </div>
 
-                <!-- Loading State -->
-                <div x-show="loadingImportTemplates" class="flex justify-center py-8">
+                                <div x-show="loadingImportTemplates" class="flex justify-center py-8">
                     <span class="loading loading-spinner loading-lg"></span>
                 </div>
 
-                <!-- Empty State -->
-                <div x-show="!loadingImportTemplates && importTemplates.length === 0" class="text-center py-8">
+                                <div x-show="!loadingImportTemplates && importTemplates.length === 0" class="text-center py-8">
                     <i data-lucide="clipboard" class="w-16 h-16 mx-auto text-base-content/30 mb-4"></i>
                     <h4 class="text-lg font-medium mb-2">Không có mục kiểm tra nào</h4>
                     <p class="text-base-content/70">Tàu này chưa có mục kiểm tra để nhập</p>
                 </div>
 
-                <!-- Checklists Table -->
-                <div x-show="!loadingImportTemplates && importTemplates.length > 0" class="overflow-x-auto max-h-96">
+                                <div x-show="!loadingImportTemplates && importTemplates.length > 0" class="overflow-x-auto max-h-96">
                     <table class="table table-zebra w-full">
                         <thead class="sticky top-0 bg-base-100 z-10">
                             <tr>
@@ -138,8 +127,7 @@
                         </thead>
                         <template x-for="template in importTemplates" :key="template.id">
                             <tbody>
-                                <!-- Template Header -->
-                                <tr class="bg-base-200 border-t-2 border-base-300">
+                                                                <tr class="bg-base-200 border-t-2 border-base-300">
                                     <td>
                                         <input type="checkbox" 
                                                class="checkbox checkbox-secondary" 
@@ -156,8 +144,7 @@
                                     </td>
                                 </tr>
 
-                                <!-- Template Items -->
-                                <template x-for="(item, index) in getTemplateItems(template)" :key="template.id + '_' + item.id">
+                                                                <template x-for="(item, index) in getTemplateItems(template)" :key="template.id + '_' + item.id">
                                     <tr>
                                         <td>
                                             <input type="checkbox" 
@@ -206,8 +193,7 @@
         <div class="modal-backdrop" @click="closeImportModal()"></div>
     </div>
 
-    <!-- Toast Notifications -->
-    <div class="toast toast-top toast-end">
+        <div class="toast toast-top toast-end">
         <template x-for="notification in importNotifications" :key="notification.id">
             <div class="alert" :class="'alert-' + notification.type">
                 <i :data-lucide="notification.icon" class="w-4 h-4"></i>
@@ -223,34 +209,34 @@
 <script>
 function importManager() {
     return {
-        // Modal state
+
         showImportModal: false,
         currentStep: 1,
         canImport: true,
 
-        // Data
+
         importCompanies: [],
         importShips: [],
         importTemplates: [],
         
-        // Loading states
+
         loadingImportShips: false,
         loadingImportTemplates: false,
         submittingImport: false,
 
-        // Form data
+
         importForm: {
             sourceCompanyId: '',
             sourceShipId: ''
         },
 
-        // Selection state
+
         selectedItems: {}, // {templateId: [itemId1, itemId2, ...]}
 
-        // Notifications
+
         importNotifications: [],
 
-        // Modal functions
+
         async openImportModal() {
             this.showImportModal = true;
             this.currentStep = 1;
@@ -280,7 +266,7 @@ function importManager() {
             this.selectedItems = {};
         },
 
-        // Data loading functions
+
         async loadImportCompanies() {
             try {
                 const response = await fetch('/api/companies?page=0&size=1000&strict=true');
@@ -346,7 +332,7 @@ function importManager() {
             }
         },
 
-        // Helper functions
+
         getSelectedShipName() {
             const ship = this.importShips.find(s => s.id == this.importForm.sourceShipId);
             return ship ? ship.name : '';
@@ -360,7 +346,7 @@ function importManager() {
             return template.checklistItems ? template.checklistItems.length : 0;
         },
 
-        // Selection functions
+
         isTemplateSelected(template) {
             const items = this.getTemplateItems(template);
             if (items.length === 0) return false;
@@ -385,10 +371,10 @@ function importManager() {
             const isCurrentlySelected = this.isTemplateSelected(template);
             
             if (isCurrentlySelected) {
-                // Deselect all items in this template
+
                 this.selectedItems[template.id] = [];
             } else {
-                // Select all items in this template
+
                 this.selectedItems[template.id] = items.map(item => item.id);
             }
         },
@@ -405,7 +391,7 @@ function importManager() {
                 this.selectedItems[templateId].push(itemId);
             }
 
-            // Clean up empty template arrays
+
             if (this.selectedItems[templateId].length === 0) {
                 delete this.selectedItems[templateId];
             }
@@ -425,7 +411,7 @@ function importManager() {
             const shouldSelectAll = !this.isAllSelected();
             
             if (shouldSelectAll) {
-                // Select all items in all templates
+
                 this.importTemplates.forEach(template => {
                     const items = this.getTemplateItems(template);
                     if (items.length > 0) {
@@ -433,7 +419,7 @@ function importManager() {
                     }
                 });
             } else {
-                // Deselect all
+
                 this.selectedItems = {};
             }
         },
@@ -450,7 +436,7 @@ function importManager() {
             return count;
         },
 
-        // Submit function
+
         async submitImport() {
             if (this.getSelectedCount() === 0) {
                 this.showImportNotification('warning', 'Vui lòng chọn ít nhất một mục để nhập', 'alert-triangle');
@@ -460,7 +446,7 @@ function importManager() {
             this.submittingImport = true;
 
             try {
-                // Prepare data structure as requested: {shipId, checklists: {templateId, checklistId}}
+
                 const checklists = [];
                 Object.entries(this.selectedItems).forEach(([templateId, itemIds]) => {
                     itemIds.forEach(itemId => {
@@ -506,7 +492,7 @@ function importManager() {
             }
         },
 
-        // Notification functions
+
         showImportNotification(type, message, icon) {
             const id = Date.now().toString() + Math.floor(Math.random() * 1000);
             const notification = {

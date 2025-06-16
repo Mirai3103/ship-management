@@ -142,7 +142,7 @@ public class ChecklistTemplateController {
         return ResponseEntity.ok(response);
     }
 
-    // Error response class
+
     public static class ErrorResponse {
         public String status;
         public String message;

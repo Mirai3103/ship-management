@@ -86,7 +86,7 @@ public class ChecklistItemService {
         Map<ChecklistTemplate, List<ChecklistItem>> checklistMap = checklists.stream()
                 .collect(Collectors.groupingBy(ChecklistItem::getChecklistTemplate));
 
-//         đầu tiên kiếm mấy template trùng tên với cái có sẵn mà push vào
+
         currentTemplates.forEach(template -> {
             var incomingTemplate= checklistMap.get(template);
             if(incomingTemplate!=null){
@@ -103,7 +103,7 @@ public class ChecklistItemService {
         });
 
 
-        // sau đó push vào checklist item mới
+
         checklistMap.keySet().forEach(template -> {
             var newTemplate = new ChecklistTemplate();
             newTemplate.setSection(template.getSection());

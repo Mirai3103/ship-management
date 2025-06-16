@@ -86,7 +86,7 @@ public class RoleController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    // Error response class
+
     public static class ErrorResponse {
         public String status;
         public String message;

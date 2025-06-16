@@ -25,8 +25,7 @@
 <body class="min-h-screen bg-gradient-to-br from-blue-50 to-cyan-100">
     <div class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
         <div class="max-w-md w-full space-y-8" x-data="loginForm()">
-            <!-- Header -->
-            <div class="text-center">
+                        <div class="text-center">
                 <div class="avatar">
                     <div class="w-16 h-16 rounded-full bg-primary !flex items-center justify-center mb-4 mx-auto">
                         <i data-lucide="ship" class="h-8 w-8 text-primary-content"></i>
@@ -40,13 +39,10 @@
                 </p>
             </div>
 
-            <!-- Login Form Card -->
-            <div class="card bg-base-100 shadow-xl">
+                        <div class="card bg-base-100 shadow-xl">
                 <div class="card-body">
-                    <!-- Spring Security Login Form -->
-                    <form action="/login" method="POST" class="space-y-6">
-                        <!-- Email Field -->
-                        <div class="form-control">
+                                        <form action="/login" method="POST" class="space-y-6">
+                                                <div class="form-control">
                             <label class="label">
                                 <span class="label-text font-medium">Email <span class="text-error">*</span></span>
                             </label>
@@ -63,8 +59,7 @@
                             </label>
                         </div>
 
-                        <!-- Password Field -->
-                        <div class="form-control">
+                                                <div class="form-control">
                             <label class="label">
                                 <span class="label-text font-medium">Mật khẩu <span class="text-error">*</span></span>
                             </label>
@@ -89,8 +84,7 @@
                             </label>
                         </div>
 
-                        <!-- Remember me & Forgot password -->
-                        <div class="flex items-center justify-start">
+                                                <div class="flex items-center justify-start">
                             <label class="label cursor-pointer gap-2">
                                 <input type="checkbox" name="remember-me" class="checkbox checkbox-primary checkbox-sm" />
                                 <span class="label-text">Ghi nhớ đăng nhập</span>
@@ -98,8 +92,7 @@
                           
                         </div>
 
-                        <!-- Submit Button -->
-                        <button type="submit" class="btn btn-primary w-full">
+                                                <button type="submit" class="btn btn-primary w-full">
                             <span class="flex items-center gap-2">
                                 <i data-lucide="log-in" class="h-5 w-5"></i>
                                 Đăng nhập
@@ -115,8 +108,7 @@
         </div>
     </div>
 
-    <!-- Toast Notifications Container -->
-    <div class="toast toast-top toast-end z-50">
+        <div class="toast toast-top toast-end z-50">
         <template x-for="notification in notifications" :key="notification.id">
             <div class="alert shadow-lg" :class="'alert-' + notification.type">
                 <div class="flex items-center gap-2">
@@ -147,7 +139,7 @@
                     
                     this.notifications.push(notification);
                     
-                    // Auto-remove notification after 5 seconds
+
                     setTimeout(() => {
                         this.removeNotification(notification.id);
                     }, 5000);
@@ -159,7 +151,7 @@
             }
         }
 
-        // Show notifications based on URL parameters
+
         document.addEventListener('DOMContentLoaded', function() {
             lucide.createIcons();
             

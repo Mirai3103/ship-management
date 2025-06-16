@@ -59,19 +59,19 @@ public class UserService implements UserDetailsService {
     }
 
     public UserDTO createUser(UserDTO userDTO) throws Exception {
-        // Check if user already exists
+
         if (userRepository.existsByEmail(userDTO.getEmail())) {
             throw new Exception("Email đã tồn tại");
         }
 
-        // Get role
+
         Role role = roleRepository.findById(userDTO.getRoleId())
                 .orElseThrow(() -> new Exception("Vai trò không tồn tại"));
         
         Company company = companyRepository.findById(userDTO.getCompanyId())
                 .orElseThrow(() -> new Exception("Công ty không tồn tại"));
 
-        // Create new user with default password
+
         User user = User.builder()
                 .email(userDTO.getEmail())
                 .fullName(userDTO.getFullName())
@@ -87,7 +87,7 @@ public class UserService implements UserDetailsService {
     public Optional<UserDTO> updateUser(Long id, UserDTO userDTO) throws Exception {
         return userRepository.findById(id)
                 .map(existingUser -> {
-                    // Check if the new email conflicts with another user
+
                     Optional<User> userWithSameEmail = userRepository.findByEmail(userDTO.getEmail());
                     if (userWithSameEmail.isPresent() && !userWithSameEmail.get().getId().equals(id)) {
                         throw new RuntimeException("Email đã tồn tại");
@@ -114,17 +114,17 @@ public class UserService implements UserDetailsService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new Exception("Người dùng không tồn tại"));
 
-        // Verify current password
+
         if (!passwordEncoder.matches(changePasswordDTO.getCurrentPassword(), user.getHashedPassword())) {
             throw new Exception("Mật khẩu hiện tại không đúng");
         }
 
-        // Check if new passwords match
+
         if (!changePasswordDTO.getNewPassword().equals(changePasswordDTO.getConfirmNewPassword())) {
             throw new Exception("Mật khẩu xác nhận không khớp");
         }
 
-        // Update password
+
         user.setHashedPassword(passwordEncoder.encode(changePasswordDTO.getNewPassword()));
         userRepository.save(user);
         
@@ -145,23 +145,23 @@ public class UserService implements UserDetailsService {
     }
 
     public User registerUser(UserRegistrationDTO registrationDTO) throws Exception {
-        // Check if user already exists
+
         if (userRepository.existsByEmail(registrationDTO.getEmail())) {
             throw new Exception("Email đã tồn tại");
         }
 
-        // Check if passwords match
+
         if (!registrationDTO.getPassword().equals(registrationDTO.getConfirmPassword())) {
             throw new Exception("Mật khẩu xác nhận không khớp");
         }
 
-        // Get default role (USER)
+
         Role userRole = roleRepository.findByName("USER")
                 .orElseThrow(() -> new Exception("Default role not found"));
 
        
 
-        // Create new user
+
         User user = User.builder()
                 .email(registrationDTO.getEmail())
                 .fullName(registrationDTO.getFullName())

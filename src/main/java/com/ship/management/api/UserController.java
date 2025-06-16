@@ -143,7 +143,7 @@ public class UserController {
     @GetMapping("/roles")
     public ResponseEntity<?> getAllRoles() {
         try {
-            // Get all roles for role assignment dropdown
+
             var roles = roleService.getAllRoles(Pageable.unpaged());
             return ResponseEntity.ok(roles.getContent());
         } catch (Exception e) {
@@ -152,7 +152,7 @@ public class UserController {
         }
     }
 
-    // Error response class
+
     public static class ErrorResponse {
         public String status;
         public String message;

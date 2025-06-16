@@ -45,7 +45,7 @@ public class RoleService {
     }
 
     public RoleDTO createRole(RoleDTO roleDTO) {
-        // Check if role name already exists
+
         if (roleRepository.findByName(roleDTO.getName()).isPresent()) {
             throw new RuntimeException("Tên vai trò đã tồn tại");
         }
@@ -60,7 +60,7 @@ public class RoleService {
     public Optional<RoleDTO> updateRole(Long id, RoleDTO roleDTO) {
         return roleRepository.findById(id)
                 .map(existingRole -> {
-                    // Check if the new name conflicts with another role
+
                     Optional<Role> roleWithSameName = roleRepository.findByName(roleDTO.getName());
                     if (roleWithSameName.isPresent() && !roleWithSameName.get().getId().equals(id)) {
                         throw new RuntimeException("Tên vai trò đã tồn tại");
@@ -92,7 +92,7 @@ public class RoleService {
 
     public boolean deleteRole(Long id) {
         if (roleRepository.existsById(id)) {
-            // Check if role is being used by users
+
             Optional<Role> role = roleRepository.findById(id);
             if (role.isPresent() && role.get().getUsers() != null && !role.get().getUsers().isEmpty()) {
                 throw new RuntimeException("Không thể xóa vai trò đang được sử dụng");

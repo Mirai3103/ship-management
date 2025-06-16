@@ -88,20 +88,20 @@ public class ChecklistTemplateService {
 
 
     public ChecklistTemplateDTO createChecklistTemplate(ChecklistTemplateDTO templateDTO) throws Exception {
-        // Validate ship exists
+
         Ship ship = shipRepository.findById(templateDTO.getShipId())
                 .orElseThrow(() -> new Exception("Tàu không tồn tại"));
 
-        // Validate company exists
+
         Company company = companyRepository.findById(templateDTO.getCompanyId())
                 .orElseThrow(() -> new Exception("Công ty không tồn tại"));
 
-        // Check if section already exists for this ship
+
         if (checklistTemplateRepository.existsBySectionAndShipId(templateDTO.getSection(), templateDTO.getShipId())) {
             throw new Exception("Phần kiểm tra đã tồn tại cho tàu này");
         }
 
-        // Create new template
+
         ChecklistTemplate template = convertToEntity(templateDTO);
         template.setId(null); // Ensure it's a new entity
         template.setShip(ship);
@@ -114,24 +114,24 @@ public class ChecklistTemplateService {
     public Optional<ChecklistTemplateDTO> updateChecklistTemplate(Long id, ChecklistTemplateDTO templateDTO) throws Exception {
         return checklistTemplateRepository.findById(id)
                 .map(existingTemplate -> {
-                    // Check if the new section conflicts with another template for the same ship
+
                     if (!existingTemplate.getSection().equals(templateDTO.getSection()) &&
                         checklistTemplateRepository.existsBySectionAndShipId(templateDTO.getSection(), existingTemplate.getShip().getId())) {
                         throw new RuntimeException("Phần kiểm tra đã tồn tại cho tàu này");
                     }
 
-                    // Update basic fields
+
                     existingTemplate.setSection(templateDTO.getSection());
                     existingTemplate.setOrderNo(templateDTO.getOrderNo());
 
-                    // Update ship if changed
+
                     if (!existingTemplate.getShip().getId().equals(templateDTO.getShipId())) {
                         Ship ship = shipRepository.findById(templateDTO.getShipId())
                                 .orElseThrow(() -> new RuntimeException("Tàu không tồn tại"));
                         existingTemplate.setShip(ship);
                     }
 
-                    // Update company if changed
+
                     if (!existingTemplate.getCompany().getId().equals(templateDTO.getCompanyId())) {
                         Company company = companyRepository.findById(templateDTO.getCompanyId())
                                 .orElseThrow(() -> new RuntimeException("Công ty không tồn tại"));
@@ -145,7 +145,7 @@ public class ChecklistTemplateService {
 
     public boolean deleteChecklistTemplate(Long id) {
         if (checklistTemplateRepository.existsById(id)) {
-            // Get template with items to check if it has checklist items
+
             Optional<ChecklistTemplate> template = checklistTemplateRepository.findByIdWithItems(id);
             if (template.isPresent() && template.get().getChecklistItems() != null && 
                 !template.get().getChecklistItems().isEmpty()) {
@@ -165,7 +165,7 @@ public class ChecklistTemplateService {
     private ChecklistTemplateDTO convertToDTO(ChecklistTemplate template) {
         ChecklistTemplateDTO dto = modelMapper.map(template, ChecklistTemplateDTO.class);
         
-        // Set related entity IDs and names
+
         if (template.getShip() != null) {
             dto.setShipId(template.getShip().getId());
             dto.setShipName(template.getShip().getName());
@@ -178,14 +178,14 @@ public class ChecklistTemplateService {
         
         if (template.getReviewPlan() != null) {
             dto.setReviewPlanId(template.getReviewPlan().getId());
-            // Assuming ReviewPlan has a name field - adjust if different
-            // dto.setReviewPlanName(template.getReviewPlan().getName());
+
+
         }
         if(template.getChecklistItems()!=null){
             dto.setChecklistItems(template.getChecklistItems().stream().map(item->modelMapper.map(item, ChecklistItemDTO.class)).toList());
         }
         
-        // Set item count
+
         if (template.getChecklistItems() != null) {
             dto.setItemCount(template.getChecklistItems().size());
         }
