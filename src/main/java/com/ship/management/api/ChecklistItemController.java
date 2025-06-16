@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ship.management.dto.ChecklistItemDTO;
+import com.ship.management.dto.CopyCheckListDTO;
 import com.ship.management.dto.ReviewDTO;
 import com.ship.management.dto.UpdateItemDTO;
 import com.ship.management.entity.Role.RootRole;
@@ -51,5 +52,10 @@ public class ChecklistItemController {
             return checklistItemService.reviewFromCompany(reviewItemDTO);
         }
         throw new RuntimeException("User not found");
+    }
+
+    @PostMapping("/copy")
+    public void copyChecklistToShip(@RequestBody CopyCheckListDTO copyCheckListDTO) {
+        checklistItemService.copyCheckListToShip(copyCheckListDTO);
     }
 }

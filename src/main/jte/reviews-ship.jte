@@ -24,7 +24,7 @@ content = @`
     <div class="card bg-base-100 shadow-xl">
         <div class="card-body">
             <h3 class="font-semibold text-lg mb-4">Chọn công ty, tàu và mục kiểm tra</h3>
-            <div class="grid grid-cols-1 lg:grid-cols-5 gap-4">
+            <div class="grid grid-cols-1 lg:grid-cols-6 gap-4">
                 <!-- Company Selection -->
                 <div class="form-control">
                     <label class="label">
@@ -98,12 +98,8 @@ content = @`
                 </div>
 
                 <!-- Add Template Button -->
-                <div class="form-control">
-                    <label class="label">
-                        <span class="label-text">&nbsp;</span>
-                    </label>
+             
                     @if(Stream.of("ROLE_ADMIN","REVIEW_MANAGEMENT").anyMatch(permissions::contains))
-                    <div class="flex gap-2">
                         <button
                                 class="btn btn-success"
                                 @click="openAddTemplateModal()"
@@ -112,12 +108,13 @@ content = @`
                             <i data-lucide="plus" class="w-4 h-4"></i>
                             Thêm mục kiểm tra
                         </button>
-                        
-                        <!-- Import Button Component -->
                         @template.import-btn()
-                    </div>
+
+                        <!-- Import Button Component -->
+
                     @endif
-                </div>
+                
+
             </div>
 
             <!-- Search Bar (only shown after loading) -->

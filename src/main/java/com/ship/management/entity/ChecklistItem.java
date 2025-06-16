@@ -36,7 +36,7 @@ public class ChecklistItem {
 
 
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.REFRESH)
     @JoinColumn(name = "checklist_template_id")
     private ChecklistTemplate checklistTemplate;
 

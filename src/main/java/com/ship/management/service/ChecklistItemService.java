@@ -9,6 +9,7 @@ import com.ship.management.dto.CopyCheckListDTO;
 import com.ship.management.entity.ChecklistTemplate;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.ship.management.dto.ChecklistItemDTO;
 import com.ship.management.dto.ReviewDTO;
@@ -16,6 +17,7 @@ import com.ship.management.dto.UpdateItemDTO;
 import com.ship.management.entity.ChecklistItem;
 import com.ship.management.repository.ChecklistItemRepository;
 import com.ship.management.repository.ChecklistTemplateRepository;
+import com.ship.management.repository.ShipRepository;
 import com.ship.management.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -24,6 +26,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ChecklistItemService {
     private final ChecklistItemRepository checklistItemRepository;
+    private final ShipRepository shipRepository;
 
     private final ChecklistTemplateRepository checklistTemplateRepository;
     private final UserRepository userRepository;
@@ -50,6 +53,8 @@ public class ChecklistItemService {
         checklistItem.setContent(updateItemDTO.getContent());
         checklistItem.setGuide(updateItemDTO.getGuide());
         checklistItem.setOrderNo(updateItemDTO.getOrderNo());
+        checklistItem.setAssignedTo(userRepository.findById(updateItemDTO.getAssignedToId()).orElseThrow(() -> new RuntimeException("User not found")));
+        checklistItem.setComAssignedTo(userRepository.findById(updateItemDTO.getComAssignedToId()).orElseThrow(() -> new RuntimeException("User not found")));
         checklistItem = checklistItemRepository.save(checklistItem);
         return modelMapper.map(checklistItem, ChecklistItemDTO.class);
     }
@@ -73,18 +78,49 @@ public class ChecklistItemService {
         return new ChecklistItemDTO();
     }
 
+    @Transactional
     public void  copyCheckListToShip(CopyCheckListDTO copyCheckListDTO) {
-        var currentTemplate= checklistTemplateRepository.findById(copyCheckListDTO.getShipId())
-                .orElseThrow(() -> new RuntimeException("Ship not found"));
+        var ship= shipRepository.findById(copyCheckListDTO.getShipId()).orElseThrow(() -> new RuntimeException("Ship not found"));
+        var currentTemplates= checklistTemplateRepository.findByShipId(copyCheckListDTO.getShipId());
         var checklists = checklistItemRepository.findByIdIsIn((copyCheckListDTO.getItems().stream().map(CopyCheckListDTO.CopyCheckListItemDTO::getChecklistId).toList()));
         Map<ChecklistTemplate, List<ChecklistItem>> checklistMap = checklists.stream()
                 .collect(Collectors.groupingBy(ChecklistItem::getChecklistTemplate));
 
 //         đầu tiên kiếm mấy template trùng tên với cái có sẵn mà push vào
+        currentTemplates.forEach(template -> {
+            var incomingTemplate= checklistMap.get(template);
+            if(incomingTemplate!=null){
+               checklistItemRepository.saveAll(incomingTemplate.stream().map(item -> {
+                var newItem = new ChecklistItem();
+                newItem.setContent(item.getContent());
+                newItem.setGuide(item.getGuide());
+                newItem.setOrderNo(item.getOrderNo());
+                newItem.setChecklistTemplate(template);
+                return newItem;
+               }).collect(Collectors.toList()));
+               checklistMap.remove(template);
+            }
+        });
 
 
         // sau đó push vào checklist item mới
+        checklistMap.keySet().forEach(template -> {
+            var newTemplate = new ChecklistTemplate();
+            newTemplate.setSection(template.getSection());
+            newTemplate.setCompany(ship.getCompany());
+            newTemplate.setShip(ship);
+            final  ChecklistTemplate a = checklistTemplateRepository.save(newTemplate);
+            checklistItemRepository.saveAll(checklistMap.get(template).stream().map(item -> {
+                var newItem = new ChecklistItem();
+                newItem.setContent(item.getContent());
+                newItem.setGuide(item.getGuide());
+                newItem.setOrderNo(item.getOrderNo());
+                newItem.setChecklistTemplate(a);                                                    
+                return newItem;
+            }).collect(Collectors.toList()));                                                                           
+        });
     }
+
 
     
 }

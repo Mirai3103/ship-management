@@ -4,7 +4,7 @@
     <button
         class="btn btn-info"
         @click="openImportModal()"
-        :disabled="!canImport"
+        :disabled="!canImport || !selectedShipId"
     >
         <i data-lucide="download" class="w-4 h-4"></i>
         Nhập từ tàu khác
@@ -472,34 +472,36 @@ function importManager() {
                 });
 
                 const importData = {
-                    shipId: this.importForm.sourceShipId,
-                    checklists: checklists
+                    shipId: this.selectedShipId,
+                    checklists: checklists,
+                    items: checklists.map(item => ({
+                        templateId: item.templateId,
+                        checklistId: item.checklistId
+                    }))
                 };
 
                 console.log('Import data to be submitted:', importData);
+                const response = await fetch('/api/checklist-items/copy', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(importData)
+                })
+                if(response.ok){
+                    this.showImportNotification('success', `Đã nhập thành công ${this.getSelectedCount()} mục kiểm tra`, 'check-circle');
+                    this.closeImportModal();
+                }else{
+                    this.showImportNotification('error', 'Lỗi khi nhập: ' + response.statusText, 'alert-triangle');
+                }
 
-                // TODO: Implement actual API call
-                // const response = await fetch('/api/checklist-templates/import', {
-                //     method: 'POST',
-                //     headers: {
-                //         'Content-Type': 'application/json',
-                //     },
-                //     body: JSON.stringify(importData)
-                // });
-
-                // Simulate API call for now
-                await new Promise(resolve => setTimeout(resolve, 1500));
-
-                this.showImportNotification('success', `Đã nhập thành công ${this.getSelectedCount()} mục kiểm tra`, 'check-circle');
-                this.closeImportModal();
-
-                // TODO: Trigger refresh of the main review table
-                // window.dispatchEvent(new CustomEvent('refreshReviewTable'));
 
             } catch (error) {
                 console.error('Failed to import checklists:', error);
                 this.showImportNotification('error', 'Lỗi khi nhập: ' + error.message, 'alert-triangle');
             } finally {
+             this.refreshTable()
+
                 this.submittingImport = false;
             }
         },

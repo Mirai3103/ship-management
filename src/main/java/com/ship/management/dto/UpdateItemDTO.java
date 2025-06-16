@@ -8,4 +8,6 @@ public class UpdateItemDTO {
     private String content;
     private String guide;
     private String orderNo;
+    private Long assignedToId;
+    private Long comAssignedToId;
 }
