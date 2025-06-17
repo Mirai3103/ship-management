@@ -32,6 +32,13 @@ public class ShipController {
         Page<ShipDTO> ships = strict ? shipService.getAllShipsStrict(pageable) : shipService.getAllShips(pageable);
         return ResponseEntity.ok(new PagedModel<>(ships));
     }
+    @GetMapping("company/{companyId}")
+    public ResponseEntity<List<ShipDTO>> getShipsByCompanyId(
+            @PathVariable Long companyId, @RequestParam(required = false) Boolean strict) {
+        List<ShipDTO> ships = strict ? shipService.getShipsByCompanyIdStrict(companyId) : shipService.getShipsByCompanyId(companyId);
+        return ResponseEntity.ok(ships);
+
+    }
 
     @GetMapping("/{id}")
     public ResponseEntity<ShipDTO> getShipById(@PathVariable Long id) {

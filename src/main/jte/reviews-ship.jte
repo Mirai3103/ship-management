@@ -1030,11 +1030,11 @@ content = @`
                     this.showSearchBar = false;
 
                     try {
-                        const response = await fetch(`/api/ships?page=0&size=1000&strict=true`);
+                        const response = await fetch(`/api/ships/company/${this.selectedCompanyId}?page=0&size=1000&strict=true`);
                         if (response.ok) {
                             const data = await response.json();
 
-                            this.ships = data.content || [];
+                            this.ships = data || [];
                         }
                     } catch (error) {
                         console.error('Failed to load ships:', error);

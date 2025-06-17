@@ -38,7 +38,7 @@
         }
     </style>
 </head>
-<body class="bg-base-200" x-data="{ sidebarOpen: true, isMobile: window.innerWidth < 1024 }"
+<body class="bg-base-200" x-data="{ sidebarOpen: window.innerWidth > 1024, isMobile: window.innerWidth < 1024 }"
       @resize.window="isMobile = window.innerWidth < 1024">
 <div class="drawer" :class="{ 'lg:drawer-open': sidebarOpen && !isMobile }">
     <input id="drawer-toggle" type="checkbox" class="drawer-toggle" x-model="sidebarOpen"/>
@@ -172,20 +172,11 @@
             </div>
 
             <div class="flex-none space-x-2">
-                <button class="btn btn-ghost btn-circle">
-                    <div class="indicator">
-                        <i data-lucide="bell" class="w-5 h-5"></i>
-                        <span class="badge badge-xs badge-primary indicator-item"></span>
-                    </div>
-                </button>
-
-                <button class="btn btn-ghost btn-circle">
-                    <i data-lucide="settings" class="w-5 h-5"></i>
-                </button>
+              
             </div>
         </header>
 
-        <main class="flex-1 p-6">
+        <main class="flex-1 p-1 md:p-6">
             ${content}
         </main>
     </div>

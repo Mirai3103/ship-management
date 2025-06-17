@@ -119,4 +119,26 @@ public class ShipService {
         ship.getUsers().removeAll(removeUsers);
         shipRepository.save(ship);
     }
+
+    public List<ShipDTO> getShipsByCompanyIdStrict(Long companyId) {
+        var rootRole = userService.getCurrentUserRootRole();
+        if (RootRole.ADMIN.equals(rootRole)) {
+            return shipRepository.findByCompanyId(companyId).stream()
+                    .map(this::convertToDTO)
+                    .collect(Collectors.toList());
+        }
+        var userShip = shipRepository.findByUserIdAndCompanyId(userService.getCurrentUser().getId(), companyId);
+        return userShip.stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
+
+    public List<ShipDTO> getShipsByCompanyId(Long companyId) {
+
+            return shipRepository.findByCompanyId(companyId).stream()
+                    .map(this::convertToDTO)
+                    .collect(Collectors.toList());
+
+
+    }
 }
