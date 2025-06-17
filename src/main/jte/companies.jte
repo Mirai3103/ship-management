@@ -40,12 +40,7 @@
                         </div>
                         
                                                 <div class="form-control w-full max-w-xs">
-                            <select class="select select-bordered" x-model="pageSize" @change="loadCompanies()">
-                                <option value="5">5 công ty/trang</option>
-                                <option value="10">10 công ty/trang</option>
-                                <option value="20">20 công ty/trang</option>
-                                <option value="50">50 công ty/trang</option>
-                            </select>
+                      
                         </div>
                     </div>
                 </div>

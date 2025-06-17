@@ -28,8 +28,9 @@ public class UserController {
 
     @GetMapping
     public ResponseEntity<Page<UserDTO>> getAllUsers(
-            @PageableDefault(size = 10, sort = "id") Pageable pageable) {
-        Page<UserDTO> users = userService.getAllUsers(pageable);
+            @PageableDefault(size = 10, sort = "id") Pageable pageable,
+            @RequestParam(required = false, defaultValue = "") String search) {
+        Page<UserDTO> users = userService.getAllUsers(pageable, search);
         return ResponseEntity.ok(users);
     }
 

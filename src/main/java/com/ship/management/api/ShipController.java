@@ -2,6 +2,7 @@ package com.ship.management.api;
 
 import com.ship.management.dto.EditShipUserDTO;
 import com.ship.management.dto.ShipDTO;
+import com.ship.management.dto.ShipQueryDTO;
 import com.ship.management.dto.UserDTO;
 import com.ship.management.service.ShipService;
 import lombok.RequiredArgsConstructor;
@@ -28,8 +29,8 @@ public class ShipController {
     @GetMapping
     public ResponseEntity<PagedModel<ShipDTO>> getAllShips(
             @PageableDefault(size = 10, sort = "id") Pageable pageable,
-            @RequestParam(required = false, defaultValue = "false") Boolean strict) {
-        Page<ShipDTO> ships = strict ? shipService.getAllShipsStrict(pageable) : shipService.getAllShips(pageable);
+            ShipQueryDTO queryDTO) {
+        Page<ShipDTO> ships = shipService.getAllShips(pageable, queryDTO);
         return ResponseEntity.ok(new PagedModel<>(ships));
     }
     @GetMapping("company/{companyId}")

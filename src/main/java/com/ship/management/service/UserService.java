@@ -43,8 +43,8 @@ public class UserService implements UserDetailsService {
                 .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
     }
 
-    public Page<UserDTO> getAllUsers(Pageable pageable) {
-        Page<User> users = userRepository.findAll(pageable);
+    public Page<UserDTO> getAllUsers(Pageable pageable, String search) {
+        Page<User> users = userRepository.findAllBySearch(search, pageable);
         return users.map(this::convertToDTO);
     }
 

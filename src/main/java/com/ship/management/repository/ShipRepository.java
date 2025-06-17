@@ -6,6 +6,7 @@ import com.ship.management.entity.User;
 import org.hibernate.query.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
@@ -13,7 +14,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface ShipRepository extends JpaRepository<Ship, Long> {
+public interface ShipRepository extends JpaRepository<Ship, Long>, JpaSpecificationExecutor<Ship> {
 
     
     Optional<Ship> findByName(String name);
@@ -27,4 +28,7 @@ public interface ShipRepository extends JpaRepository<Ship, Long> {
 
     @Query("SELECT s FROM Ship s JOIN s.users u WHERE u.id = :id AND s.company.id = :companyId")
     List<Ship> findByUserIdAndCompanyId(Long id, Long companyId);
+
+    // Các query methods cơ bản vẫn giữ để dùng cho các API khác
+    // Các tìm kiếm phức tạp sẽ dùng Specification
 }

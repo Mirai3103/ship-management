@@ -40,12 +40,7 @@
                         </div>
                         
                                                 <div class="form-control w-full max-w-xs">
-                            <select class="select select-bordered" x-model="pageSize" @change="loadUsers()">
-                                <option value="5">5 người dùng/trang</option>
-                                <option value="10">10 người dùng/trang</option>
-                                <option value="20">20 người dùng/trang</option>
-                                <option value="50">50 người dùng/trang</option>
-                            </select>
+                        
                         </div>
                     </div>
                 </div>
@@ -594,7 +589,7 @@
                     changingPassword: false,
                     assigningRole: false,
                     currentPage: 0,
-                    pageSize: 10,
+                    pageSize: 20,
                     searchQuery: '',
                     showModal: false,
                     showPasswordModal: false,
@@ -625,13 +620,14 @@
                     passwordErrors: {},
                     notifications: [],
 
-                    async loadUsers() {
+                    async loadUsers(search='') {
                         this.loading = true;
                         try {
                             const params = new URLSearchParams({
                                 page: this.currentPage,
                                 size: this.pageSize,
-                                sort: 'id,asc'
+                                sort: 'id,asc',
+                                search: search
                             });
 
                             const response = await fetch('/api/users?' + params);
@@ -674,38 +670,12 @@
                     async searchUsers() {
                         if (this.searchQuery.trim()) {
                             this.loading = true;
-                            try {
-                                const response = await fetch('/api/users/email/' + encodeURIComponent(this.searchQuery.trim()));
-                                if (response.ok) {
-                                    const user = await response.json();
-                                    this.users = {
-                                        content: [user],
-                                        totalElements: 1,
-                                        totalPages: 1,
-                                        numberOfElements: 1,
-                                        first: true,
-                                        last: true
-                                    };
-                                } else if (response.status === 404) {
-                                    this.users = {
-                                        content: [],
-                                        totalElements: 0,
-                                        totalPages: 0,
-                                        numberOfElements: 0,
-                                        first: true,
-                                        last: true
-                                    };
-                                } else {
-                                    this.showNotification('error', 'Không thể tìm kiếm người dùng', 'alert-triangle');
-                                }
-                            } catch (error) {
-                                this.showNotification('error', 'Lỗi tìm kiếm: ' + error.message, 'alert-triangle');
-                            } finally {
+                            this.loadUsers(this.searchQuery).finally(() => {
                                 this.loading = false;
-                            }
+                            });
                         } else {
                             this.currentPage = 0;
-                            this.loadUsers();
+                            this.loadUsers('');
                         }
                     },
 

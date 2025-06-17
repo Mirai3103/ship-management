@@ -2,6 +2,7 @@ package com.ship.management.service;
 
 import com.ship.management.dto.EditShipUserDTO;
 import com.ship.management.dto.ShipDTO;
+import com.ship.management.dto.ShipQueryDTO;
 import com.ship.management.dto.UserDTO;
 import com.ship.management.entity.Company;
 import com.ship.management.entity.Ship;
@@ -10,12 +11,14 @@ import com.ship.management.entity.Role.RootRole;
 import com.ship.management.repository.CompanyRepository;
 import com.ship.management.repository.ShipRepository;
 import com.ship.management.repository.UserRepository;
+import com.ship.management.specification.ShipSpecification;
 
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -32,28 +35,29 @@ public class ShipService {
     private final UserRepository userRepository;
     private final UserService userService;
 
-    public Page<ShipDTO> getAllShips(Pageable pageable) {
+    public Page<ShipDTO> getAllShips(Pageable pageable, ShipQueryDTO queryDTO) {
         var rootRole = userService.getCurrentUserRootRole();
-        if (RootRole.ADMIN.equals(rootRole)) {
-            Page<Ship> ships = shipRepository.findAll(pageable);
-            return ships.map(this::convertToDTO);
-        }
-            Page<Ship> ships = shipRepository.findByCompanyId(userService.getCurrentUser().getCompany().getId(),pageable);
-            return ships.map(this::convertToDTO);
+        var currentUser = userService.getCurrentUser();
         
-
-    }
-
-    public Page<ShipDTO> getAllShipsStrict(Pageable pageable) {
-        var rootRole = userService.getCurrentUserRootRole();
+        Specification<Ship> spec = Specification.where(ShipSpecification.withQuery(queryDTO));
+        
         if (RootRole.ADMIN.equals(rootRole)) {
-            Page<Ship> ships = shipRepository.findAll(pageable);
+            // Admin có thể xem tất cả ships
+            Page<Ship> ships = shipRepository.findAll(spec, pageable);
             return ships.map(this::convertToDTO);
         }
-        var userShip = shipRepository.findByUserId(userService.getCurrentUser().getId());
-        return new PageImpl<>(userShip.stream()
-                .map(this::convertToDTO)
-                .collect(Collectors.toList()), pageable, userShip.size());
+        
+        // Nếu strict = true, chỉ lấy ships mà user được assign
+        if (Boolean.TRUE.equals(queryDTO.getStrict())) {
+            spec = spec.and(ShipSpecification.withUserId(currentUser.getId()));
+            Page<Ship> ships = shipRepository.findAll(spec, pageable);
+            return ships.map(this::convertToDTO);
+        }
+        
+        // Nếu strict = false, lấy tất cả ships của company
+        spec = spec.and(ShipSpecification.withCompanyId(currentUser.getCompany().getId()));
+        Page<Ship> ships = shipRepository.findAll(spec, pageable);
+        return ships.map(this::convertToDTO);
     }
     public Optional<ShipDTO> getShipById(Long id) {
         return shipRepository.findById(id)
@@ -127,8 +131,8 @@ public class ShipService {
                     .map(this::convertToDTO)
                     .collect(Collectors.toList());
         }
-        var userShip = shipRepository.findByUserIdAndCompanyId(userService.getCurrentUser().getId(), companyId);
-        return userShip.stream()
+        var userShips = shipRepository.findByUserIdAndCompanyId(userService.getCurrentUser().getId(), companyId);
+        return userShips.stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }

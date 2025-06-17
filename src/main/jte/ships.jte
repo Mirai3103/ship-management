@@ -40,12 +40,7 @@
                         </div>
                         
                                                 <div class="form-control w-full max-w-xs">
-                            <select class="select select-bordered" x-model="pageSize" @change="loadShips()">
-                                <option value="5">5 tàu/trang</option>
-                                <option value="10">10 tàu/trang</option>
-                                <option value="20">20 tàu/trang</option>
-                                <option value="50">50 tàu/trang</option>
-                            </select>
+                    
                         </div>
                     </div>
                 </div>
@@ -526,13 +521,14 @@
                     errors: {},
                     notifications: [],
 
-                    async loadShips() {
+                    async loadShips(name='') {
                         this.loading = true;
                         try {
                             const params = new URLSearchParams({
                                 page: this.currentPage,
                                 size: this.pageSize,
-                                sort: 'id,asc'
+                                sort: 'id,asc',
+                                name: name
                             });
 
                             const response = await fetch('/api/ships?' + params);
@@ -565,38 +561,14 @@
                     async searchShips() {
                         if (this.searchQuery.trim()) {
                             this.loading = true;
-                            try {
-                                const response = await fetch('/api/ships/name/' + encodeURIComponent(this.searchQuery.trim()));
-                                if (response.ok) {
-                                    const ship = await response.json();
-                                    this.ships = {
-                                        content: [ship],
-                                        totalElements: 1,
-                                        totalPages: 1,
-                                        numberOfElements: 1,
-                                        first: true,
-                                        last: true
-                                    };
-                                } else if (response.status === 404) {
-                                    this.ships = {
-                                        content: [],
-                                        totalElements: 0,
-                                        totalPages: 0,
-                                        numberOfElements: 0,
-                                        first: true,
-                                        last: true
-                                    };
-                                } else {
-                                    this.showNotification('error', 'Không thể tìm kiếm tàu', 'alert-triangle');
-                                }
-                            } catch (error) {
-                                this.showNotification('error', 'Lỗi tìm kiếm: ' + error.message, 'alert-triangle');
-                            } finally {
+                            this.loadShips(this.searchQuery).finally(() => {
                                 this.loading = false;
-                            }
+                            });
                         } else {
                             this.currentPage = 0;
-                            this.loadShips();
+                            this.loadShips('').finally(() => {
+                                this.loading = false;
+                            });
                         }
                     },
 

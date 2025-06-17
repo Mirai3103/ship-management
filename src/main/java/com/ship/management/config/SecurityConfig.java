@@ -83,7 +83,7 @@ public class SecurityConfig {
                         .requestMatchers("/**.css").permitAll()
                         .requestMatchers("/error").permitAll()
 
-                        .anyRequest().authenticated())
+                        .anyRequest().permitAll())
                 .formLogin(form -> form
                         .loginPage("/login")
                         .loginProcessingUrl("/login")
