@@ -37,9 +37,13 @@ public class ChecklistItemService {
         checklistItem.setContent(checklistItemDTO.getContent());
         checklistItem.setGuide(checklistItemDTO.getGuide());
         checklistItem.setOrderNo(checklistItemDTO.getOrderNo());
-        checklistItem.setChecklistTemplate(checklistTemplateRepository.findById(checklistItemDTO.getChecklistTemplateId()).orElseThrow(() -> new RuntimeException("Checklist template not found")));
-        checklistItem.setAssignedTo(userRepository.findById(checklistItemDTO.getAssignedToId()).orElseThrow(() -> new RuntimeException("User not found")));
-        checklistItem.setComAssignedTo(userRepository.findById(checklistItemDTO.getComAssignedToId()).orElseThrow(() -> new RuntimeException("User not found")));
+        checklistItem
+                .setChecklistTemplate(checklistTemplateRepository.findById(checklistItemDTO.getChecklistTemplateId())
+                        .orElseThrow(() -> new RuntimeException("Checklist template not found")));
+        checklistItem.setAssignedTo(userRepository.findById(checklistItemDTO.getAssignedToId())
+                .orElseThrow(() -> new RuntimeException("User not found")));
+        checklistItem.setComAssignedTo(userRepository.findById(checklistItemDTO.getComAssignedToId())
+                .orElseThrow(() -> new RuntimeException("User not found")));
         checklistItem = checklistItemRepository.save(checklistItem);
         return modelMapper.map(checklistItem, ChecklistItemDTO.class);
     }
@@ -49,78 +53,98 @@ public class ChecklistItemService {
     }
 
     public ChecklistItemDTO updateChecklistItem(UpdateItemDTO updateItemDTO) {
-        ChecklistItem checklistItem = checklistItemRepository.findById(updateItemDTO.getId()).orElseThrow(() -> new RuntimeException("Checklist item not found"));
+        ChecklistItem checklistItem = checklistItemRepository.findById(updateItemDTO.getId())
+                .orElseThrow(() -> new RuntimeException("Checklist item not found"));
         checklistItem.setContent(updateItemDTO.getContent());
         checklistItem.setGuide(updateItemDTO.getGuide());
         checklistItem.setOrderNo(updateItemDTO.getOrderNo());
-        checklistItem.setAssignedTo(userRepository.findById(updateItemDTO.getAssignedToId()).orElseThrow(() -> new RuntimeException("User not found")));
-        checklistItem.setComAssignedTo(userRepository.findById(updateItemDTO.getComAssignedToId()).orElseThrow(() -> new RuntimeException("User not found")));
+        checklistItem.setAssignedTo(userRepository.findById(updateItemDTO.getAssignedToId())
+                .orElseThrow(() -> new RuntimeException("User not found")));
+        checklistItem.setComAssignedTo(userRepository.findById(updateItemDTO.getComAssignedToId())
+                .orElseThrow(() -> new RuntimeException("User not found")));
         checklistItem = checklistItemRepository.save(checklistItem);
         return modelMapper.map(checklistItem, ChecklistItemDTO.class);
     }
 
+    @Deprecated
     public ChecklistItemDTO reviewFromShip(ReviewDTO reviewDTO) {
-        ChecklistItem checklistItem = checklistItemRepository.findById(reviewDTO.getChecklistItemId()).orElseThrow(() -> new RuntimeException("Checklist item not found"));
-        checklistItem.setVesselResult(reviewDTO.getResult());
+        ChecklistItem checklistItem = checklistItemRepository.findById(reviewDTO.getChecklistItemId())
+                .orElseThrow(() -> new RuntimeException("Checklist item not found"));
+        // checklistItem.setVesselResult(reviewDTO.getResult());
         checklistItem.setVesselRemark(reviewDTO.getRemark());
-        checklistItem.setVesselReviewAt(LocalDateTime.now());
+        // checklistItem.setVesselReviewAt(LocalDateTime.now());
         checklistItemRepository.save(checklistItem);
         return new ChecklistItemDTO();
     }
 
     public ChecklistItemDTO reviewFromCompany(ReviewDTO reviewDTO) {
-        ChecklistItem checklistItem = checklistItemRepository.findById(reviewDTO.getChecklistItemId()).orElseThrow(() -> new RuntimeException("Checklist item not found"));
-        checklistItem.setComResult(reviewDTO.getResult());
-        checklistItem.setComRemark(reviewDTO.getRemark());
-        checklistItem.setComReviewAt(LocalDateTime.now());
-        checklistItem.setNote(reviewDTO.getNote());
-    checklistItemRepository.save(checklistItem);
+        ChecklistItem checklistItem = checklistItemRepository.findById(reviewDTO.getChecklistItemId())
+                .orElseThrow(() -> new RuntimeException("Checklist item not found"));
+        switch (reviewDTO.getReviewType()) {
+            case COMPANY:
+                checklistItem.setComResult(reviewDTO.getResult());
+                checklistItem.setComReviewAt(LocalDateTime.now());
+                break;
+            case SHIP:
+                checklistItem.setVesselResult(reviewDTO.getResult());
+                checklistItem.setVesselReviewAt(LocalDateTime.now());
+                break;
+            case NOTE:
+                checklistItem.setNote(reviewDTO.getNote());
+                break;
+            case REQUIRE:
+                checklistItem.setComRemark(reviewDTO.getRemark());
+                checklistItem.setVesselRemark(reviewDTO.getRemark());
+                break;
+            default:
+                break;
+
+        }
+
+        checklistItemRepository.save(checklistItem);
         return new ChecklistItemDTO();
     }
 
     @Transactional
-    public void  copyCheckListToShip(CopyCheckListDTO copyCheckListDTO) {
-        var ship= shipRepository.findById(copyCheckListDTO.getShipId()).orElseThrow(() -> new RuntimeException("Ship not found"));
-        var currentTemplates= checklistTemplateRepository.findByShipId(copyCheckListDTO.getShipId());
-        var checklists = checklistItemRepository.findByIdIsIn((copyCheckListDTO.getItems().stream().map(CopyCheckListDTO.CopyCheckListItemDTO::getChecklistId).toList()));
+    public void copyCheckListToShip(CopyCheckListDTO copyCheckListDTO) {
+        var ship = shipRepository.findById(copyCheckListDTO.getShipId())
+                .orElseThrow(() -> new RuntimeException("Ship not found"));
+        var currentTemplates = checklistTemplateRepository.findByShipId(copyCheckListDTO.getShipId());
+        var checklists = checklistItemRepository.findByIdIsIn((copyCheckListDTO.getItems().stream()
+                .map(CopyCheckListDTO.CopyCheckListItemDTO::getChecklistId).toList()));
         Map<ChecklistTemplate, List<ChecklistItem>> checklistMap = checklists.stream()
                 .collect(Collectors.groupingBy(ChecklistItem::getChecklistTemplate));
 
-
         currentTemplates.forEach(template -> {
-            var incomingTemplate= checklistMap.get(template);
-            if(incomingTemplate!=null){
-               checklistItemRepository.saveAll(incomingTemplate.stream().map(item -> {
-                var newItem = new ChecklistItem();
-                newItem.setContent(item.getContent());
-                newItem.setGuide(item.getGuide());
-                newItem.setOrderNo(item.getOrderNo());
-                newItem.setChecklistTemplate(template);
-                return newItem;
-               }).collect(Collectors.toList()));
-               checklistMap.remove(template);
+            var incomingTemplate = checklistMap.get(template);
+            if (incomingTemplate != null) {
+                checklistItemRepository.saveAll(incomingTemplate.stream().map(item -> {
+                    var newItem = new ChecklistItem();
+                    newItem.setContent(item.getContent());
+                    newItem.setGuide(item.getGuide());
+                    newItem.setOrderNo(item.getOrderNo());
+                    newItem.setChecklistTemplate(template);
+                    return newItem;
+                }).collect(Collectors.toList()));
+                checklistMap.remove(template);
             }
         });
-
-
 
         checklistMap.keySet().forEach(template -> {
             var newTemplate = new ChecklistTemplate();
             newTemplate.setSection(template.getSection());
             newTemplate.setCompany(ship.getCompany());
             newTemplate.setShip(ship);
-            final  ChecklistTemplate a = checklistTemplateRepository.save(newTemplate);
+            final ChecklistTemplate a = checklistTemplateRepository.save(newTemplate);
             checklistItemRepository.saveAll(checklistMap.get(template).stream().map(item -> {
                 var newItem = new ChecklistItem();
                 newItem.setContent(item.getContent());
                 newItem.setGuide(item.getGuide());
                 newItem.setOrderNo(item.getOrderNo());
-                newItem.setChecklistTemplate(a);                                                    
+                newItem.setChecklistTemplate(a);
                 return newItem;
-            }).collect(Collectors.toList()));                                                                           
+            }).collect(Collectors.toList()));
         });
     }
 
-
-    
 }

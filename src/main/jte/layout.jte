@@ -142,11 +142,7 @@
                         </label>
                     @endif
                     <ul tabindex="0" class="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52 mb-2">
-                        <li><a href="/profile"><i data-lucide="user" class="w-4 h-4"></i> Hồ sơ</a></li>
-                        <li><a href="/preferences"><i data-lucide="settings" class="w-4 h-4"></i> Tùy chọn</a></li>
-                        <li>
-                            <hr class="my-2">
-                        </li>
+                       
                         <li><a href="/logout" class="text-error"><i data-lucide="log-out" class="w-4 h-4"></i> Đăng xuất</a>
                         </li>
                     </ul>
