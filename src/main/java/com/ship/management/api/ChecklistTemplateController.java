@@ -1,6 +1,7 @@
 package com.ship.management.api;
 
 import com.ship.management.dto.ChecklistTemplateDTO;
+import com.ship.management.dto.UpdateOrderDTO;
 import com.ship.management.service.ChecklistTemplateService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -151,5 +152,10 @@ public class ChecklistTemplateController {
             this.status = status;
             this.message = message;
         }
+    }
+
+    @PatchMapping("/update-order")
+    public void updateOrder(@RequestBody UpdateOrderDTO updateOrderDTO) {
+        checklistTemplateService.updateOrder(updateOrderDTO);
     }
 } 

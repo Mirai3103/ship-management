@@ -10,4 +10,6 @@ import java.util.List;
 public interface ChecklistItemRepository extends JpaRepository<ChecklistItem, Long> {
 
     List<ChecklistItem> findByIdIsIn(Collection<Long> ids);
+
+    List<ChecklistItem> findByChecklistTemplateIdOrderByOrderNoAsc(Long templateId);
 }

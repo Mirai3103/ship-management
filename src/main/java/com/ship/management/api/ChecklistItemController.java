@@ -1,5 +1,8 @@
 package com.ship.management.api;
 
+import java.util.Map;
+
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -13,6 +16,7 @@ import com.ship.management.dto.ChecklistItemDTO;
 import com.ship.management.dto.CopyCheckListDTO;
 import com.ship.management.dto.ReviewDTO;
 import com.ship.management.dto.UpdateItemDTO;
+import com.ship.management.dto.UpdateOrderDTO;
 import com.ship.management.entity.Role.RootRole;
 import com.ship.management.service.ChecklistItemService;
 import com.ship.management.service.UserService;
@@ -57,5 +61,11 @@ public class ChecklistItemController {
     @PostMapping("/copy")
     public void copyChecklistToShip(@RequestBody CopyCheckListDTO copyCheckListDTO) {
         checklistItemService.copyCheckListToShip(copyCheckListDTO);
+    }
+
+    @PatchMapping("/update-order")
+    public ResponseEntity<Map<String, Object>> updateOrder(@RequestBody UpdateOrderDTO updateOrderDTO) {
+        checklistItemService.updateOrder(updateOrderDTO);
+        return ResponseEntity.ok(Map.of("success", true));
     }
 }

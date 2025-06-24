@@ -15,7 +15,7 @@ public class ChecklistItemDTO {
 
     private String guide;
 
-    private String orderNo;
+    private Integer orderNo = 0;
 
     private Long checklistTemplateId;
 

@@ -90,6 +90,14 @@ function reviewManager() {
         uploadingSingle: false,
         uploadingMultiple: false,
         deletingAttachment: false,
+        showReorderModal: false,
+        reorderForm: {
+            templateId: '',
+            checklistId: '',
+            orderNo: 0
+        },
+        reorderErrors: {},
+        savingReorder: false,
 
         async loadCompanies() {
             try {
@@ -290,7 +298,7 @@ function reviewManager() {
                 if (response.ok) {
                     this.checklistTemplates = await response.json();
                     this.usersOfShip = await fetch(`/api/ships/${this.selectedShipId}/users`).then(res => res.json());
-
+                    this.sortChecklistTemplatesEachItem();
                     console.log('Loaded checklist templates:', this.checklistTemplates);
                 } else {
                     console.error('Failed to load templates, status:', response.status);
@@ -304,7 +312,11 @@ function reviewManager() {
                 this.loadingTemplates = false;
             }
         },
-
+        async sortChecklistTemplatesEachItem() {
+            this.checklistTemplates.forEach(template => {
+                template.checklistItems.sort((a, b) => a.orderNo - b.orderNo);
+            });
+        },
         async loadReviews() {
             if (!this.selectedCompanyId || !this.selectedShipId) {
                 console.log('Missing company or ship ID');
@@ -906,5 +918,45 @@ function reviewManager() {
                 this.attachmentToDelete = null;
             }
         },
+        openReorderModal(item) {
+            this.reorderForm = {
+                templateId: item.checklistTemplateId,
+                checklistId: item.id,
+                orderNo: item.orderNo
+            };
+            this.showReorderModal = true;
+        },
+        closeReorderModal() {
+            this.showReorderModal = false;
+            this.reorderForm = {
+                templateId: '',
+                checklistId: '',
+                orderNo: 0
+            };
+        },
+        async saveReorder() {
+            this.savingReorder = true;
+            try {
+                const response = await fetch('/api/checklist-items/update-order', {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(this.reorderForm)
+                });
+                const data = await response.json();
+                if (response.ok) {
+                    this.closeReorderModal();
+                    this.showNotification('success', 'Đã cập nhật thứ tự thành công', 'check-circle');
+                    await this.refreshTable();
+                } else {
+                    this.showNotification('error', data.message || 'Không thể cập nhật thứ tự', 'alert-triangle');
+                }
+            } catch (error) {
+                this.showNotification('error', 'Lỗi kết nối: ' + error.message, 'alert-triangle');
+            } finally {
+                this.savingReorder = false;
+            }
+        }
     }
 }

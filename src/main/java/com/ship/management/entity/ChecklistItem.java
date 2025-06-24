@@ -32,7 +32,7 @@ public class ChecklistItem {
 
     private String guide;
 
-    private String orderNo;
+    private Integer orderNo = 0;
 
 
 

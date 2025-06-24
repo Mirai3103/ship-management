@@ -1,8 +1,11 @@
 package com.ship.management.service;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import com.ship.management.dto.CopyCheckListDTO;
@@ -14,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.ship.management.dto.ChecklistItemDTO;
 import com.ship.management.dto.ReviewDTO;
 import com.ship.management.dto.UpdateItemDTO;
+import com.ship.management.dto.UpdateOrderDTO;
 import com.ship.management.entity.ChecklistItem;
 import com.ship.management.repository.ChecklistItemRepository;
 import com.ship.management.repository.ChecklistTemplateRepository;
@@ -152,5 +156,53 @@ public class ChecklistItemService {
             }).collect(Collectors.toList()));
         });
     }
+    @Transactional
+    public void updateOrder(UpdateOrderDTO updateOrderDTO) {
+        // Lấy toàn bộ item theo thứ tự
+        var allChecklistItems = checklistItemRepository.findByChecklistTemplateIdOrderByOrderNoAsc(updateOrderDTO.getTemplateId());
+        allChecklistItems.stream().forEach(item-> item.setOrderNo(Objects.isNull(item.getOrderNo())?0:item.getOrderNo()));
+        
+        // Tìm item cần thay đổi
+        var checklistItem = allChecklistItems.stream()
+                .filter(item -> item.getId().equals(updateOrderDTO.getChecklistId()))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("Checklist item not found"));
+    
+        int currentOrder = Objects.isNull(checklistItem.getOrderNo())?0:checklistItem.getOrderNo();
+        int newOrder = updateOrderDTO.getOrderNo();
+    
+        // Giới hạn newOrder hợp lý
+        if (newOrder < 1) newOrder = 1;
+        if (newOrder > allChecklistItems.size()) newOrder = allChecklistItems.size();
+    
+        if (newOrder == currentOrder) return; // Không cần xử lý nếu không thay đổi
+    
+        for (var item : allChecklistItems) {
+            // Di chuyển lên trên danh sách
+            if (newOrder < currentOrder) {
+                if (item.getOrderNo() >= newOrder && item.getOrderNo() < currentOrder) {
+                    item.setOrderNo(item.getOrderNo() + 1);
+                }
+            }
+            // Di chuyển xuống dưới danh sách
+            else {
+                if (item.getOrderNo() <= newOrder && item.getOrderNo() > currentOrder) {
+                    item.setOrderNo(item.getOrderNo() - 1);
+                }
+            }
+        }
+    
+        // Cập nhật order cho item cần di chuyển
+        checklistItem.setOrderNo(newOrder);
+    
+        // Lưu toàn bộ danh sách (có thể tối ưu chỉ lưu những item thực sự thay đổi)
+        // then re generate orderNo for all items start from 1
+        Collections.sort(allChecklistItems, Comparator.comparingInt(ChecklistItem::getOrderNo));
+        for(int i = 0; i < allChecklistItems.size(); i++){
+            allChecklistItems.get(i).setOrderNo(i+1);
+        }
+        checklistItemRepository.saveAll(allChecklistItems);
+    }
+    
 
 }

@@ -338,6 +338,12 @@ content = @`
                                                             </a></li>
                                                     @endif
                                                     @if(Stream.of("ROLE_ADMIN","REVIEW_MANAGEMENT").anyMatch(permissions::contains))
+                                                        <li><a @click="openReorderModal(item)" class="text-warning">
+
+
+                                                                Sắp xếp
+
+                                                            </a></li>
                                                         <li><a @click="editChecklistItem(item)" class="text-warning">
 
 
@@ -919,6 +925,27 @@ content = @`
                 </form>
             </div>
             <div class="modal-backdrop" @click="closeNoteModal()"></div>
+        </div>
+        <div class="modal" :class="{ 'modal-open': showReorderModal }">
+            <div class="modal-box">
+                <h3 class="font-bold text-lg mb-4">Sắp xếp</h3>
+                <form @submit.prevent="saveReorder()" class="space-y-4">
+                    <div class="form-control">
+                        <label class="label">
+                            <span class="label-text">Thứ tự</span>
+                        </label>
+                        <input type="number" class="input input-bordered" x-model="reorderForm.orderNo" required>
+                    </div>
+                    <div class="modal-action">
+                        <button type="button" class="btn btn-ghost" @click="closeReorderModal()">Hủy</button>
+                        <button type="submit" class="btn btn-primary" :disabled="savingReorder">
+                            <span x-show="savingReorder" class="loading loading-spinner loading-sm"></span>
+                            <span x-show="!savingReorder">Lưu</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-backdrop" @click="closeReorderModal()"></div>
         </div>
     </div>
         <script>

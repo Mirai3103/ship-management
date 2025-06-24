@@ -2,6 +2,7 @@ package com.ship.management.service;
 
 import com.ship.management.dto.ChecklistItemDTO;
 import com.ship.management.dto.ChecklistTemplateDTO;
+import com.ship.management.dto.UpdateOrderDTO;
 import com.ship.management.entity.ChecklistTemplate;
 import com.ship.management.entity.Company;
 import com.ship.management.entity.Ship;
@@ -10,13 +11,18 @@ import com.ship.management.entity.Role;
 import com.ship.management.repository.ChecklistTemplateRepository;
 import com.ship.management.repository.CompanyRepository;
 import com.ship.management.repository.ShipRepository;
+
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -196,5 +202,35 @@ public class ChecklistTemplateService {
 
     private ChecklistTemplate convertToEntity(ChecklistTemplateDTO dto) {
         return modelMapper.map(dto, ChecklistTemplate.class);
+    }
+
+    @Transactional
+    public void updateOrder(UpdateOrderDTO updateOrderDTO) {
+        var templatesOfShip = checklistTemplateRepository.findByShipIdOrderByOrderNoAsc(updateOrderDTO.getShipId());
+        templatesOfShip.stream().forEach(t-> t.setOrderNo(Objects.isNull(t.getOrderNo())?0:t.getOrderNo()));
+        var template = templatesOfShip.stream().filter(t->t.getId().equals(updateOrderDTO.getTemplateId())).findFirst().orElseThrow(() -> new RuntimeException("Template not found"));
+        var currentOrder = template.getOrderNo();
+        var newOrder = updateOrderDTO.getOrderNo();
+        if(newOrder < 1) newOrder = 1;
+        if(newOrder > templatesOfShip.size()) newOrder = templatesOfShip.size();
+        if(newOrder == currentOrder) return;
+        for(var t : templatesOfShip){
+            if(newOrder < currentOrder){
+                if(t.getOrderNo() >= newOrder && t.getOrderNo() < currentOrder){
+                    t.setOrderNo(t.getOrderNo() + 1);
+                }
+            }
+            else{
+                if(t.getOrderNo() <= newOrder && t.getOrderNo() > currentOrder){
+                    t.setOrderNo(t.getOrderNo() - 1);
+                }
+            }
+        }
+        template.setOrderNo(newOrder);
+        Collections.sort(templatesOfShip, Comparator.comparingInt(ChecklistTemplate::getOrderNo));
+        for(int i = 0; i < templatesOfShip.size(); i++){
+            templatesOfShip.get(i).setOrderNo(i+1);
+        }
+        checklistTemplateRepository.saveAll(templatesOfShip);
     }
 } 
