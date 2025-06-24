@@ -70,6 +70,7 @@ public class ChecklistTemplateService {
     public List<ChecklistTemplateDTO> handlePermission(List<ChecklistTemplateDTO> templates) {
         var currentUser = userService.getCurrentUser();
         var permissions = currentUser.getListAuthorities();
+        System.out.println(permissions);
         if(Stream.of("ROLE_ADMIN","REVIEW_MANAGEMENT","ROLE_COMPANY").anyMatch(permissions::contains)) {
             return templates;
         }

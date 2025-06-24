@@ -2,6 +2,7 @@
 @import java.util.stream.Stream
 
 @param User currentUser
+!{var userId = currentUser.getId();}
 !{var rootRole = currentUser.getRole().getRootRole().toString();}
 !{var permissions = currentUser.getListAuthorities();}
 @template.layout(
@@ -295,7 +296,7 @@ content = @`
                                                     <li><a @click="openAttachmentModal(item)">
 
 
-                                                            Tải file
+                                                             file
 
                                                         </a></li>
                                                     <%-- @if(rootRole != "ADMIN")
@@ -311,25 +312,25 @@ content = @`
                                                             </a></li>
                                                     @endif --%>
                                                     @if(Stream.of("ROLE_COMPANY").anyMatch(permissions::contains))
-                                                        <li><a @click="openReviewModal(item, 'SHIP')" class="text-warning">
+                                                        <li><a @click="openReviewModal(item, 'SHIP')" class="text-warning" x-show="isAllowUserReview(item)">
 
 
                                                                 Đánh giá tàu
 
                                                             </a></li>
-                                                        <li><a @click="openReviewModal(item, 'COMPANY')" class="text-warning">
+                                                        <li><a @click="openReviewModal(item, 'COMPANY')" class="text-warning" x-show="isAllowUserReview(item)">
 
 
                                                                 Đánh giá từ Cty
 
                                                             </a></li>
-                                                        <li><a @click="openRequireModal(item)" class="text-warning">
+                                                        <li><a @click="openRequireModal(item)" class="text-warning" x-show="isAllowUserReview(item)">
 
 
                                                                 Yêu cầu
 
                                                             </a></li>
-                                                        <li><a @click="openNoteModal(item)" class="text-warning">
+                                                        <li><a @click="openNoteModal(item)" class="text-warning" x-show="isAllowUserReview(item)">
 
 
                                                                 Note
@@ -923,6 +924,7 @@ content = @`
         <script>
             var rootRole = '${rootRole}';
             var currentUserId = ${currentUser.getId()};
+            window.currentUserId = currentUserId;
         </script>
         @raw
         <script src="/review.js"></script>

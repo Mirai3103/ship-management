@@ -191,7 +191,7 @@ function reviewManager() {
 
         async saveReview() {
             console.log(this.reviewItem);
-            if (!this.reviewItem || !this.reviewForm.result || !this.reviewForm.remark) {
+            if (!this.reviewForm.result ) {
                 this.showNotification('warning', 'Vui lòng điền đầy đủ thông tin đánh giá', 'alert-triangle');
                 return;
             }
@@ -471,10 +471,17 @@ function reviewManager() {
             }, 0);
         },
         isAllowReview(item) {
-            if (rootRole === 'SHIP') {
-                return item.vesselReviewAt == null;
-            } else if (rootRole === 'COMPANY') {
-                return item.comReviewAt == null;
+            // if (rootRole === 'SHIP') {
+            //     return item.vesselReviewAt == null;
+            // } else if (rootRole === 'COMPANY') {
+            //     return item.comReviewAt == null;
+            // }
+            return true;
+        },
+        isAllowUserReview(item) {
+            var currentUserId = window.currentUserId;
+            if (item.comAssignedToId == currentUserId) {
+                return true;
             }
             return false;
         },
