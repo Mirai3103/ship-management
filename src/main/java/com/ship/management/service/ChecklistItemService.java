@@ -124,6 +124,9 @@ public class ChecklistItemService {
                     newItem.setGuide(item.getGuide());
                     newItem.setOrderNo(item.getOrderNo());
                     newItem.setChecklistTemplate(template);
+                    newItem.setComRemark(item.getComRemark());
+                    newItem.setVesselRemark(item.getVesselRemark());
+                    newItem.setNote(item.getNote());
                     return newItem;
                 }).collect(Collectors.toList()));
                 checklistMap.remove(template);
@@ -142,6 +145,9 @@ public class ChecklistItemService {
                 newItem.setGuide(item.getGuide());
                 newItem.setOrderNo(item.getOrderNo());
                 newItem.setChecklistTemplate(a);
+                newItem.setComRemark(item.getComRemark());
+                newItem.setVesselRemark(item.getVesselRemark());
+                newItem.setNote(item.getNote());
                 return newItem;
             }).collect(Collectors.toList()));
         });
