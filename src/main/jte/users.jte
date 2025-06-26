@@ -120,7 +120,7 @@
                                             </div>
                                         </td>
                                         <td>
-                                            <div class="dropdown dropdown-end">
+                                            <div class="dropdown dropdown-end" x-show="user.email !='admin@gmail.com'">
                                                 <button tabindex="0" class="btn btn-ghost btn-xs">
                                                     <i data-lucide="more-horizontal" class="w-4 h-4"></i>
                                                 </button>

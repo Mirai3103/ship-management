@@ -276,6 +276,110 @@
                     </div>
                 </template>
             </div>
+
+            <!-- View Company Detail Modal -->
+            <div class="modal" :class="{ 'modal-open': showViewModal }">
+                <div class="modal-box max-w-2xl">
+                    <h3 class="font-bold text-lg mb-4 flex items-center gap-2">
+                        <i data-lucide="eye" class="w-5 h-5 text-primary"></i>
+                        Chi tiết công ty
+                    </h3>
+                    
+                    <div x-show="viewingCompany" class="space-y-6">
+                        <!-- Basic Information -->
+                        <div class="card bg-base-200/50">
+                            <div class="card-body p-4">
+                                <h4 class="font-semibold text-base mb-3 flex items-center gap-2">
+                                    <i data-lucide="info" class="w-4 h-4"></i>
+                                    Thông tin cơ bản
+                                </h4>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="text-sm font-medium text-base-content/70">ID</label>
+                                        <p class="font-mono text-sm bg-base-100 p-2 rounded" x-text="viewingCompany?.id"></p>
+                                    </div>
+                                    <div>
+                                        <label class="text-sm font-medium text-base-content/70">Tên công ty</label>
+                                        <p class="font-medium text-lg" x-text="viewingCompany?.name"></p>
+                                    </div>
+                                    <div class="md:col-span-2">
+                                        <label class="text-sm font-medium text-base-content/70">Địa chỉ</label>
+                                        <p class="bg-base-100 p-3 rounded flex items-start gap-2">
+                                            <i data-lucide="map-pin" class="w-4 h-4 mt-0.5 text-primary"></i>
+                                            <span x-text="viewingCompany?.address"></span>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Contact Information -->
+                        <div class="card bg-base-200/50">
+                            <div class="card-body p-4">
+                                <h4 class="font-semibold text-base mb-3 flex items-center gap-2">
+                                    <i data-lucide="contact" class="w-4 h-4"></i>
+                                    Thông tin liên hệ
+                                </h4>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="text-sm font-medium text-base-content/70">Số điện thoại</label>
+                                        <p class="bg-base-100 p-3 rounded flex items-center gap-2">
+                                            <i data-lucide="phone" class="w-4 h-4 text-success"></i>
+                                            <span class="font-mono" x-text="viewingCompany?.phone"></span>
+                                            <button class="btn btn-ghost btn-xs ml-auto" @click="copyToClipboard(viewingCompany?.phone)" title="Sao chép">
+                                                <i data-lucide="copy" class="w-3 h-3"></i>
+                                            </button>
+                                        </p>
+                                    </div>
+                                    <div>
+                                        <label class="text-sm font-medium text-base-content/70">Email</label>
+                                        <p class="bg-base-100 p-3 rounded flex items-center gap-2">
+                                            <i data-lucide="mail" class="w-4 h-4 text-info"></i>
+                                            <span class="text-primary" x-text="viewingCompany?.email"></span>
+                                            <button class="btn btn-ghost btn-xs ml-auto" @click="copyToClipboard(viewingCompany?.email)" title="Sao chép">
+                                                <i data-lucide="copy" class="w-3 h-3"></i>
+                                            </button>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Quick Actions -->
+                        <div class="card bg-base-200/50">
+                            <div class="card-body p-4">
+                                <h4 class="font-semibold text-base mb-3 flex items-center gap-2">
+                                    <i data-lucide="zap" class="w-4 h-4"></i>
+                                    Thao tác nhanh
+                                </h4>
+                                <div class="flex flex-wrap gap-2">
+                                    <a :href="'tel:' + viewingCompany?.phone" class="btn btn-sm btn-success">
+                                        <i data-lucide="phone-call" class="w-3 h-3"></i>
+                                        Gọi điện
+                                    </a>
+                                    <a :href="'mailto:' + viewingCompany?.email" class="btn btn-sm btn-info">
+                                        <i data-lucide="mail" class="w-3 h-3"></i>
+                                        Gửi email
+                                    </a>
+                                    <button class="btn btn-sm btn-ghost" @click="copyCompanyInfo()">
+                                        <i data-lucide="copy" class="w-3 h-3"></i>
+                                        Sao chép thông tin
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-action">
+                        <button type="button" class="btn btn-ghost" @click="closeViewModal()">Đóng</button>
+                        <button type="button" class="btn btn-primary" @click="editCompanyFromView()">
+                            <i data-lucide="edit" class="w-4 h-4"></i>
+                            Chỉnh sửa
+                        </button>
+                    </div>
+                </div>
+                <div class="modal-backdrop" @click="closeViewModal()"></div>
+            </div>
         </div>
 
         @raw
@@ -308,6 +412,8 @@
                     },
                     errors: {},
                     notifications: [],
+                    showViewModal: false,
+                    viewingCompany: null,
 
                     async loadCompanies() {
                         this.loading = true;
@@ -410,7 +516,8 @@
                     },
 
                     viewCompany(company) {
-                        this.showNotification('info', 'Xem chi tiết công ty: ' + company.name, 'info');
+                        this.viewingCompany = company;
+                        this.showViewModal = true;
                     },
 
                     closeModal() {
@@ -511,6 +618,31 @@
 
                     removeNotification(id) {
                         this.notifications = this.notifications.filter(n => n.id !== id);
+                    },
+
+                    closeViewModal() {
+                        this.showViewModal = false;
+                        this.viewingCompany = null;
+                    },
+
+                    editCompanyFromView() {
+                        const company = this.viewingCompany;
+                        this.closeViewModal();
+                        this.editCompany(company);
+                    },
+
+                    copyToClipboard(text) {
+                        const tempInput = document.createElement('input');
+                        tempInput.value = text;
+                        document.body.appendChild(tempInput);
+                        tempInput.select();
+                        document.execCommand('copy');
+                        document.body.removeChild(tempInput);
+                        this.showNotification('success', 'Đã sao chép thông tin vào clipboard', 'check-circle');
+                    },
+
+                    copyCompanyInfo() {
+                        this.copyToClipboard(this.viewingCompany.name + '\n' + this.viewingCompany.address + '\n' + this.viewingCompany.phone + '\n' + this.viewingCompany.email);
                     }
                 }
             }

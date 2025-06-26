@@ -344,6 +344,92 @@
                     </div>
                 </template>
             </div>
+
+            <!-- View Role Detail Modal -->
+            <div class="modal" :class="{ 'modal-open': showViewModal }">
+                <div class="modal-box max-w-2xl">
+                    <h3 class="font-bold text-lg mb-4 flex items-center gap-2">
+                        <i data-lucide="eye" class="w-5 h-5 text-primary"></i>
+                        Chi tiết vai trò
+                    </h3>
+                    
+                    <div x-show="viewingRole" class="space-y-6">
+                        <!-- Basic Information -->
+                        <div class="card bg-base-200/50">
+                            <div class="card-body p-4">
+                                <h4 class="font-semibold text-base mb-3 flex items-center gap-2">
+                                    <i data-lucide="info" class="w-4 h-4"></i>
+                                    Thông tin cơ bản
+                                </h4>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="text-sm font-medium text-base-content/70">ID</label>
+                                        <p class="font-mono text-sm bg-base-100 p-2 rounded" x-text="viewingRole?.id"></p>
+                                    </div>
+                                    <div>
+                                        <label class="text-sm font-medium text-base-content/70">Tên vai trò</label>
+                                        <p class="font-medium">
+                                            <span class="badge badge-outline badge-lg" x-text="viewingRole?.name"></span>
+                                        </p>
+                                    </div>
+                                    <div class="md:col-span-2">
+                                        <label class="text-sm font-medium text-base-content/70">Mô tả</label>
+                                        <p class="bg-base-100 p-3 rounded" x-text="viewingRole?.description"></p>
+                                    </div>
+                                    <div>
+                                        <label class="text-sm font-medium text-base-content/70">Loại vai trò</label>
+                                        <p>
+                                            <span class="badge" 
+                                                  :class="{
+                                                      'badge-error': viewingRole?.rootRole === 'ADMIN',
+                                                      'badge-warning': viewingRole?.rootRole === 'COMPANY', 
+                                                      'badge-info': viewingRole?.rootRole === 'SHIP'
+                                                  }"
+                                                  x-text="getRootRoleDisplay(viewingRole?.rootRole)"></span>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Permissions -->
+                        <div class="card bg-base-200/50">
+                            <div class="card-body p-4">
+                                <h4 class="font-semibold text-base mb-3 flex items-center gap-2">
+                                    <i data-lucide="shield-check" class="w-4 h-4"></i>
+                                    Quyền hạn được phân
+                                </h4>
+                                <div x-show="viewingRolePermissions && viewingRolePermissions.length > 0">
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                        <template x-for="permission in viewingRolePermissions" :key="permission">
+                                            <div class="flex items-center gap-3 p-3 bg-base-100 rounded-lg">
+                                                <i :data-lucide="getPermissionIcon(permission)" class="w-4 h-4 text-success"></i>
+                                                <div>
+                                                    <div class="font-medium text-sm" x-text="getPermissionName(permission)"></div>
+                                                    <div class="text-xs text-base-content/70" x-text="getPermissionDescription(permission)"></div>
+                                                </div>
+                                            </div>
+                                        </template>
+                                    </div>
+                                </div>
+                                <div x-show="!viewingRolePermissions || viewingRolePermissions.length === 0" class="text-center py-4">
+                                    <i data-lucide="shield-off" class="w-8 h-8 mx-auto text-base-content/30 mb-2"></i>
+                                    <p class="text-base-content/70">Chưa có quyền hạn nào được phân cho vai trò này</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-action">
+                        <button type="button" class="btn btn-ghost" @click="closeViewModal()">Đóng</button>
+                        <button type="button" class="btn btn-primary" @click="editRoleFromView()">
+                            <i data-lucide="edit" class="w-4 h-4"></i>
+                            Chỉnh sửa
+                        </button>
+                    </div>
+                </div>
+                <div class="modal-backdrop" @click="closeViewModal()"></div>
+            </div>
         </div>
 
         @raw
@@ -412,6 +498,9 @@
                     },
                     errors: {},
                     notifications: [],
+                    showViewModal: false,
+                    viewingRole: null,
+                    viewingRolePermissions: [],
 
                     async loadRoles() {
                         this.loading = true;
@@ -512,8 +601,22 @@
                         this.showModal = true;
                     },
 
-                    viewRole(role) {
-                        this.showNotification('info', 'Xem chi tiết vai trò: ' + role.name, 'info');
+                    async viewRole(role) {
+                        this.viewingRole = role;
+                        this.showViewModal = true;
+                        
+                        // Load role permissions
+                        try {
+                            const response = await fetch('/api/roles/' + role.id);
+                            if (response.ok) {
+                                const roleData = await response.json();
+                                this.viewingRolePermissions = roleData.permissions || [];
+                            }
+                        } catch (error) {
+                            this.viewingRolePermissions = [];
+                        }
+                        
+                        this.$nextTick(() => lucide.createIcons());
                     },
 
                     closeModal() {
@@ -696,6 +799,23 @@
                     getPermissionIcon(permissionKey) {
                         const permission = this.availablePermissions.find(p => p.key === permissionKey);
                         return permission ? permission.icon : 'shield';
+                    },
+
+                    closeViewModal() {
+                        this.showViewModal = false;
+                        this.viewingRole = null;
+                        this.viewingRolePermissions = [];
+                    },
+
+                    editRoleFromView() {
+                        const role = this.viewingRole;
+                        this.closeViewModal();
+                        this.editRole(role);
+                    },
+
+                    getPermissionDescription(permissionKey) {
+                        const permission = this.availablePermissions.find(p => p.key === permissionKey);
+                        return permission ? permission.description : '';
                     }
                 }
             }

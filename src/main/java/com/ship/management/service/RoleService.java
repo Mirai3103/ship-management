@@ -90,18 +90,10 @@ public class RoleService {
     }
     
 
+    @Transactional
     public boolean deleteRole(Long id) {
-        if (roleRepository.existsById(id)) {
-
-            Optional<Role> role = roleRepository.findById(id);
-            if (role.isPresent() && role.get().getUsers() != null && !role.get().getUsers().isEmpty()) {
-                throw new RuntimeException("Không thể xóa vai trò đang được sử dụng");
-            }
-            
-            roleRepository.deleteById(id);
-            return true;
-        }
-        return false;
+        roleRepository.deleteById(id);
+        return true;
     }
 
     private RoleDTO convertToDTO(Role role) {
