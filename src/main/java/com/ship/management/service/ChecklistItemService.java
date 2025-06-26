@@ -48,6 +48,8 @@ public class ChecklistItemService {
                 .orElseThrow(() -> new RuntimeException("User not found")));
         checklistItem.setComAssignedTo(userRepository.findById(checklistItemDTO.getComAssignedToId())
                 .orElseThrow(() -> new RuntimeException("User not found")));
+        checklistItem.setVesselAssignedTo(userRepository.findById(checklistItemDTO.getVesselAssignedToId())
+                .orElseThrow(() -> new RuntimeException("User not found")));
         checklistItem = checklistItemRepository.save(checklistItem);
         return modelMapper.map(checklistItem, ChecklistItemDTO.class);
     }
@@ -65,6 +67,8 @@ public class ChecklistItemService {
         checklistItem.setAssignedTo(userRepository.findById(updateItemDTO.getAssignedToId())
                 .orElseThrow(() -> new RuntimeException("User not found")));
         checklistItem.setComAssignedTo(userRepository.findById(updateItemDTO.getComAssignedToId())
+                .orElseThrow(() -> new RuntimeException("User not found")));
+        checklistItem.setVesselAssignedTo(userRepository.findById(updateItemDTO.getVesselAssignedToId())
                 .orElseThrow(() -> new RuntimeException("User not found")));
         checklistItem = checklistItemRepository.save(checklistItem);
         return modelMapper.map(checklistItem, ChecklistItemDTO.class);

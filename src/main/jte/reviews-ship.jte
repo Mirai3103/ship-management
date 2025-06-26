@@ -168,6 +168,7 @@ content = @`
 
                             <th class="min-w-32">Người phụ trách</th>
                             <th class="text-center w-24">Đánh giá</th>
+                            <th class="min-w-32">Người đánh giá tàu</th>
                             <th class="min-w-32">Người phụ trách từ Cty</th>
                             <th class="text-center w-24">Đánh giá từ Cty</th>
                             <th class="min-w-32">Note</th>
@@ -177,7 +178,7 @@ content = @`
                         <template x-for="template in displayedTemplates" :key="template.id">
                             <tbody>
                             <tr class="bg-base-200 border-t-2 border-base-300 bg-base-400">
-                                <%-- 12 --%>
+                                <%-- 13 --%>
                                 <td colspan="5" class="p-4">
                                     <div class="flex items-center justify-start">
                                         <div class="flex items-center gap-4">
@@ -192,7 +193,7 @@ content = @`
                                 <td>
                                     YES-NO-N/A
                                 </td>
-                                <td colspan="2">
+                                <td colspan="3">
                                 </td>
                                 <td>
                                     YES-NO-N/A
@@ -262,6 +263,17 @@ content = @`
 
                                     <td>
                                         <div class="flex items-center gap-2">
+                                            <div>
+                                                <div class="text-xs font-medium"
+                                                     x-text="item.vesselAssignedToFullName"></div>
+                                                <div class="text-xs text-gray-500"
+                                                     x-text="item.vesselAssignedToRoleName"></div>
+                                            </div>
+                                        </div>
+                                    </td>
+
+                                    <td>
+                                        <div class="flex items-center gap-2">
 
                                             <div>
                                                 <div class="text-xs font-medium"
@@ -299,38 +311,26 @@ content = @`
                                                              file
 
                                                         </a></li>
-                                                    <%-- @if(rootRole != "ADMIN")
-                                                        <li><a :disabled="!isAllowReview(item)"
-                                                               @click="openReviewModal(item)" :class="{ 'text-error': !isAllowReview(item), 'text-success': isAllowReview(item) }">
-                                                               
-                                                             
-                                                                    <span x-show="!isAllowReview(item)"
-                                                                          class="text-error">Đã đánh giá</span>
-                                                                <span x-show="isAllowReview(item)"
-                                                                      class="text-success">Đánh giá</span>
-
-                                                            </a></li>
-                                                    @endif --%>
                                                     @if(Stream.of("ROLE_COMPANY").anyMatch(permissions::contains))
-                                                        <li><a @click="openReviewModal(item, 'SHIP')" class="text-warning" x-show="isAllowUserReview(item)">
+                                                        <li><a @click="openReviewModal(item, 'SHIP')" class="text-warning" x-show="isAllowUserReview(item,'SHIP')">
 
 
                                                                 Đánh giá tàu
 
                                                             </a></li>
-                                                        <li><a @click="openReviewModal(item, 'COMPANY')" class="text-warning" x-show="isAllowUserReview(item)">
+                                                        <li><a @click="openReviewModal(item, 'COMPANY')" class="text-warning" x-show="isAllowUserReview(item,'COMPANY')">
 
 
                                                                 Đánh giá từ Cty
 
                                                             </a></li>
-                                                        <li><a @click="openRequireModal(item)" class="text-warning" x-show="isAllowUserReview(item)">
+                                                        <li><a @click="openRequireModal(item)" class="text-warning" x-show="isAllowUserReview(item,'REQUIRE')">
 
 
                                                                 Yêu cầu
 
                                                             </a></li>
-                                                        <li><a @click="openNoteModal(item)" class="text-warning" x-show="isAllowUserReview(item)">
+                                                        <li><a @click="openNoteModal(item)" class="text-warning" x-show="isAllowUserReview(item,'NOTE')">
 
 
                                                                 Note
@@ -368,7 +368,7 @@ content = @`
                             </tbody>
                         </template>
                         <tr>
-                            <td colspan="12" class="h-20"></td>
+                            <td colspan="13" class="h-20"></td>
                         </tr>
 
 
@@ -558,6 +558,27 @@ content = @`
 
                         <div class="form-control">
                             <label class="label">
+                                <span class="label-text">Người đánh giá tàu <span class="text-error">*</span></span>
+                            </label>
+                            <select
+                                    class="select select-bordered"
+                                    :class="{ 'select-error': itemErrors.vesselAssignedToId }"
+                                    x-model="itemForm.vesselAssignedToId"
+                                    required
+                            >
+                                <option value="">Chọn người đánh giá</option>
+                                <template x-for="user in getCompanyUsers()" :key="user.id">
+                                    <option :value="user.id"
+                                            x-text="user.fullName + ' (' + user.roleName + ')'"></option>
+                                </template>
+                            </select>
+                            <label class="label" x-show="itemErrors.vesselAssignedToId">
+                                <span class="label-text-alt text-error" x-text="itemErrors.vesselAssignedToId"></span>
+                            </label>
+                        </div>
+
+                        <div class="form-control">
+                            <label class="label">
                                 <span class="label-text">Người phụ trách (Công ty) <span
                                             class="text-error">*</span></span>
                             </label>
@@ -654,6 +675,27 @@ content = @`
                             </select>
                             <label class="label" x-show="editItemErrors.assignedToId">
                                 <span class="label-text-alt text-error" x-text="editItemErrors.assignedToId"></span>
+                            </label>
+                        </div>
+
+                        <div class="form-control">
+                            <label class="label">
+                                <span class="label-text">Người đánh giá tàu <span class="text-error">*</span></span>
+                            </label>
+                            <select
+                                    class="select select-bordered"
+                                    :class="{ 'select-error': editItemErrors.vesselAssignedToId }"
+                                    x-model="editItemForm.vesselAssignedToId"
+                                    required
+                            >
+                                <option value="">Chọn người đánh giá</option>
+                                <template x-for="user in getCompanyUsers()" :key="user.id">
+                                    <option :value="user.id"
+                                            x-text="user.fullName + ' (' + user.roleName + ')'"></option>
+                                </template>
+                            </select>
+                            <label class="label" x-show="editItemErrors.vesselAssignedToId">
+                                <span class="label-text-alt text-error" x-text="editItemErrors.vesselAssignedToId"></span>
                             </label>
                         </div>
 

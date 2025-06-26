@@ -57,6 +57,7 @@ function reviewManager() {
             guide: '',
             orderNo: '',
             assignedToId: '',
+            vesselAssignedToId: '',
             comAssignedToId: ''
         },
         itemErrors: {},
@@ -73,6 +74,7 @@ function reviewManager() {
             guide: '',
             orderNo: '',
             assignedToId: '',
+            vesselAssignedToId: '',
             comAssignedToId: ''
         },
         type: 'NONE',
@@ -490,11 +492,18 @@ function reviewManager() {
             // }
             return true;
         },
-        isAllowUserReview(item) {
+        isAllowUserReview(item,type="COMPANY") {
             var currentUserId = window.currentUserId;
-            if (item.comAssignedToId == currentUserId) {
-                return true;
+            if (type == "COMPANY") {
+                return item.comAssignedToId == currentUserId;
+            } else if (type == "SHIP") {
+                return item.vesselAssignedToId == currentUserId;
+            } else if (type == "REQUIRE") {
+                return rootRole.includes("ADMIN")||rootRole.includes("COMPANY");
+            } else if (type == "NOTE") {
+                return rootRole.includes("ADMIN")||rootRole.includes("COMPANY");
             }
+         
             return false;
         },
 
@@ -570,6 +579,7 @@ function reviewManager() {
                 guide: '',
                 orderNo: '',
                 assignedToId: '',
+                vesselAssignedToId: '',
                 comAssignedToId: ''
             };
             this.itemErrors = {};
@@ -584,6 +594,7 @@ function reviewManager() {
                 guide: '',
                 orderNo: '',
                 assignedToId: '',
+                vesselAssignedToId: '',
                 comAssignedToId: ''
             };
             this.itemErrors = {};
@@ -645,6 +656,7 @@ function reviewManager() {
                 guide: item.guide || '',
                 orderNo: item.orderNo || '',
                 assignedToId: item.assignedToId || '',
+                vesselAssignedToId: item.vesselAssignedToId || '',
                 comAssignedToId: item.comAssignedToId || ''
             };
             this.editItemErrors = {};
@@ -659,6 +671,7 @@ function reviewManager() {
                 guide: '',
                 orderNo: '',
                 assignedToId: '',
+                vesselAssignedToId: '',
                 comAssignedToId: ''
             };
             this.editItemErrors = {};

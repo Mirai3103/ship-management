@@ -42,7 +42,11 @@ public class ChecklistItem {
 
     @ManyToOne
     @JoinColumn(name = "assigned_to")
-    private User assignedTo;
+    private User assignedTo; // this is for upload file
+
+    @ManyToOne
+    @JoinColumn(name = "vessel_assigned_to")
+    private User vesselAssignedTo; // this is for vessel review
 
     @Column(name = "vessel_result")
     private String vesselResult;

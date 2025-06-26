@@ -21,6 +21,12 @@ public class ChecklistItemDTO {
 
     private Long assignedToId;
 
+    private Long vesselAssignedToId;
+
+    private String vesselAssignedToFullName;
+    private String vesselAssignedToRoleName;
+    private String vesselAssignedToRoleRootRole;
+
     private String assignedToFullName;
     private String assignedToRoleName;
     private String assignedToRoleRootRole;

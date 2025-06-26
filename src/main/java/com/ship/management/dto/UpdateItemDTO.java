@@ -10,4 +10,5 @@ public class UpdateItemDTO {
     private Integer orderNo = 0;
     private Long assignedToId;
     private Long comAssignedToId;
+    private Long vesselAssignedToId;
 }
