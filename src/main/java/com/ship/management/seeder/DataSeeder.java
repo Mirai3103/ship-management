@@ -35,7 +35,8 @@ public class DataSeeder {
     private final boolean needSeed = false;
     @EventListener(ApplicationReadyEvent.class)
     public void seedData() {
-        if(!needSeed) return;
+        if(!
+        needSeed) return;
         if (roleRepository.count() == 0) {
 
             Role admin = Role.builder()
