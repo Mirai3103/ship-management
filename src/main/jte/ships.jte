@@ -634,7 +634,7 @@
 
                     closeViewModal() {
                         this.showViewModal = false;
-                        this.viewingShip = null;
+                        // this.viewingShip = null;
                         this.loadingShipDetail = false;
                     },
 

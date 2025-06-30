@@ -803,7 +803,7 @@
 
                     closeViewModal() {
                         this.showViewModal = false;
-                        this.viewingRole = null;
+                        // this.viewingRole = null;
                         this.viewingRolePermissions = [];
                     },
 

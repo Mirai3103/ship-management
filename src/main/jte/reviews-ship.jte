@@ -167,8 +167,9 @@ content = @`
                             <th class="min-w-32">Yêu cầu</th>
 
                             <th class="min-w-32">Người phụ trách</th>
-                            <th class="text-center w-24">Đánh giá</th>
                             <th class="min-w-32">Người đánh giá tàu</th>
+
+                            <th class="text-center w-24">Đánh giá</th>
                             <th class="min-w-32">Người phụ trách từ Cty</th>
                             <th class="text-center w-24">Đánh giá từ Cty</th>
                             <th class="min-w-32">Note</th>
@@ -190,10 +191,12 @@ content = @`
 
                                     </div>
                                 </td>
+                                <td colspan="2">
+                                </td>
                                 <td>
                                     YES-NO-N/A
                                 </td>
-                                <td colspan="3">
+                                <td colspan="1">
                                 </td>
                                 <td>
                                     YES-NO-N/A
@@ -250,6 +253,16 @@ content = @`
                                             </div>
                                         </div>
                                     </td>
+                                         <td>
+                                        <div class="flex items-center gap-2">
+                                            <div>
+                                                <div class="text-xs font-medium"
+                                                     x-text="item.vesselAssignedToFullName"></div>
+                                                <div class="text-xs text-gray-500"
+                                                     x-text="item.vesselAssignedToRoleName"></div>
+                                            </div>
+                                        </div>
+                                    </td>
                                     <td class="text-center tooltip" :data-tip="formatDate(item.vesselReviewAt)">
                     <span class="badge"
                           :class="{
@@ -261,16 +274,7 @@ content = @`
                     </span>
                                     </td>
 
-                                    <td>
-                                        <div class="flex items-center gap-2">
-                                            <div>
-                                                <div class="text-xs font-medium"
-                                                     x-text="item.vesselAssignedToFullName"></div>
-                                                <div class="text-xs text-gray-500"
-                                                     x-text="item.vesselAssignedToRoleName"></div>
-                                            </div>
-                                        </div>
-                                    </td>
+                               
 
                                     <td>
                                         <div class="flex items-center gap-2">

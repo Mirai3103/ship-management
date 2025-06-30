@@ -622,7 +622,7 @@
 
                     closeViewModal() {
                         this.showViewModal = false;
-                        this.viewingCompany = null;
+                        // this.viewingCompany = null;
                     },
 
                     editCompanyFromView() {

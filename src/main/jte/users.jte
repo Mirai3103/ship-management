@@ -742,7 +742,7 @@
 
                     closeViewModal() {
                         this.showViewModal = false;
-                        this.viewingUser = null;
+                        // this.viewingUser = null;
                         this.loadingUserDetail = false;
                     },
 
