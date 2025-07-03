@@ -21,8 +21,12 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -81,6 +85,7 @@ public class UserService implements UserDetailsService {
                 .build();
 
         User savedUser = userRepository.save(user);
+        this.updateUserOrderNo(savedUser.getId(), 999);
         return convertToDTO(savedUser);
     }
 
@@ -220,5 +225,53 @@ public class UserService implements UserDetailsService {
             return null;
         }
         return currentUser.getRole().getRootRole();
+    }
+
+    @Transactional
+    public void updateUserOrderNo(Long id, Integer orderNo) {
+        // Lấy toàn bộ users theo thứ tự
+        var allUsers = userRepository.findAllByOrderByOrderNoAsc();
+        allUsers.stream().forEach(user -> user.setOrderNo(Objects.isNull(user.getOrderNo()) ? 0 : user.getOrderNo()));
+        
+        // Tìm user cần thay đổi
+        var user = allUsers.stream()
+                .filter(item -> item.getId().equals(id))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("User not found"));
+    
+        int currentOrder = Objects.isNull(user.getOrderNo()) ? 0 : user.getOrderNo();
+        int newOrder = orderNo;
+    
+        // Giới hạn newOrder hợp lý
+        if (newOrder < 1) newOrder = 1;
+        if (newOrder > allUsers.size()) newOrder = allUsers.size();
+    
+        if (newOrder == currentOrder) return; // Không cần xử lý nếu không thay đổi
+    
+        for (var item : allUsers) {
+            // Di chuyển lên trên danh sách
+            if (newOrder < currentOrder) {
+                if (item.getOrderNo() >= newOrder && item.getOrderNo() < currentOrder) {
+                    item.setOrderNo(item.getOrderNo() + 1);
+                }
+            }
+            // Di chuyển xuống dưới danh sách
+            else {
+                if (item.getOrderNo() <= newOrder && item.getOrderNo() > currentOrder) {
+                    item.setOrderNo(item.getOrderNo() - 1);
+                }
+            }
+        }
+    
+        // Cập nhật order cho user cần di chuyển
+        user.setOrderNo(newOrder);
+    
+        // Lưu toàn bộ danh sách (có thể tối ưu chỉ lưu những item thực sự thay đổi)
+        // then re generate orderNo for all items start from 1
+        Collections.sort(allUsers, Comparator.comparingInt(User::getOrderNo));
+        for(int i = 0; i < allUsers.size(); i++){
+            allUsers.get(i).setOrderNo(i+1);
+        }
+        userRepository.saveAll(allUsers);
     }
 } 

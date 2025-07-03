@@ -77,6 +77,7 @@
                             <thead>
                                 <tr>
                                     <th>ID</th>
+                                    <th>Thứ tự</th>
                                     <th>Tên vai trò</th>
                                     <th>Mô tả</th>
                                     <th>Loại vai trò</th>
@@ -88,6 +89,11 @@
                                     <tr>
                                         <td>
                                             <span class="font-mono text-sm" x-text="role.id"></span>
+                                        </td>
+                                        <td>
+                                            <div class="flex items-center space-x-2">
+                                                <span class="badge badge-outline" x-text="role.orderNo || 'N/A'"></span>
+                                            </div>
                                         </td>
                                         <td>
                                             <div class="flex items-center space-x-3">
@@ -114,6 +120,9 @@
                                                 </button>
                                                 <button @click="editRole(role)" class="btn btn-ghost btn-xs tooltip" data-tip="Chỉnh sửa">
                                                     <i data-lucide="edit" class="w-3 h-3"></i>
+                                                </button>
+                                                <button @click="editOrderNo(role)" class="btn btn-ghost btn-xs tooltip" data-tip="Sửa thứ tự">
+                                                    <i data-lucide="arrow-up-down" class="w-3 h-3"></i>
                                                 </button>
                                                 <button @click="editRolePermissions(role)" class="btn btn-ghost btn-xs text-info tooltip" data-tip="Quản lý quyền">
                                                     <i data-lucide="shield" class="w-3 h-3"></i>
@@ -430,6 +439,57 @@
                 </div>
                 <div class="modal-backdrop" @click="closeViewModal()"></div>
             </div>
+
+            <!-- Edit Order Number Modal -->
+            <div class="modal" :class="{ 'modal-open': showOrderModal }">
+                <div class="modal-box">
+                    <h3 class="font-bold text-lg mb-4 flex items-center gap-2">
+                        <i data-lucide="arrow-up-down" class="w-5 h-5 text-primary"></i>
+                        Cập nhật thứ tự vai trò
+                    </h3>
+                    
+                    <div x-show="editingOrderRole" class="space-y-4">
+                        <div class="bg-base-200 p-4 rounded-lg">
+                            <h4 class="font-medium mb-2">Vai trò:</h4>
+                            <p class="text-lg font-semibold">
+                                <span class="badge badge-outline badge-lg" x-text="editingOrderRole?.name"></span>
+                            </p>
+                        </div>
+
+                        <form @submit.prevent="saveOrderNo()" class="space-y-4">
+                            <div class="form-control">
+                                <label class="label">
+                                    <span class="label-text">Thứ tự mới <span class="text-error">*</span></span>
+                                </label>
+                                <input 
+                                    type="number" 
+                                    placeholder="Nhập thứ tự mới" 
+                                    class="input input-bordered"
+                                    :class="{ 'input-error': orderErrors.orderNo }"
+                                    x-model.number="newOrderNo"
+                                    min="1"
+                                    required
+                                />
+                                <label class="label" x-show="orderErrors.orderNo">
+                                    <span class="label-text-alt text-error" x-text="orderErrors.orderNo"></span>
+                                </label>
+                                <label class="label">
+                                    <span class="label-text-alt">Thứ tự hiện tại: <span x-text="editingOrderRole?.orderNo || 'Chưa có'"></span></span>
+                                </label>
+                            </div>
+
+                            <div class="modal-action">
+                                <button type="button" class="btn btn-ghost" @click="closeOrderModal()">Hủy</button>
+                                <button type="submit" class="btn btn-primary" :disabled="savingOrder">
+                                    <span x-show="savingOrder" class="loading loading-spinner loading-sm"></span>
+                                    <span x-show="!savingOrder">Cập nhật thứ tự</span>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div class="modal-backdrop" @click="closeOrderModal()"></div>
+            </div>
         </div>
 
         @raw
@@ -501,6 +561,11 @@
                     showViewModal: false,
                     viewingRole: null,
                     viewingRolePermissions: [],
+                    showOrderModal: false,
+                    editingOrderRole: null,
+                    newOrderNo: 1,
+                    savingOrder: false,
+                    orderErrors: {},
 
                     async loadRoles() {
                         this.loading = true;
@@ -508,7 +573,7 @@
                             const params = new URLSearchParams({
                                 page: this.currentPage,
                                 size: this.pageSize,
-                                sort: 'id,asc'
+                                sort: 'orderNo,desc'
                             });
 
                             const response = await fetch('/api/roles?' + params);
@@ -816,6 +881,50 @@
                     getPermissionDescription(permissionKey) {
                         const permission = this.availablePermissions.find(p => p.key === permissionKey);
                         return permission ? permission.description : '';
+                    },
+
+                    editOrderNo(role) {
+                        this.editingOrderRole = role;
+                        this.newOrderNo = role.orderNo || 1;
+                        this.orderErrors = {};
+                        this.showOrderModal = true;
+                    },
+
+                    closeOrderModal() {
+                        this.showOrderModal = false;
+                        this.editingOrderRole = null;
+                        this.newOrderNo = 1;
+                        this.orderErrors = {};
+                    },
+
+                    async saveOrderNo() {
+                        this.savingOrder = true;
+                        this.orderErrors = {};
+
+                        try {
+                            const response = await fetch('/api/roles/' + this.editingOrderRole.id + '/order-no', {
+                                method: 'PATCH',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                },
+                                body: JSON.stringify({ orderNo: this.newOrderNo })
+                            });
+
+                            if (response.ok) {
+                                this.closeOrderModal();
+                                this.loadRoles();
+                                this.showNotification('success', `Đã cập nhật thứ tự cho vai trò "${this.editingOrderRole.name}" thành công`, 'check-circle');
+                            } else if (response.status === 400) {
+                                const errorData = await response.json();
+                                this.orderErrors.orderNo = errorData.message || 'Thứ tự không hợp lệ';
+                            } else {
+                                this.showNotification('error', 'Không thể cập nhật thứ tự vai trò', 'alert-triangle');
+                            }
+                        } catch (error) {
+                            this.showNotification('error', 'Lỗi kết nối: ' + error.message, 'alert-triangle');
+                        } finally {
+                            this.savingOrder = false;
+                        }
                     }
                 }
             }

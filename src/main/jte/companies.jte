@@ -77,6 +77,7 @@
                             <thead>
                                 <tr>
                                     <th>ID</th>
+                                    <th>Thứ tự</th>
                                     <th>Tên công ty</th>
                                     <th>Địa chỉ</th>
                                     <th>Điện thoại</th>
@@ -89,6 +90,11 @@
                                     <tr>
                                         <td>
                                             <span class="font-mono text-sm" x-text="company.id"></span>
+                                        </td>
+                                        <td>
+                                            <div class="flex items-center space-x-2">
+                                                <span class="badge badge-outline" x-text="company.orderNo || 'N/A'"></span>
+                                            </div>
                                         </td>
                                         <td>
                                             <div class="flex items-center space-x-3">
@@ -112,6 +118,9 @@
                                                 </button>
                                                 <button @click="editCompany(company)" class="btn btn-ghost btn-xs tooltip" data-tip="Chỉnh sửa">
                                                     <i data-lucide="edit" class="w-3 h-3"></i>
+                                                </button>
+                                                <button @click="editOrderNo(company)" class="btn btn-ghost btn-xs tooltip" data-tip="Sửa thứ tự">
+                                                    <i data-lucide="arrow-up-down" class="w-3 h-3"></i>
                                                 </button>
                                                 <button @click="deleteCompany(company)" class="btn btn-ghost btn-xs text-error tooltip" data-tip="Xóa">
                                                     <i data-lucide="trash-2" class="w-3 h-3"></i>
@@ -380,6 +389,55 @@
                 </div>
                 <div class="modal-backdrop" @click="closeViewModal()"></div>
             </div>
+
+            <!-- Edit Order Number Modal -->
+            <div class="modal" :class="{ 'modal-open': showOrderModal }">
+                <div class="modal-box">
+                    <h3 class="font-bold text-lg mb-4 flex items-center gap-2">
+                        <i data-lucide="arrow-up-down" class="w-5 h-5 text-primary"></i>
+                        Cập nhật thứ tự công ty
+                    </h3>
+                    
+                    <div x-show="editingOrderCompany" class="space-y-4">
+                        <div class="bg-base-200 p-4 rounded-lg">
+                            <h4 class="font-medium mb-2">Công ty:</h4>
+                            <p class="text-lg font-semibold" x-text="editingOrderCompany?.name"></p>
+                        </div>
+
+                        <form @submit.prevent="saveOrderNo()" class="space-y-4">
+                            <div class="form-control">
+                                <label class="label">
+                                    <span class="label-text">Thứ tự mới <span class="text-error">*</span></span>
+                                </label>
+                                <input 
+                                    type="number" 
+                                    placeholder="Nhập thứ tự mới" 
+                                    class="input input-bordered"
+                                    :class="{ 'input-error': orderErrors.orderNo }"
+                                    x-model.number="newOrderNo"
+                                    min="1"
+                                    required
+                                />
+                                <label class="label" x-show="orderErrors.orderNo">
+                                    <span class="label-text-alt text-error" x-text="orderErrors.orderNo"></span>
+                                </label>
+                                <label class="label">
+                                    <span class="label-text-alt">Thứ tự hiện tại: <span x-text="editingOrderCompany?.orderNo || 'Chưa có'"></span></span>
+                                </label>
+                            </div>
+
+                            <div class="modal-action">
+                                <button type="button" class="btn btn-ghost" @click="closeOrderModal()">Hủy</button>
+                                <button type="submit" class="btn btn-primary" :disabled="savingOrder">
+                                    <span x-show="savingOrder" class="loading loading-spinner loading-sm"></span>
+                                    <span x-show="!savingOrder">Cập nhật thứ tự</span>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div class="modal-backdrop" @click="closeOrderModal()"></div>
+            </div>
         </div>
 
         @raw
@@ -414,6 +472,11 @@
                     notifications: [],
                     showViewModal: false,
                     viewingCompany: null,
+                    showOrderModal: false,
+                    editingOrderCompany: null,
+                    newOrderNo: 1,
+                    savingOrder: false,
+                    orderErrors: {},
 
                     async loadCompanies() {
                         this.loading = true;
@@ -421,7 +484,7 @@
                             const params = new URLSearchParams({
                                 page: this.currentPage,
                                 size: this.pageSize,
-                                sort: 'id,asc'
+                                sort: 'orderNo,asc'
                             });
 
                             const response = await fetch('/api/companies?' + params);
@@ -643,6 +706,50 @@
 
                     copyCompanyInfo() {
                         this.copyToClipboard(this.viewingCompany.name + '\n' + this.viewingCompany.address + '\n' + this.viewingCompany.phone + '\n' + this.viewingCompany.email);
+                    },
+
+                    editOrderNo(company) {
+                        this.editingOrderCompany = company;
+                        this.newOrderNo = company.orderNo || 1;
+                        this.orderErrors = {};
+                        this.showOrderModal = true;
+                    },
+
+                    closeOrderModal() {
+                        this.showOrderModal = false;
+                        this.editingOrderCompany = null;
+                        this.newOrderNo = 1;
+                        this.orderErrors = {};
+                    },
+
+                    async saveOrderNo() {
+                        this.savingOrder = true;
+                        this.orderErrors = {};
+
+                        try {
+                            const response = await fetch('/api/companies/' + this.editingOrderCompany.id + '/order-no', {
+                                method: 'PATCH',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                },
+                                body: JSON.stringify({ orderNo: this.newOrderNo })
+                            });
+
+                            if (response.ok) {
+                                this.closeOrderModal();
+                                this.loadCompanies();
+                                this.showNotification('success', `Đã cập nhật thứ tự cho công ty "${this.editingOrderCompany.name}" thành công`, 'check-circle');
+                            } else if (response.status === 400) {
+                                const errorData = await response.json();
+                                this.orderErrors.orderNo = errorData.message || 'Thứ tự không hợp lệ';
+                            } else {
+                                this.showNotification('error', 'Không thể cập nhật thứ tự công ty', 'alert-triangle');
+                            }
+                        } catch (error) {
+                            this.showNotification('error', 'Lỗi kết nối: ' + error.message, 'alert-triangle');
+                        } finally {
+                            this.savingOrder = false;
+                        }
                     }
                 }
             }

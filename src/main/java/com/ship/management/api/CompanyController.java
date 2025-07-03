@@ -3,6 +3,9 @@ package com.ship.management.api;
 import com.ship.management.dto.CompanyDTO;
 import com.ship.management.service.CompanyService;
 import lombok.RequiredArgsConstructor;
+
+import java.util.Map;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -69,5 +72,11 @@ public class CompanyController {
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.notFound().build();
+    }
+
+    @PatchMapping("/{id}/order-no")
+    public ResponseEntity<Void> updateCompanyOrderNo(@PathVariable Long id, @RequestBody Map<String, Integer> requestBody) {
+        companyService.updateCompanyOrderNo(id, requestBody.get("orderNo"));
+        return ResponseEntity.noContent().build();
     }
 } 

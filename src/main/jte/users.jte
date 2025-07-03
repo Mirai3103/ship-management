@@ -77,6 +77,7 @@
                             <thead>
                                 <tr>
                                     <th>ID</th>
+                                    <th>Thứ tự</th>
                                     <th>Họ và tên</th>
                                     <th>Email</th>
                                     <th>Vai trò</th>
@@ -89,6 +90,11 @@
                                     <tr>
                                         <td>
                                             <span class="font-mono text-sm" x-text="user.id"></span>
+                                        </td>
+                                        <td>
+                                            <div class="flex items-center space-x-2">
+                                                <span class="badge badge-outline" x-text="user.orderNo || 'N/A'"></span>
+                                            </div>
                                         </td>
                                         <td>
                                             <div class="flex items-center space-x-3">
@@ -135,6 +141,12 @@
                                                         <a @click="editUser(user)">
                                                             <i data-lucide="edit" class="w-4 h-4"></i>
                                                             Chỉnh sửa
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a @click="editOrderNo(user)">
+                                                            <i data-lucide="arrow-up-down" class="w-4 h-4"></i>
+                                                            Sửa thứ tự
                                                         </a>
                                                     </li>
                                                     <li>
@@ -556,6 +568,62 @@
                 <div class="modal-backdrop" @click="showDeleteModal = false"></div>
             </div>
 
+            <!-- Edit Order Number Modal -->
+            <div class="modal" :class="{ 'modal-open': showOrderModal }">
+                <div class="modal-box">
+                    <h3 class="font-bold text-lg mb-4 flex items-center gap-2">
+                        <i data-lucide="arrow-up-down" class="w-5 h-5 text-primary"></i>
+                        Cập nhật thứ tự người dùng
+                    </h3>
+                    
+                    <div x-show="editingOrderUser" class="space-y-4">
+                        <div class="bg-base-200 p-4 rounded-lg">
+                            <h4 class="font-medium mb-2">Người dùng:</h4>
+                            <div class="flex items-center space-x-3">
+                                <div class="avatar">
+                                    <div class="w-8 h-8 rounded-full">
+                                        <img :src="'https://ui-avatars.com/api/?name=' + encodeURIComponent(editingOrderUser?.fullName) + '&background=0d9488&color=fff'" :alt="editingOrderUser?.fullName" />
+                                    </div>
+                                </div>
+                                <span class="text-lg font-semibold" x-text="editingOrderUser?.fullName"></span>
+                            </div>
+                        </div>
+
+                        <form @submit.prevent="saveOrderNo()" class="space-y-4">
+                            <div class="form-control">
+                                <label class="label">
+                                    <span class="label-text">Thứ tự mới <span class="text-error">*</span></span>
+                                </label>
+                                <input 
+                                    type="number" 
+                                    placeholder="Nhập thứ tự mới" 
+                                    class="input input-bordered"
+                                    :class="{ 'input-error': orderErrors.orderNo }"
+                                    x-model.number="newOrderNo"
+                                    min="1"
+                                    required
+                                />
+                                <label class="label" x-show="orderErrors.orderNo">
+                                    <span class="label-text-alt text-error" x-text="orderErrors.orderNo"></span>
+                                </label>
+                                <label class="label">
+                                    <span class="label-text-alt">Thứ tự hiện tại: <span x-text="editingOrderUser?.orderNo || 'Chưa có'"></span></span>
+                                </label>
+                            </div>
+
+                            <div class="modal-action">
+                                <button type="button" class="btn btn-ghost" @click="closeOrderModal()">Hủy</button>
+                                <button type="submit" class="btn btn-primary" :disabled="savingOrder">
+                                    <span x-show="savingOrder" class="loading loading-spinner loading-sm"></span>
+                                    <span x-show="!savingOrder">Cập nhật thứ tự</span>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div class="modal-backdrop" @click="closeOrderModal()"></div>
+            </div>
+
                         <div class="toast toast-top toast-end">
                 <template x-for="notification in notifications" :key="notification.id">
                     <div class="alert" :class="'alert-' + notification.type">
@@ -619,6 +687,11 @@
                     errors: {},
                     passwordErrors: {},
                     notifications: [],
+                    showOrderModal: false,
+                    editingOrderUser: null,
+                    newOrderNo: 1,
+                    savingOrder: false,
+                    orderErrors: {},
 
                     async loadUsers(search='') {
                         this.loading = true;
@@ -626,7 +699,7 @@
                             const params = new URLSearchParams({
                                 page: this.currentPage,
                                 size: this.pageSize,
-                                sort: 'id,asc',
+                                sort: 'orderNo,desc',
                                 search: search
                             });
 
@@ -930,6 +1003,50 @@
 
                     removeNotification(id) {
                         this.notifications = this.notifications.filter(n => n.id !== id);
+                    },
+
+                    editOrderNo(user) {
+                        this.editingOrderUser = user;
+                        this.newOrderNo = user.orderNo || 1;
+                        this.orderErrors = {};
+                        this.showOrderModal = true;
+                    },
+
+                    closeOrderModal() {
+                        this.showOrderModal = false;
+                        this.editingOrderUser = null;
+                        this.newOrderNo = 1;
+                        this.orderErrors = {};
+                    },
+
+                    async saveOrderNo() {
+                        this.savingOrder = true;
+                        this.orderErrors = {};
+
+                        try {
+                            const response = await fetch('/api/users/' + this.editingOrderUser.id + '/order-no', {
+                                method: 'PATCH',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                },
+                                body: JSON.stringify({ orderNo: this.newOrderNo })
+                            });
+
+                            if (response.ok) {
+                                this.closeOrderModal();
+                                this.loadUsers();
+                                this.showNotification('success', `Đã cập nhật thứ tự cho người dùng "${this.editingOrderUser.fullName}" thành công`, 'check-circle');
+                            } else if (response.status === 400) {
+                                const errorData = await response.json();
+                                this.orderErrors.orderNo = errorData.message || 'Thứ tự không hợp lệ';
+                            } else {
+                                this.showNotification('error', 'Không thể cập nhật thứ tự người dùng', 'alert-triangle');
+                            }
+                        } catch (error) {
+                            this.showNotification('error', 'Lỗi kết nối: ' + error.message, 'alert-triangle');
+                        } finally {
+                            this.savingOrder = false;
+                        }
                     }
                 }
             }

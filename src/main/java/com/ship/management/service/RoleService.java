@@ -17,6 +17,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -53,7 +56,7 @@ public class RoleService {
         Role role = convertToEntity(roleDTO);
         role.setId(null); // Ensure it's a new entity
         Role savedRole = roleRepository.save(role);
-
+        this.updateRoleOrderNo(savedRole.getId(), 999);
         return convertToDTO(savedRole);
     }
 
@@ -105,5 +108,53 @@ public class RoleService {
 
     private Role convertToEntity(RoleDTO roleDTO) {
         return modelMapper.map(roleDTO, Role.class);
+    }
+
+    @Transactional
+    public void updateRoleOrderNo(Long id, Integer orderNo) {
+        // Lấy toàn bộ roles theo thứ tự
+        var allRoles = roleRepository.findAllByOrderByOrderNoAsc();
+        allRoles.stream().forEach(role -> role.setOrderNo(Objects.isNull(role.getOrderNo()) ? 0 : role.getOrderNo()));
+        
+        // Tìm role cần thay đổi
+        var role = allRoles.stream()
+                .filter(item -> item.getId().equals(id))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("Role not found"));
+    
+        int currentOrder = Objects.isNull(role.getOrderNo()) ? 0 : role.getOrderNo();
+        int newOrder = orderNo;
+    
+        // Giới hạn newOrder hợp lý
+        if (newOrder < 1) newOrder = 1;
+        if (newOrder > allRoles.size()) newOrder = allRoles.size();
+    
+        if (newOrder == currentOrder) return; // Không cần xử lý nếu không thay đổi
+    
+        for (var item : allRoles) {
+            // Di chuyển lên trên danh sách
+            if (newOrder < currentOrder) {
+                if (item.getOrderNo() >= newOrder && item.getOrderNo() < currentOrder) {
+                    item.setOrderNo(item.getOrderNo() + 1);
+                }
+            }
+            // Di chuyển xuống dưới danh sách
+            else {
+                if (item.getOrderNo() <= newOrder && item.getOrderNo() > currentOrder) {
+                    item.setOrderNo(item.getOrderNo() - 1);
+                }
+            }
+        }
+    
+        // Cập nhật order cho role cần di chuyển
+        role.setOrderNo(newOrder);
+    
+        // Lưu toàn bộ danh sách (có thể tối ưu chỉ lưu những item thực sự thay đổi)
+        // then re generate orderNo for all items start from 1
+        Collections.sort(allRoles, Comparator.comparingInt(Role::getOrderNo));
+        for(int i = 0; i < allRoles.size(); i++){
+            allRoles.get(i).setOrderNo(i+1);
+        }
+        roleRepository.saveAll(allRoles);
     }
 } 

@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/roles")
@@ -84,6 +85,12 @@ public class RoleController {
         return roleService.editRolePermission(id, editRolePermissionDTO)
                 .map(role -> ResponseEntity.ok(role))
                 .orElse(ResponseEntity.notFound().build());
+    }
+
+    @PatchMapping("/{id}/order-no")
+    public ResponseEntity<Void> updateRoleOrderNo(@PathVariable Long id, @RequestBody Map<String, Integer> requestBody) {
+        roleService.updateRoleOrderNo(id, requestBody.get("orderNo"));
+        return ResponseEntity.noContent().build();
     }
 
 

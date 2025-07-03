@@ -1,5 +1,6 @@
 package com.ship.management.entity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -30,6 +31,11 @@ public class Role {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    
+    @Column(name = "order_no", nullable = true)
+    @Builder.Default
+    private Integer orderNo = 0;
+    
     private String name;
     private String description;
     private RootRole rootRole;

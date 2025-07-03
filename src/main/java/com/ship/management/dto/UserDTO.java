@@ -20,7 +20,9 @@ public class UserDTO {
     @Email(message = "Email không hợp lệ")
     @Size(max = 100, message = "Email không được quá 100 ký tự")
     private String email;
-    
+
+    private Integer orderNo = 99;
+
     private Long roleId;
     private String roleName;
     private Role.RootRole roleRootRole;

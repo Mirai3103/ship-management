@@ -23,6 +23,11 @@ public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    
+    @Column(name = "order_no", nullable = true)
+    @Builder.Default
+    private Integer orderNo = 0;
+    
     private String fullName;
     private String email;
     private String hashedPassword;

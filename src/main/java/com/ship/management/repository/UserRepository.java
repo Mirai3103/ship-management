@@ -22,5 +22,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     List<User> findByCompanyId(Long companyId);
     @Query("SELECT u FROM User u WHERE LOWER(u.fullName) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(u.email) LIKE LOWER(CONCAT('%', :search, '%'))")
     Page<User> findAllBySearch (String search, Pageable pageable);
+    
+    List<User> findAllByOrderByOrderNoAsc();
 
 }

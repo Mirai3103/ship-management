@@ -12,6 +12,8 @@ public class CompanyDTO {
     @NotBlank(message = "Tên công ty là bắt buộc")
     @Size(min = 1, max = 100, message = "Tên công ty phải từ 1 đến 100 ký tự")
     private String name;
+
+    private Integer orderNo=99;
     
     @NotBlank(message = "Địa chỉ là bắt buộc")
     @Size(min = 1, max = 255, message = "Địa chỉ phải từ 1 đến 255 ký tự")

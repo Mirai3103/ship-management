@@ -153,6 +153,12 @@ public class UserController {
         }
     }
 
+    @PatchMapping("/{id}/order-no")
+    public ResponseEntity<Void> updateUserOrderNo(@PathVariable Long id, @RequestBody Map<String, Integer> requestBody) {
+        userService.updateUserOrderNo(id, requestBody.get("orderNo"));
+        return ResponseEntity.noContent().build();
+    }
+
 
     public static class ErrorResponse {
         public String status;
